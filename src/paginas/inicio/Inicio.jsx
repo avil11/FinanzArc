@@ -6,7 +6,7 @@ const Home = () => {
           <div>
             <div>
                 <img src="https://drive.google.com/file/d/1XufqgjkSSAfcjWAXHkdmVo9_A8i3qr4N/view?usp=sharing"  />
-                <h1>COMISTEEEEEE</h1>
+                <h1>Puto el que lee,  COMISTEEEEEE</h1>
               </div>
 
             </div>  
