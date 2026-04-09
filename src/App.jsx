@@ -1,9 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './componentes/Navbar';
-import Home from './paginas/Inicio';
-import Registro from './paginas/Registro';
-import Exito from './paginas/Exito';
-import Principal from './paginas/Principal';
+import Home from './paginas/Inicio/Inicio';
+import Registro from './paginas/inicio/InicioSesion/InicioSesion';
+import Principal from './paginas/Principal/Principal';
 
 function App() {
   return (
@@ -12,7 +11,6 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/registro" element={<Registro />} />
-        <Route path="/exito" element={<Exito />} />
         <Route path="/dashboard" element={<div style={{padding: '50px'}}><h1>Bienvenido a tu Panel</h1></div>} />
         <Route path="/principal" element={<Principal />} /> 
       </Routes>
