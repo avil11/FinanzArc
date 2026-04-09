@@ -1,0 +1,82 @@
+/* Contenedor principal del Main */
+.containerInicio {
+    max-width: 1210px;
+    margin: 0 auto; /* Centra todo el contenido */
+    padding: 20px;
+    background-color: #121212; /* Fondo oscuro que coincide con el Navbar */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Contenedor de la imagen principal (Hero) */
+.contenedorBackground {
+    width: 100%;
+    position: relative;
+    border-radius: 40px;
+    overflow: hidden;
+    background-color: #0c0c0d; /* Asegura fondo oscuro detrás */
+    
+    /* Borde fino para dar definición al borde redondeado */
+    border: 1px solid rgba(200, 178, 119, 0.3); 
+
+    /* --- VALORES DE TU FIGMA --- */
+    /* Position X: 5px | Position Y: 5px | Blur: 10px | Spread: 0 | Color: Oro */
+    box-shadow: 5px 5px 10px 0px rgba(200, 178, 119, 0.5);
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.contenedorBackground {
+    margin-bottom: 20px; /* Espacio para que luzca la sombra */
+}
+.contenedorBackground img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+/* Contenedor de la sección de logos/iconos */
+.contenedorLogos {
+    width: 100%;
+    padding: 5px;
+    padding-bottom: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.logos {
+    display: flex;
+    justify-content: space-around; /* Distribuye los iconos uniformemente */
+    align-items: center;
+    width: 100%;
+    max-width: 1100px; /* Un poco más ancho para aprovechar el espacio */
+}
+
+/* Estilo específico para los iconos */
+.logos img {
+    width: 140px; /* Requerimiento: 150 de ancho */
+    object-fit: contain; /* Asegura que el logo no se deforme */
+    opacity: 1; /* Opacidad total para que se vean sus colores originales */
+    transition: transform 0.3s ease;
+}
+
+.logos img:hover {
+    transform: scale(1.05); /* Ligero aumento de tamaño al pasar el mouse */
+    
+}
+
+/* Responsivo para móviles */
+@media (max-width: 768px) {
+    .logos {
+        flex-wrap: wrap; /* En móviles se acomodan en varias filas */
+        gap: 20px;
+        justify-content: center;
+    }
+    
+    .logos img {
+        width: 120px; /* Más pequeños en pantallas chicas */
+        height: 56px;
+    }
+}

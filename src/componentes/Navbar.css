@@ -1,0 +1,95 @@
+/* Reset básico para asegurar consistencia */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* El elemento <nav> que contiene todo el menú */
+nav {
+    background-color: #121212; /* Fondo negro muy oscuro */
+    width: 100%;
+    height: 80px; /* Altura de la barra de navegación */
+    display: flex;
+    justify-content: center; /* Centra el contenido horizontalmente */
+    align-items: center; /* Centra el contenido verticalmente */
+    color: #e3e3e3; /* Color de texto base claro */
+}
+
+/* El div contenedor interno que limita el ancho máximo */
+nav > div {
+
+    max-width: 1210px; /* Requerimiento: Ancho máximo de 1210px */
+    width: 100%;
+    display: flex;
+    justify-content: space-between; /* Espacia el logo, menú y botón */
+    align-items: center;
+    padding: 0 20px; /* Espaciado interno lateral */
+}
+
+/* --- Contenedor del Título/Logo --- */
+.Titulo {
+    display: flex;
+    align-items: center;
+}
+
+.Titulo p {
+    font-size: 1.1rem; /* Tamaño de fuente del logo */
+    font-weight: 600; /* Grosor de fuente medio-alto */
+    letter-spacing: 0.5px; /* Ligero espaciado entre letras */
+    text-transform: capitalize; /* Asegura mayúsculas iniciales si no están en el texto original */
+}
+
+/* --- Contenedor de los enlaces del menú central --- */
+.BotonesNav {
+    height: 60px;
+    display: flex;
+    background-color: #272626; /* Fondo gris oscuro de la píldora central */
+    padding: 8px 12px; /* Espaciado interno de la píldora */
+    border-radius: 20px; /* Bordes muy redondeados tipo píldora */
+    gap: 5px; /* Espacio entre los enlaces internos */
+
+    transition: box-shadow 0.2s ease; /* Transición suave para el hover */
+}
+
+.BotonesNav:hover{
+    box-shadow: 0px 4px 6px #c8b27762 ;
+}
+
+/* Estilo para los enlaces <Link> dentro del menú central */
+.BotonesNav a {
+    text-decoration: none; /* Quita el subrayado predeterminado */
+    color: #ffffffd8; /* Color de texto gris más claro para los enlaces inactivos */
+    padding: 8px 16px; /* Espaciado interno de cada enlace para la zona de clic */
+    border-radius: 15px; /* Bordes redondeados sutiles */
+    transition: background-color 0.2s ease, color 0.2s ease; /* Transición suave para el hover */
+}
+
+
+/* Estilo para el botón de Iniciar Sesión */
+.BotonLogin {
+    font-size: 16px;
+    height: 60px;
+    background-color: #242425; /* Fondo gris oscuro diferente del menú central */
+    color: #ffffffd8; /* Texto blanco */
+    border: none; /* Sin borde predeterminado */
+    padding: 12px 24px; /* Espaciado interno del botón */
+    border-radius: 20px; /* Bordes muy redondeados tipo píldora */
+    font-weight: 500; /* Grosor de fuente medio */
+    cursor: pointer; /* Cambia el cursor a mano al pasar por encima */
+    transition: box-shadow 0.2s ease; /* Transición suave para el hover */
+}
+.BotonLogin:hover {
+    box-shadow: 0px 4px 6px #c8b27762 ;
+}
+
+/* Efecto active (al hacer clic) para el botón de Login */
+.BotonLogin:active {
+    background-color: #1e1e1f; /* Fondo un poco más oscuro al presionar */
+    transform: translateY(1px); /* Ligero movimiento hacia abajo para feedback */
+}
+.BotonesNav:active{
+    background-color: #1e1e1f; /* Fondo un poco más oscuro al presionar */
+    transform: translateY(1px); /* Ligero movimiento hacia abajo para feedback */
+}

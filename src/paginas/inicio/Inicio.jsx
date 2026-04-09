@@ -1,16 +1,46 @@
 import React from 'react';
+import "./Inicio.css"; // Un solo punto significa "aquí mismo"
 
 const Home = () => {
     return (
-        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh'}}>
-          <div>
-            <div>
-                <img src="https://drive.google.com/file/d/1XufqgjkSSAfcjWAXHkdmVo9_A8i3qr4N/view?usp=sharing"  />
-                <h1>Concha rica y peludita </h1>
-              </div>
+        <div>
+            <div className='containerInicio'>
+                <div className='contenedorBackground'> <img src="/public/Imagenes/Gemini_Generated_Image_ebcj9lebcj9lebcj.png" alt="Not Found" /></div>
+                <div className='contenedorLogos'>
+                    <div className='logos'>
+                        <img src="/public/Imagenes/Logo 1.png" alt="Not Found" />
+                        <img src="/public/Imagenes/Logo 2.png" alt="Not Found" />
+                        <img src="/public/Imagenes/Logo 3.png" alt="Not Found" />
+                        <img src="/public/Imagenes/Logo 4.png" alt="Not Found" />
+                    </div>
+                </div>
+            </div>
+            <div className='containerServicio'>
+                    <div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div>
+                        <div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                    </div>
+            </div>
+            <div className='containerSobreNosotros'>
 
-            </div>  
+            </div>
+            <div className="ContainerTarjetas">
 
+            </div>
+            <div className='containerContactanos'>
+
+            </div>
         </div>
     );
 }
