@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './componentes/Navbar';
 import Home from './paginas/Inicio/Inicio';
 import Registro from './paginas/inicio/InicioSesion/InicioSesion';
-import Principal from './paginas/GastoIngreso/GastoIngreso';
+import Principal from './paginas/Principal/General/General';
 
 function App() {
   return (
