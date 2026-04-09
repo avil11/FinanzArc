@@ -3,6 +3,11 @@ import Navbar from './componentes/Navbar';
 import Home from './paginas/Inicio/Inicio';
 import Registro from './paginas/inicio/InicioSesion/InicioSesion';
 import Principal from './paginas/Principal/General/General';
+import Ahorro from "./paginas/Principal/Ahorro/Ahorro";
+import Ingreso from './paginas/Principal/Ingreso/Ingreso';
+import Gasto from './paginas/Principal/Gasto/Gasto';
+import Perfil from './paginas/perfil/Perfil';
+
 
 function App() {
   return (
@@ -13,6 +18,10 @@ function App() {
         <Route path="/registro" element={<Registro />} />
         <Route path="/dashboard" element={<div style={{padding: '50px'}}><h1>Bienvenido a tu Panel</h1></div>} />
         <Route path="/principal" element={<Principal />} /> 
+        <Route path="/ahorro" element={<Ahorro />} />
+        <Route path="/ingreso" element={<Ingreso />} />
+        <Route path="/gasto" element={<Gasto />} />
+        <Route path="/perfil" element={<Perfil />} />
       </Routes>
     </BrowserRouter>
   );

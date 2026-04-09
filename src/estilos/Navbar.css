@@ -1,21 +1,14 @@
-.BotonInicio {
-    margin: auto;
+.ContenedorNavbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 10px 20px;
-    color: var(--crisp-white);
-    text-decoration: none;
-    font-size: 14px;
-    animation: alternate 1s fadeIn;
-    border-radius: 10px;
-    transition-duration: 300ms;
-    background-color: rgba(255, 255, 255, 0.075);
-}
-.BotonInicio:hover {
-    color: rgb(197, 160, 95);
-    background-color: rgb(71, 75, 78);
 
-}   
-.BotonServicios {
-    margin: auto;
+    box-shadow: 0px 4px 4px rgba(197, 160, 95, 0.2);
+}
+
+.Links{
+      margin: auto;
     padding: 10px 20px;
     color: var(--crisp-white);
     text-decoration: none;
@@ -23,13 +16,15 @@
     animation: alternate 1s fadeIn;
     transition-duration: 300ms;
     background-color: rgba(255, 255, 255, 0.075);
+    border-radius: 10px;
 }
-.BotonServicios:hover {
-    color: rgb(197, 160, 95);
-    background-color: rgb(71, 75, 78);
-
+.Titulo {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--crisp-white);
+    animation: alternate 1s fadeIn;
 }
-.BotonSobreNosotros {
+.Boton {
     margin: auto;
     padding: 10px 20px;
     color: var(--crisp-white);
@@ -40,25 +35,9 @@
     transition-duration: 300ms;
 
 }
-.BotonSobreNosotros:hover {
-    color: rgb(197, 160, 95);
-    background-color: rgb(71, 75, 78);
-}
-.BotonContacto {
-
-    padding: 10px 20px;
-    color: var(--crisp-white);
-    text-decoration: none;
-    font-size: 14px;
-    animation: alternate 1s fadeIn;
-    border-radius: 10px;
-    transition-duration: 300ms;
-
-}
-.BotonContacto:hover {
-    color: rgb(197, 160, 95);
-    background-color: rgb(71, 75, 78);
-
+.Boton:active {
+    color: rgb(122, 97, 57);
+    background-color: rgb(63, 65, 68);
 }
 .BotonLogin {
     margin: auto;
@@ -66,13 +45,12 @@
     color: var(--crisp-white);
     text-decoration: none;
     font-size: 14px;
-    margin-right: 25px;
     animation: alternate 1s fadeIn;
     border-radius: 10px;
     transition-duration: 300ms;
+    border: 0cap;
 }
-.BotonLogin:hover {
-    color: black;
-    background-color: rgb(197, 160, 95);
-    transition-duration: 300ms;
+.BotonLogin:active {
+    color: rgb(122, 97, 57);
+    background-color: rgb(63, 65, 68);
 }
