@@ -1,18 +1,12 @@
 import React from 'react';
 
-const Home = () => {
-    return (
-        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh'}}>
-          <div>
-            <div>
-                <img src="https://drive.google.com/file/d/1XufqgjkSSAfcjWAXHkdmVo9_A8i3qr4N/view?usp=sharing"  />
-                <h1>Puto el que lee,  COMISTEEEEEE</h1>
-              </div>
-
-            </div>  
-
-        </div>
-    );
+function Inicio() {
+  return (
+    <div style={{ padding: '50px', textAlign: 'center' }}>
+      <h1>Puto el que leeee</h1>
+      <p>Comiste Gordita</p>
+    </div>
+  );
 }
 
-export default Home;
+export default Inicio;  
