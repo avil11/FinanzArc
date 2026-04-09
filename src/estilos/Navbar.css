@@ -15,7 +15,7 @@
 
 }   
 .BotonServicios {
-     margin: auto;
+    margin: auto;
     padding: 10px 20px;
     color: var(--crisp-white);
     text-decoration: none;
@@ -30,7 +30,7 @@
 
 }
 .BotonSobreNosotros {
-      margin: auto;
+    margin: auto;
     padding: 10px 20px;
     color: var(--crisp-white);
     text-decoration: none;
@@ -68,7 +68,7 @@
     font-size: 14px;
     margin-right: 25px;
     animation: alternate 1s fadeIn;
-    border-radius-left: 10px;
+    border-radius: 10px;
     transition-duration: 300ms;
 }
 .BotonLogin:hover {
