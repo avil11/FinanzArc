@@ -13,11 +13,12 @@ const Inicio = () => {
           />
         </div>
         <div className="contenedorLogos">
+          <h1>RAMI PUTO</h1>
           <div className="logos">
-            <img src="/public/Imagenes/Logo 1.png" alt="Not Found" />
-            <img src="/public/Imagenes/Logo 2.png" alt="Not Found" />
-            <img src="/public/Imagenes/Logo 3.png" alt="Not Found" />
-            <img src="/public/Imagenes/Logo 4.png" alt="Not Found" />
+            <img src="/Imagenes/Logo 1.png" alt="Not Found" />
+            <img src="/Imagenes/Logo 2.png" alt="Not Found" />
+            <img src="/Imagenes/Logo 3.png" alt="Not Found" />
+            <img src="/Imagenes/Logo 4.png" alt="Not Found" />
           </div>
         </div>
       </div>
