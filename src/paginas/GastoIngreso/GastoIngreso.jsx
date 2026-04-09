@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell } from 'recharts';
 
-const Principal = () => {
+const GastoIngreso = () => {
     const navigate = useNavigate();
     const userName = "Pepe Ramirez";
     const saludar = "¡Bienvenido de nuevo, ";
@@ -60,4 +60,4 @@ return (
 
 }
 
-export default Principal;
+export default GastoIngreso;
