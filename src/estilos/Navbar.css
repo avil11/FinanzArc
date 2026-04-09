@@ -1,0 +1,78 @@
+.BotonInicio {
+    margin: auto;
+    padding: 10px 20px;
+    color: var(--crisp-white);
+    text-decoration: none;
+    font-size: 14px;
+    animation: alternate 1s fadeIn;
+    border-radius: 10px;
+    transition-duration: 300ms;
+    background-color: rgba(255, 255, 255, 0.075);
+}
+.BotonInicio:hover {
+    color: rgb(197, 160, 95);
+    background-color: rgb(71, 75, 78);
+
+}   
+.BotonServicios {
+     margin: auto;
+    padding: 10px 20px;
+    color: var(--crisp-white);
+    text-decoration: none;
+    font-size: 14px;
+    animation: alternate 1s fadeIn;
+    transition-duration: 300ms;
+    background-color: rgba(255, 255, 255, 0.075);
+}
+.BotonServicios:hover {
+    color: rgb(197, 160, 95);
+    background-color: rgb(71, 75, 78);
+
+}
+.BotonSobreNosotros {
+      margin: auto;
+    padding: 10px 20px;
+    color: var(--crisp-white);
+    text-decoration: none;
+    font-size: 14px;
+    animation: alternate 1s fadeIn;
+    border-radius: 10px;
+    transition-duration: 300ms;
+
+}
+.BotonSobreNosotros:hover {
+    color: rgb(197, 160, 95);
+    background-color: rgb(71, 75, 78);
+}
+.BotonContacto {
+
+    padding: 10px 20px;
+    color: var(--crisp-white);
+    text-decoration: none;
+    font-size: 14px;
+    animation: alternate 1s fadeIn;
+    border-radius: 10px;
+    transition-duration: 300ms;
+
+}
+.BotonContacto:hover {
+    color: rgb(197, 160, 95);
+    background-color: rgb(71, 75, 78);
+
+}
+.BotonLogin {
+    margin: auto;
+    padding: 10px 20px;
+    color: var(--crisp-white);
+    text-decoration: none;
+    font-size: 14px;
+    margin-right: 25px;
+    animation: alternate 1s fadeIn;
+    border-radius-left: 10px;
+    transition-duration: 300ms;
+}
+.BotonLogin:hover {
+    color: black;
+    background-color: rgb(197, 160, 95);
+    transition-duration: 300ms;
+}
