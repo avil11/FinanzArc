@@ -1,82 +1,151 @@
-/* Contenedor principal del Main */
-.containerInicio {
+/* Reset y Tipografía Unificada */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    /* Aplicamos la misma fuente a toda la web */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Contenedor padre para centrar todas las secciones */
+.main-wrapper {
     max-width: 1210px;
-    margin: 0 auto; /* Centra todo el contenido */
-    padding: 20px;
-    background-color: #121212; /* Fondo oscuro que coincide con el Navbar */
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #121212;
+}
+
+/* --- SECCIÓN HERO --- */
+.containerInicio {
+    width: 100%;
+    margin-top: 40px;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* Contenedor de la imagen principal (Hero) */
 .contenedorBackground {
     width: 100%;
-    position: relative;
     border-radius: 40px;
     overflow: hidden;
-    background-color: #0c0c0d; /* Asegura fondo oscuro detrás */
-    
-    /* Borde fino para dar definición al borde redondeado */
-    border: 1px solid rgba(200, 178, 119, 0.3); 
-
-    /* --- VALORES DE TU FIGMA --- */
-    /* Position X: 5px | Position Y: 5px | Blur: 10px | Spread: 0 | Color: Oro */
+    border: 1px solid rgba(200, 178, 119, 0.3);
     box-shadow: 5px 5px 10px 0px rgba(200, 178, 119, 0.5);
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin-bottom: 30px;
 }
-.contenedorBackground {
-    margin-bottom: 20px; /* Espacio para que luzca la sombra */
-}
+
 .contenedorBackground img {
     width: 100%;
     height: auto;
     display: block;
     object-fit: cover;
 }
-/* Contenedor de la sección de logos/iconos */
-.contenedorLogos {
-    width: 100%;
-    padding: 5px;
-    padding-bottom: 20px;
-    display: flex;
-    justify-content: center;
-}
 
 .logos {
     display: flex;
-    justify-content: space-around; /* Distribuye los iconos uniformemente */
+    justify-content: space-between;
     align-items: center;
     width: 100%;
-    max-width: 1100px; /* Un poco más ancho para aprovechar el espacio */
+    max-width: 1000px;
 }
 
-/* Estilo específico para los iconos */
 .logos img {
-    width: 140px; /* Requerimiento: 150 de ancho */
-    object-fit: contain; /* Asegura que el logo no se deforme */
-    opacity: 1; /* Opacidad total para que se vean sus colores originales */
-    transition: transform 0.3s ease;
+    width: 140px;
+    transition: transform 0.3s ease, opacity 0.3s;
 }
 
 .logos img:hover {
-    transform: scale(1.05); /* Ligero aumento de tamaño al pasar el mouse */
-    
+    transform: scale(1.1);
+    opacity: 1;
 }
 
-/* Responsivo para móviles */
-@media (max-width: 768px) {
-    .logos {
-        flex-wrap: wrap; /* En móviles se acomodan en varias filas */
-        gap: 20px;
-        justify-content: center;
-    }
-    
-    .logos img {
-        width: 120px; /* Más pequeños en pantallas chicas */
-        height: 56px;
-    }
+/* --- SECCIÓN SERVICIOS --- */
+.containerServicio {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 80px;
+    margin-top: 20px;
+    width: 100%;
+    border-top: 1px solid rgba(255, 255, 255, 0.2); /* Borde suavizado */
+    padding: 50px 5px 5px 5px;
+}
+
+.containerProyecto {
+    flex: 1;
+    max-width: 480px;
+    /* Asegura que el texto comience alineado arriba */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Alineación de H1 */
+.containerProyecto h1 {
+    font-size: 2.8rem;
+    font-weight: 100; /* Un poco más de peso para jerarquía */
+    line-height: 1.1; /* Ajuste para que no haya mucho espacio entre líneas del título */
+    margin-bottom: 20px;
+    color: #ffffff;
+    text-align: left;
+}
+
+/* Alineación de Párrafo Principal */
+.containerProyecto p {
+    color: #6C6C6C;
+    font-size: 1rem;
+    line-height: 1.6; /* Altura de línea óptima para lectura */
+    text-align: left;
+}
+
+.containerProyecto img {
+    width: 100%;
+    border-radius: 30px;
+    border: 1px solid rgba(200, 178, 119, 0.3);
+    box-shadow: 5px 5px 15px rgba(200, 178, 119, 0.2);
+    margin-top: 30px;
+}
+
+.containerTarjetas {
+    flex: 1.2;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.containerTarjetas1, .containerTarjetas2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+/* Línea divisoria */
+.containerTarjetas1 {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 40px;
+}
+
+/* Alineación de H4 en Tarjetas */
+.containerTarjetas h4 {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin: 15px 0 10px 0; /* Ajuste de margen inferior */
+    color: #ffffff;
+    text-align: left;
+}
+
+/* Alineación de P en Tarjetas */
+.containerTarjetas p {
+    font-size: 1rem;
+    color: #6C6C6C;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.containerTarjetas img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain; /* Para que no se deformen los logos */
 }

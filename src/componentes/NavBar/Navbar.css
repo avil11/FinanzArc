@@ -19,7 +19,7 @@ nav {
 
 /* El div contenedor interno que limita el ancho máximo */
 nav > div {
-
+    margin-top: 20px;
     max-width: 1210px; /* Requerimiento: Ancho máximo de 1210px */
     width: 100%;
     display: flex;
