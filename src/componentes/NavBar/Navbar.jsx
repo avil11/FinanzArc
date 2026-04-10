@@ -1,38 +1,57 @@
 import { Link, useNavigate } from "react-router-dom";
 import "../NavBar/Navbar.css";
+
 const Navbar = () => {
   const navigate = useNavigate();
 
-  function revisarLogin() {
+  const revisarLogin = () => {
     const token = localStorage.getItem("token");
-    return !!token; // Devuelve true si el token existe, false si no
-  }
-  function handleLoginClick() {
+    return !!token;
+  };
+
+  const handleLoginClick = () => {
     if (revisarLogin()) {
-      navigate("/dashboard"); // Redirige al dashboard si el usuario ya ha iniciado sesión
+      navigate("/dashboard");
     } else {
-      navigate("/registro"); // Redirige a la página de registro si no ha iniciado sesión
+      navigate("/registro");
     }
-  }
+  };
+
   return (
-    <nav className="layout-container">
-      <div>
-        <div className="Titulo">
-          <p>FinanzARC</p>
+    <header className="navbar-container">
+      <nav className="nav-content">
+        {/* Logo */}
+        <div className="logo-section">
+          <p className="logo-text">FinanzARC</p>
+          
         </div>
-        <div className="BotonesNav">
-          <Link to="/" className="BotonInicio">Inicio</Link>
-          <Link to="/servicios" className="BotonServicios">Servicios</Link>
-          <Link to="/sobre-nosotros" className="BotonSobreNosotros">Sobre Nosotros</Link>
-          <Link to="/contacto" className="BotonContacto"> Contactanos</Link>
+
+        {/* Menú Central (Píldora) */}
+        <div className="menu-pill">
+          <Link to="/" className="nav-link">
+            Inicio
+          </Link>
+          <Link to="/servicios" className="nav-link">
+            Servicios
+          </Link>
+          <Link to="/propuesta" className="nav-link">
+            Propuesta
+          </Link>
+          <Link to="/contacto" className="nav-link">
+            Contactanos
+          </Link>
         </div>
-        <div className="BotonInicio">
-          <button onClick={() => navigate("/registro")} className="BotonLogin">
-            Iniciar Sesion
-          </button>
+
+        {/* Sección Acceso con estilo Píldora */}
+        <div className="auth-section">
+          <div className="auth-pill">
+            <button onClick={handleLoginClick} className="login-button">
+              {revisarLogin() ? "Ir al Dashboard" : "Iniciar Sesión"}
+            </button>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
 };
 

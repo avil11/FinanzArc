@@ -72,7 +72,9 @@ const Inicio = () => {
       </div>
 
       {/* Espacios para futuras secciones */}
-      <div className="containerSobreNosotros"></div>
+      <div className="containerSobreNosotros">
+        
+      </div>
       <div className="containerContactanos"></div>
     </div>
   );

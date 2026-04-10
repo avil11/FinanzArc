@@ -1,95 +1,106 @@
-/* Reset básico para asegurar consistencia */
+/* Reset y Base */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Inter', -apple-system, sans-serif;
 }
 
-/* El elemento <nav> que contiene todo el menú */
-nav {
-    background-color: #121212; /* Fondo negro muy oscuro */
+.navbar-container {
     width: 100%;
-    height: 80px; /* Altura de la barra de navegación */
+    background-color: #000000; /* Fondo oscuro total */
     display: flex;
-    justify-content: center; /* Centra el contenido horizontalmente */
-    align-items: center; /* Centra el contenido verticalmente */
-    color: #e3e3e3; /* Color de texto base claro */
+    justify-content: center;
+    align-items: center;
+    height: 90px; /* Un poco más de aire */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-/* El div contenedor interno que limita el ancho máximo */
-nav > div {
-    margin-top: 20px;
-    max-width: 1210px; /* Requerimiento: Ancho máximo de 1210px */
+.nav-content {
+    background-color: #121212;
     width: 100%;
+    height: 90px;
+    max-width: 1210px;
     display: flex;
-    justify-content: space-between; /* Espacia el logo, menú y botón */
+    justify-content: space-between;
     align-items: center;
-    padding: 0 20px; /* Espaciado interno lateral */
+    padding: 0 20px;
 }
 
-/* --- Contenedor del Título/Logo --- */
-.Titulo {
+/* --- Logo --- */
+.logo-text {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+/* --- Menú Central Estilo Píldora --- */
+.menu-pill {
     display: flex;
+    background-color: #272626;
+    padding: 6px;
+    border-radius: 50px; /* Forma de píldora perfecta */
+    gap: 5px;
+    transition: box-shadow 0.3s ease;
     align-items: center;
 }
 
-.Titulo p {
-    font-size: 1.1rem; /* Tamaño de fuente del logo */
-    font-weight: 600; /* Grosor de fuente medio-alto */
-    letter-spacing: 0.5px; /* Ligero espaciado entre letras */
-    text-transform: capitalize; /* Asegura mayúsculas iniciales si no están en el texto original */
+.menu-pill:hover {
+    box-shadow: 0px 0px 15px rgba(200, 178, 119, 0.2);
 }
 
-/* --- Contenedor de los enlaces del menú central --- */
-.BotonesNav {
-    height: 60px;
+.nav-link {
+    text-decoration: none;
+    color: #ffffffd8;
+    padding: 10px 20px;
+    border-radius: 40px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    background-color: #3d3c3c;
+    color: #ffffff;
+}
+
+/* --- Sección Acceso (Copia fiel de la Píldora) --- */
+.auth-pill {
     display: flex;
-    background-color: #272626; /* Fondo gris oscuro de la píldora central */
-    padding: 8px 12px; /* Espaciado interno de la píldora */
-    border-radius: 20px; /* Bordes muy redondeados tipo píldora */
-    gap: 5px; /* Espacio entre los enlaces internos */
-
-    transition: box-shadow 0.2s ease; /* Transición suave para el hover */
+    background-color: #272626; /* Mismo gris que el menú central */
+    padding: 6px;
+    border-radius: 50px;
+    transition: box-shadow 0.3s ease;
+    align-items: center;
 }
 
-.BotonesNav:hover{
-    box-shadow: 0px 4px 6px #c8b27762 ;
+/* Mismo efecto hover que el menú central */
+.auth-pill:hover {
+    box-shadow: 0px 0px 15px rgba(200, 178, 119, 0.2);
 }
 
-/* Estilo para los enlaces <Link> dentro del menú central */
-.BotonesNav a {
-    text-decoration: none; /* Quita el subrayado predeterminado */
-    color: #ffffffd8; /* Color de texto gris más claro para los enlaces inactivos */
-    padding: 8px 16px; /* Espaciado interno de cada enlace para la zona de clic */
-    border-radius: 15px; /* Bordes redondeados sutiles */
-    transition: background-color 0.2s ease, color 0.2s ease; /* Transición suave para el hover */
+/* --- Estilo del Botón dentro de la píldora --- */
+.login-button {
+    background-color: transparent; /* Fondo transparente para que se vea el de la píldora */
+    color: #ffffffd8;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 40px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-
-/* Estilo para el botón de Iniciar Sesión */
-.BotonLogin {
-    font-size: 16px;
-    height: 60px;
-    background-color: #242425; /* Fondo gris oscuro diferente del menú central */
-    color: #ffffffd8; /* Texto blanco */
-    border: none; /* Sin borde predeterminado */
-    padding: 12px 24px; /* Espaciado interno del botón */
-    border-radius: 20px; /* Bordes muy redondeados tipo píldora */
-    font-weight: 500; /* Grosor de fuente medio */
-    cursor: pointer; /* Cambia el cursor a mano al pasar por encima */
-    transition: box-shadow 0.2s ease; /* Transición suave para el hover */
-}
-.BotonLogin:hover {
-    box-shadow: 0px 4px 6px #c8b27762 ;
+/* Efecto al pasar el mouse sobre el botón (igual que los links del menú) */
+.login-button:hover {
+    background-color: #3d3c3c;
+    color: #ffffff;
 }
 
-/* Efecto active (al hacer clic) para el botón de Login */
-.BotonLogin:active {
-    background-color: #1e1e1f; /* Fondo un poco más oscuro al presionar */
-    transform: translateY(1px); /* Ligero movimiento hacia abajo para feedback */
-}
-.BotonesNav:active{
-    background-color: #1e1e1f; /* Fondo un poco más oscuro al presionar */
-    transform: translateY(1px); /* Ligero movimiento hacia abajo para feedback */
+.login-button:active {
+    transform: scale(0.96);
 }
