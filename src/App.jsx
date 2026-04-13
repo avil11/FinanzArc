@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './componentes/NavBar/Navbar';
-import Inicio from './paginas/inicio/Inicio';
+import Footer from './componentes/Footer/Footer';
 
+import Inicio from './paginas/inicio/Inicio';
 import Registro from './paginas/inicio/InicioSesion/InicioSesion';
 import Principal from './paginas/Principal/General/General';
 import Ahorro from "./paginas/Principal/Ahorro/Ahorro";
@@ -24,6 +25,7 @@ function App() {
         <Route path="/gasto" element={<Gasto />} />
         <Route path="/perfil" element={<Perfil />} />
       </Routes>
+      <Footer/>
     </BrowserRouter>
   );
 }
