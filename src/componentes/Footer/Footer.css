@@ -125,3 +125,28 @@
 .titulo p{
     color: white;
 }
+
+@media (max-width: 810px){
+    .footer-contenido{
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px 40px 20px;
+    display: flex;
+    }
+    .footer-contenido h4{
+        text-align: center;
+        font-size: 25px;
+        font-weight: 500;
+        letter-spacing: 1px;
+    }
+
+    .footer-col-marca{
+        display: none;
+    }
+    .footer-col-links{
+        display: none;
+    }
+    .footer-col-equipo{
+        width: 100%;
+    }
+}

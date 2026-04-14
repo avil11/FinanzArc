@@ -8,11 +8,13 @@
 
 .navbar-container {
     width: 100%;
-    background-color: #000000; /* Fondo oscuro total */
+    background-color: #000000;
+    /* Fondo oscuro total */
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 90px; /* Un poco más de aire */
+    height: 90px;
+    /* Un poco más de aire */
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -35,6 +37,9 @@
     font-weight: 200;
     color: #ffffff;
     letter-spacing: 1px;
+    position: relative;
+    z-index: 1100;
+    /* Para que quede por encima del menú móvil */
 }
 
 /* --- Menú Central Estilo Píldora --- */
@@ -42,7 +47,8 @@
     display: flex;
     background-color: #272626;
     padding: 6px;
-    border-radius: 50px; /* Forma de píldora perfecta */
+    border-radius: 50px;
+    /* Forma de píldora perfecta */
     gap: 5px;
     transition: box-shadow 0.3s ease;
     align-items: center;
@@ -70,7 +76,8 @@
 /* --- Sección Acceso (Copia fiel de la Píldora) --- */
 .auth-pill {
     display: flex;
-    background-color: #272626; /* Mismo gris que el menú central */
+    background-color: #272626;
+    /* Mismo gris que el menú central */
     padding: 6px;
     border-radius: 50px;
     transition: box-shadow 0.3s ease;
@@ -84,7 +91,8 @@
 
 /* --- Estilo del Botón dentro de la píldora --- */
 .login-button {
-    background-color: transparent; /* Fondo transparente para que se vea el de la píldora */
+    background-color: transparent;
+    /* Fondo transparente para que se vea el de la píldora */
     color: #ffffffd8;
     border: none;
     padding: 10px 24px;
@@ -103,4 +111,166 @@
 
 .login-button:active {
     transform: scale(0.96);
+}
+
+/* Ocultar elementos móviles en escritorio por defecto */
+.hamburger-icon {
+    display: none;
+}
+
+.mobile-menu-overlay {
+    display: none;
+}
+
+
+/* =========================================
+   RESPONSIVE (MENÚ HAMBURGUESA)
+   ========================================= */
+@media (max-width: 810px) {
+
+    /* 1. Ocultamos los menús normales */
+    .desktop-menu {
+        display: none !important;
+    }
+
+    /* 2. Mostramos y estilizamos el icono de hamburguesa */
+    .hamburger-icon {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        width: 30px;
+        height: 24px;
+        cursor: pointer;
+        z-index: 1100;
+        /* Siempre visible por encima de la capa */
+    }
+
+    /* Las 3 rayitas */
+    .hamburger-icon span {
+        display: block;
+        width: 100%;
+        height: 3px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        transition: all 0.3s linear;
+        transform-origin: 1px;
+    }
+
+    /* Animación para convertir en 'X' al abrir */
+    .hamburger-icon.open span:nth-child(1) {
+        top: 10px;
+        /* EL SECRETO 2: scale(0.85) achica sutilmente la línea para que la X no se vea gigante */
+        transform: rotate(45deg) scale(0.85);
+    }
+
+    .hamburger-icon.open span:nth-child(2) {
+        opacity: 0;
+        /* En lugar de moverla, la colapsamos en el centro */
+        transform: scale(0);
+    }
+
+    .hamburger-icon.open span:nth-child(3) {
+        transform: rotate(-45deg) scale(0.85);
+    }
+
+    /* 3. El Menú Desplegable (Capa que cubre toda la pantalla) */
+    .mobile-menu-overlay {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #000000;
+        /* Fondo oscuro */
+        z-index: 1050;
+        /* Por debajo del logo y la hamburguesa */
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        /* Animación de entrada */
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-20px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .mobile-menu-overlay.open {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateY(0);
+    }
+
+    /* 4. Estilos de los links dentro del menú móvil */
+    .mobile-menu-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+        width: 100%;
+    }
+
+    /* =========================================
+       LINKS DEL MENÚ MÓVIL
+       ========================================= */
+    .mobile-link {
+        color: #ffffff;
+        font-size: 1.5rem;
+        font-weight: 300;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        display: inline-block; /* Obligatorio para que el 'transform' funcione bien en links */
+        
+        /* TRUCO PARA EL SUBRAYADO SUAVE */
+        text-decoration: underline; 
+        text-decoration-color: transparent; /* Empieza invisible */
+        text-underline-offset: 6px; /* Lo separa un poco del texto para más elegancia */
+        
+        /* ANIMACIÓN PARA TODO (Color, tamaño y subrayado) */
+        transition: all 0.3s ease; 
+    }
+
+    .mobile-link:hover {
+        text-decoration-color: #ffffff; /* El subrayado aparece suavemente */
+    }
+
+    .mobile-link:active {
+        color: #c8b277; /* Color dorado al presionar */
+        transform: scale(1.05); /* Lo cambié a 1.05 parejo para que no se estire solo a lo alto, se siente más natural */
+    }
+
+    /* =========================================
+       BOTÓN DE LOGIN MÓVIL
+       ========================================= */
+    .mobile-login-button {
+        font-weight: 400;
+        text-transform: uppercase;
+        background-color: #121212;
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 15px 40px;
+        border-radius: 50px;
+        font-size: 1.3rem;
+        letter-spacing: 1px;
+        cursor: pointer;
+        
+        /* TRUCO PARA EL SUBRAYADO SUAVE */
+        text-decoration: underline;
+        text-decoration-color: transparent;
+        text-underline-offset: 6px;
+        
+        /* ANIMACIÓN PARA TODO */
+        transition: all 0.3s ease;
+    }
+
+    .mobile-login-button:hover {
+        text-decoration-color: #ffffff; /* El subrayado aparece suavemente */
+    }
+
+    .mobile-login-button:active {
+    /* 0px X, 0px Y, 20px de difuminado, Color */
+    box-shadow: 0px 5px 15px #c8b277; 
+    transform: scale(0.96);
+}
 }
