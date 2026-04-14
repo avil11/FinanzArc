@@ -7,9 +7,24 @@ const Inicio = () => {
     <div className="main-wrapper">
       {/* SECCIÓN HERO */}
       
-      
+      <div className="containerInicio">
+        <div className="contenedorBackground">
+          <img
+            src="/Imagenes/Gemini_Generated_Image_ebcj9lebcj9lebcj.webp"
+            alt="Hero"
+          />
+        </div>
+        <div className="contenedorLogos">
+          <div className="logos">
+            <img src="/Imagenes/Logo 1.webp" alt="Logo 1" />
+            <img src="/Imagenes/Logo 2.webp" alt="Logo 2" />
+            <img src="/Imagenes/Logo 3.webp" alt="Logo 3" />
+            <img src="/Imagenes/Logo 4.webp" alt="Logo 4" />
+          </div>
+        </div>
+      </div>
 
-      
+
 
       {/* SECCIÓN SOBRE EL PROYECTO / SERVICIOS */}
       <div className="containerServicio">
@@ -21,7 +36,7 @@ const Inicio = () => {
             su economía.
           </p>
           <img
-            src="/Imagenes/ImagenSobreProyecto.png"
+            src="/Imagenes/ImagenSobreProyecto.webp"
             alt="Sobre el Proyecto"
           />
         </div>
@@ -29,7 +44,7 @@ const Inicio = () => {
         <div className="containerTarjetas">
           <div className="containerTarjetas1">
             <div className="container1">
-              <img src="/Imagenes/Logo 1.png" alt="Icono 1" />
+              <img src="/Imagenes/Logo 1.webp" alt="Icono 1" />
               <h4>Transforma datos en decisiones.</h4>
               <p>
                 Deja atrás el registro pasivo. Nuestra interfaz te permite
@@ -37,7 +52,7 @@ const Inicio = () => {
               </p>
             </div>
             <div className="container2">
-              <img src="/Imagenes/Logo 2.png" alt="Icono 2" />
+              <img src="/Imagenes/Logo 2.webp" alt="Icono 2" />
               <h4>Elimina la ceguera inflacionaria</h4>
               <p>
                 Recupera la noción real de tu poder adquisitivo. Convierte tus
@@ -48,7 +63,7 @@ const Inicio = () => {
 
           <div className="containerTarjetas2">
             <div className="container3">
-              <img src="/Imagenes/Logo 3.png" alt="Icono 3" />
+              <img src="/Imagenes/Logo 3.webp" alt="Icono 3" />
               <h4>Respaldo digital inmediato.</h4>
               <p>
                 Vincula cada registro financiero con su comprobante digital.
@@ -56,7 +71,7 @@ const Inicio = () => {
               </p>
             </div>
             <div className="container4">
-              <img src="/Imagenes/Logo 4.png" alt="Icono 4" />
+              <img src="/Imagenes/Logo 4.webp" alt="Icono 4" />
               <h4>Frenando la inercia de gasto.</h4>
               <p>
                 No solo registras, ahorras. Kaptura te brinda las herramientas
@@ -93,7 +108,7 @@ const Inicio = () => {
           </div>
         </div>
         <div className="containerPropuestaDerecha">
-          <img src="/Imagenes/ImagenSobrePatrimonio.png" alt="" />
+          <img src="/Imagenes/ImagenSobrePatrimonio.webp" alt="" />
         </div>
       </div>
       {/* BLOQUE 2: El nuevo componente de Carrusel */}

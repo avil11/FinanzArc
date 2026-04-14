@@ -59,13 +59,34 @@
     transform: translateY(-5px);
     border: 1px solid rgba(200, 178, 119, 0.4); /* Resplandor oro sutil */
 }
-
+/* =======================================
+   ESTILOS DEL AVATAR (CÍRCULO COMPLETO)
+   ======================================= */
 .avatar-placeholder {
-    width: 40px;
-    height: 40px;
-    background-color: #2a2a2b;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
+    
+    /* Configuración para que la imagen cubra todo el círculo */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
 }
+
+.tarjeta-miembro:hover .avatar-placeholder {
+    border-color: rgba(200, 178, 119, 0.4); /* Brillo dorado en el borde al hacer hover */
+}
+
+/* 3. Animación (Keyframes) */
+@keyframes recorridoTextura {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+/* ======================================= */
 
 .info-miembro h5 {
     color: #ffffff;
@@ -108,20 +129,6 @@
     font-size: 0.8rem;
 }
 
-/* @media (max-width: 900px) {
-    .footer-contenido {
-        grid-template-columns: 1fr;
-        text-align: center;
-    }
-    .grid-equipo {
-        grid-template-columns: 1fr;
-    }
-    .tarjeta-miembro {
-        justify-content: center;
-    }
-} */
-
-
 .titulo p{
     color: white;
 }
@@ -148,5 +155,8 @@
     }
     .footer-col-equipo{
         width: 100%;
+    }
+    .grid-equipo {
+        grid-template-columns: 1fr; /* En móvil, mejor poner 1 por fila */
     }
 }
