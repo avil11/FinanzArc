@@ -13,25 +13,25 @@ import "./CarrouselPropuesta.css";
 const CarrouselPropuesta = () => {
   const itemsPropuesta = [
     {
-      logo: "/Imagenes/LogoDesordenAdmin.png", 
+      logo: "/Imagenes/LogoDesordenAdmin.webp", 
       title: "Desorden administrativo",
       texto: "Centralizá todos tus registros financieros vinculándolos a sus comprobantes digitales.",
       tilde: "✓ Trazabilidad completa y orden automático",
     },
     {
-      logo: "/Imagenes/LogoIncertidumbreValor.png",
+      logo: "/Imagenes/LogoIncertidumbreValor.webp",
       title: "Incertidumbre de valor",
       texto: "Convertí tus movimientos a divisas estables y entendé tu poder adquisitivo real.",
       tilde: "✓ Elimina el impacto de la inflacion",
     },
     {
-      logo: "/Imagenes/LogoInerciaGasto.png",
+      logo: "/Imagenes/LogoInerciaGasto.webp",
       title: "Inercia de gasto",
       texto: "Detectá fugas de dinero con comparativas históricas y análisis inteligente.",
       tilde: "✓ Pasa del registro al control activo",
     },
     {
-      logo: "/Imagenes/LogoAnalisisInteligente.png",
+      logo: "/Imagenes/LogoAnalisisInteligente.webp",
       title: "Análisis Inteligente",
       texto: "Transformá tus registros en información accionable mediantecomparativas históricas y detección de patrones.",
       tilde: "✓ Toma decisiones basadas en datos",

@@ -6,22 +6,10 @@ const Inicio = () => {
   return (
     <div className="main-wrapper">
       {/* SECCIÓN HERO */}
-      <div className="containerInicio">
-        <div className="contenedorBackground">
-          <img
-            src="/Imagenes/Gemini_Generated_Image_ebcj9lebcj9lebcj.png"
-            alt="Hero"
-          />
-        </div>
-        <div className="contenedorLogos">
-          <div className="logos">
-            <img src="/Imagenes/Logo 1.png" alt="Logo 1" />
-            <img src="/Imagenes/Logo 2.png" alt="Logo 2" />
-            <img src="/Imagenes/Logo 3.png" alt="Logo 3" />
-            <img src="/Imagenes/Logo 4.png" alt="Logo 4" />
-          </div>
-        </div>
-      </div>
+      
+      
+
+      
 
       {/* SECCIÓN SOBRE EL PROYECTO / SERVICIOS */}
       <div className="containerServicio">
