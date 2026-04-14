@@ -1,125 +1,113 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { PieChart, Pie, Cell } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 import './General.css';
 
 const GastoIngreso = () => {
-    const navigate = useNavigate();
-    const userName = "Pepe Ramirez";
-    const saludar = "¡Bienvenido de nuevo, ";
-    const sacarsaludo = saludar + userName + "!";
-    
-    const [showGreeting, setShowGreeting] = useState(true);
+    const [mostrarSaludo, setMostrarSaludo] = useState(true);
+    const COLORES = ['#d4af37', '#2e7d32', '#1976d2', '#616161'];
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setShowGreeting(false);
-        }, 3000); // El saludo desaparece después de 3 segundos
-        return () => clearTimeout(timer);
+        const temporizador = setTimeout(() => setMostrarSaludo(false), 4000);
+        return () => clearTimeout(temporizador);
     }, []);
 
-    // Datos para gastos
-    const expensesData = [
-        { name: 'Alimentación', value: 450 },
-        { name: 'Transporte', value: 280 },
-        { name: 'Entretenimiento', value: 150 },
-        { name: 'Otros', value: 120 },
+    const datosGastos = [
+        { nombre: 'Alimentación', valor: 450 },
+        { nombre: 'Transporte', valor: 280 },
+        { nombre: 'Entretenimiento', valor: 150 },
+        { nombre: 'Otros', valor: 120 },
     ];
 
-    // Datos para ingresos
-    const incomeData = [
-        { name: 'Salario', value: 2000 },
-        { name: 'Freelance', value: 600 },
-        { name: 'Inversiones', value: 400 },
+    const datosIngresos = [
+        { nombre: 'Salario', valor: 2000 },
+        { nombre: 'Freelance', valor: 600 },
+        { nombre: 'Inversiones', valor: 400 },
     ];
 
-    // Datos para ahorros
-    const savingsGoals = [
-        { label: 'Fondo de Emergencia', current: 3500, target: 5000 },
-        { label: 'Vacaciones', current: 1200, target: 2000 },
-        { label: 'Educación', current: 2800, target: 4000 },
+    const metasAhorro = [
+        { etiqueta: 'Fondo de Emergencia', actual: 3500, objetivo: 5000 },
+        { etiqueta: 'Vacaciones', actual: 1200, objetivo: 2000 },
+        { etiqueta: 'Educación', actual: 2800, objetivo: 4000 },
     ];
 
-    const totalCurrent = savingsGoals.reduce((sum, goal) => sum + goal.current, 0);
-    const totalTarget = savingsGoals.reduce((sum, goal) => sum + goal.target, 0);
-
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
-
-    const ProgressBar = ({ current, target, label }) => {
-        const percentage = Math.min(100, (current / target) * 100);
-
+    const BarraProgreso = ({ actual, objetivo, etiqueta }) => {
+        const porcentaje = Math.min(100, (actual / objetivo) * 100);
         return (
-            <div style={{ marginBottom: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <p style={{ margin: 0, fontWeight: 'bold' }}>{label}</p>
-                    <span style={{ fontSize: '12px', color: '#666' }}>{percentage.toFixed(0)}%</span>
+            <div className="item-progreso">
+                <div className="info-progreso">
+                    <span style={{ fontWeight: '500' }}>{etiqueta}</span>
+                    <span style={{ color: 'var(--dorado-acento)' }}>{porcentaje.toFixed(0)}%</span>
                 </div>
-                <div style={{ width: '100%', backgroundColor: '#2a2a2a', borderRadius: '999px', overflow: 'hidden', height: '18px' }}>
-                    <div
-                        style={{
-                            width: `${percentage}%`,
-                            backgroundColor: 'var(--accent-gold)',
-                            height: '100%',
-                            transition: 'width 0.5s ease',
-                        }}
-                    />
+                <div className="pista-barra">
+                    <div className="relleno-barra" style={{ width: `${porcentaje}%` }} />
                 </div>
-                <p style={{ marginTop: '8px', fontSize: '12px', color: '#999' }}>${current} / ${target}</p>
+                <div className="texto-monto">${actual.toLocaleString()} / ${objetivo.toLocaleString()}</div>
             </div>
         );
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '80vh', padding: '20px' }}>
-            {showGreeting && <h2 style={{ color: 'var(--accent-gold)' }}>{sacarsaludo}</h2>}
-            <p style={{ margin: '25px 0', lineHeight: '1.6', textAlign: 'center' }}>Estamos encantados de tenerte con nosotros en FinanzARC. Explora nuestras herramientas y recursos para maximizar tu patrimonio.</p>
+        <div className="contenedor-principal">
+            <div className="seccion-encabezado">
+                {mostrarSaludo ? (
+                    <h2>¡Bienvenido, Pepe Ramirez!</h2>
+                ) : (
+                    <h2>Resumen Financiero</h2>
+                )}
+                <p style={{ color: 'var(--texto-tenue)' }}>Gestioná tu patrimonio en FinanzARC</p>
+            </div>
             
-            <div style={{ display: 'flex', justifyContent: 'space-around', width: '100%', maxWidth: '800px', marginBottom: '40px' }}>
-                <div style={{ textAlign: 'center' }}>
-                    <h3>Gastos</h3>
-                    <PieChart width={300} height={300}>
+            <div className="panel-graficos">
+                <div className="tarjeta">
+                    <h3>Gastos por Categoría</h3>
+                    <PieChart width={300} height={250}>
                         <Pie
-                            data={expensesData}
-                            cx={150}
-                            cy={150}
-                            labelLine={false}
-                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                            data={datosGastos}
+                            cx="50%" cy="50%"
+                            innerRadius={60}
                             outerRadius={80}
-                            fill="#8884d8"
-                            dataKey="value"
+                            paddingAngle={5}
+                            dataKey="valor"
                         >
-                            {expensesData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            {datosGastos.map((_, i) => (
+                                <Cell key={i} fill={COLORES[i % COLORES.length]} stroke="none" />
                             ))}
                         </Pie>
+                        <Tooltip contentStyle={{ backgroundColor: '#161616', border: '1px solid #333', color: '#fff' }} />
                     </PieChart>
                 </div>
-                <div style={{ textAlign: 'center' }}>
-                    <h3>Ingresos</h3>
-                    <PieChart width={300} height={300}>
+
+                <div className="tarjeta">
+                    <h3>Fuentes de Ingreso</h3>
+                    <PieChart width={300} height={250}>
                         <Pie
-                            data={incomeData}
-                            cx={150}
-                            cy={150}
-                            labelLine={false}
-                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                            data={datosIngresos}
+                            cx="50%" cy="50%"
+                            innerRadius={60}
                             outerRadius={80}
-                            fill="#8884d8"
-                            dataKey="value"
+                            paddingAngle={5}
+                            dataKey="valor"
                         >
-                            {incomeData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            {datosIngresos.map((_, i) => (
+                                <Cell key={i} fill={COLORES[i % COLORES.length]} stroke="none" />
                             ))}
                         </Pie>
+                        <Tooltip contentStyle={{ backgroundColor: '#161616', border: '1px solid #333', color: '#fff' }} />
                     </PieChart>
                 </div>
             </div>
             
-            <div style={{ width: '100%', maxWidth: '640px', marginTop: '20px' }}>
-                <h3 style={{ marginBottom: '20px', textAlign: 'center' }}>Ahorros</h3>
-                <ProgressBar current={totalCurrent} target={totalTarget} label="Progreso Total de Ahorros" />
-                {savingsGoals.map((goal, index) => (
-                    <ProgressBar key={index} current={goal.current} target={goal.target} label={goal.label} />
+            <div className="contenedor-ahorros">
+                <h3 style={{ marginBottom: '30px', textAlign: 'center', color: 'var(--texto-principal)' }}>
+                    Objetivos de Ahorro
+                </h3>
+                {metasAhorro.map((meta, indice) => (
+                    <BarraProgreso 
+                        key={indice} 
+                        actual={meta.actual} 
+                        objetivo={meta.objetivo} 
+                        etiqueta={meta.etiqueta} 
+                    />
                 ))}
             </div>
         </div>
@@ -127,4 +115,3 @@ const GastoIngreso = () => {
 };
 
 export default GastoIngreso;
-

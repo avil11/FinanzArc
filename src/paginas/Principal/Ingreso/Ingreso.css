@@ -1,0 +1,117 @@
+/* Estilos del Modal */
+.capa-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.85); /* Fondo oscuro translúcido */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px); /* Efecto de desenfoque de fondo */
+}
+
+.contenido-modal {
+  background-color: var(--fondo-tarjeta);
+  border: 1px solid var(--dorado-acento);
+  border-radius: 20px;
+  padding: 30px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: entradaModal 0.3s ease-out;
+}
+
+@keyframes entradaModal {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.formulario-grupo {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.formulario-grupo label {
+  color: var(--texto-tenue);
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.formulario-grupo input {
+  background-color: #0a0a0a;
+  border: 1px solid var(--borde);
+  padding: 12px;
+  border-radius: 8px;
+  color: white;
+  outline: none;
+}
+
+.formulario-grupo input:focus {
+  border-color: var(--dorado-acento);
+}
+
+.formulario-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+/* Botones */
+.boton-primario {
+  background-color: var(--dorado-acento);
+  color: black;
+  font-weight: bold;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin: 20px;
+}
+
+.boton-primario:hover {
+  background-color: var(--dorado-brillante);
+}
+
+.boton-secundario {
+  background-color: transparent;
+  color: var(--texto-tenue);
+  padding: 12px 24px;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.boton-secundario:hover {
+  background-color: #222;
+  color: white;
+}
+select {
+  background-color: #0a0a0a;
+  border: 1px solid var(--borde);
+  padding: 12px;
+  border-radius: 8px;
+  color: white;
+  outline: none;
+}
+.tabla-ingresos {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+.tabla-ingresos th,
+.tabla-ingresos td {
+  border: 1px solid var(--borde);
+  padding: 12px;
+  text-align: left;
+  color: #d8d8d8;
+}
+.tabla-ingresos th {
+  background-color: var(--fondo-tarjeta);
+  color: var(--texto-principal);
+}

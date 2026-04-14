@@ -1,3 +1,116 @@
+/* General.css */
 :root {
-  --accent-gold: #FFBB28;
+  --fondo-negro: #000000;
+  --fondo-oscuro: #0a0a0a;
+  --fondo-tarjeta: #161616;
+  --dorado-acento: #d4af37;
+  --dorado-brillante: #f3cf58;
+  --texto-principal: #ffffff;
+  --texto-tenue: #a0a0a0;
+  --borde: #222222;
+}
+
+body {
+  background-color: var(--fondo-negro);
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  justify-content: center;
+}
+
+.contenedor-principal {
+  background-color: var(--fondo-oscuro);
+  width: 100%;
+  max-width: 1300px;
+  min-height: 100vh;
+  padding: 50px 40px;
+  box-sizing: border-box;
+  border-left: 1px solid var(--borde);
+  border-right: 1px solid var(--borde);
+}
+
+/* Encabezado */
+.seccion-encabezado {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.seccion-encabezado h2 {
+  font-size: 2rem;
+  color: var(--dorado-acento);
+  margin-bottom: 10px;
+}
+
+/* Grilla de Tarjetas */
+.panel-graficos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.tarjeta {
+  background-color: var(--fondo-tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 20px;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.tarjeta:hover {
+  transform: translateY(-5px);
+  border-color: #333;
+}
+
+.tarjeta h3 {
+  margin-top: 0;
+  font-size: 1rem;
+  color: var(--texto-tenue);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Sección de Ahorros */
+.contenedor-ahorros {
+  background-color: var(--fondo-tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 20px;
+  padding: 35px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.item-progreso {
+  margin-bottom: 25px;
+}
+
+.info-progreso {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.pista-barra {
+  width: 100%;
+  background-color: #222;
+  height: 12px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.relleno-barra {
+  height: 100%;
+  background: linear-gradient(90deg, var(--dorado-acento), var(--dorado-brillante));
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+  transition: width 1s ease-in-out;
+}
+
+.texto-monto {
+  font-size: 0.85rem;
+  color: var(--texto-tenue);
+  margin-top: 8px;
 }
