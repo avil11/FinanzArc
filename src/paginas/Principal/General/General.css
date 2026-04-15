@@ -1,0 +1,157 @@
+/* ESTILOS PÁGINA GENERAL (DASHBOARD)*/
+
+.contenedor-principal-general {
+
+    background-color: transparent; 
+    width: 100%;
+    max-width: 1210px;
+    margin: 0 auto;
+    padding: 120px 20px 60px 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: inherit;
+}
+
+
+.seccion-encabezado-general {
+    text-align: center;
+    margin-bottom: 50px;
+    width: 100%;
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+.seccion-encabezado-general h2 {
+    font-size: 2.2rem;
+    font-weight: 300;
+    color: #ffffff;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.panel-graficos-general {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.tarjeta-general, .contenedor-ahorros-general {
+    background-color: #1e1e1f;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 30px;
+    box-sizing: border-box;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tarjeta-general:hover, .contenedor-ahorros-general:hover {
+    transform: translateY(-5px);
+    border-color: rgba(200, 178, 119, 0.3); 
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+}
+
+.tarjeta-general h3, .titulo-ahorros-general {
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #c8b277;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+/* Sección de Ahorros */
+.contenedor-ahorros-general {
+    width: 100%;
+}
+
+.grid-ahorros-general {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.item-progreso-general {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.info-progreso-general {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+}
+
+.pista-barra-general {
+    width: 100%;
+    background-color: #2a2a2b;
+    height: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+.relleno-barra-general {
+    height: 100%;
+    background: linear-gradient(90deg, #8a733f 0%, #c8b277 100%);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(200, 178, 119, 0.4);
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.texto-monto-general {
+    font-size: 0.85rem;
+    color: #888888;
+    text-align: right;
+    margin-top: 2px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* MEDIA QUERIES (TABLET Y CELULAR) */
+
+@media (max-width: 810px) {
+
+    .contenedor-principal-general {
+        padding: 100px 20px 40px 20px;
+    }
+
+    .seccion-encabezado-general h2 {
+        font-size: 1.8rem; 
+    }
+
+    .panel-graficos-general {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .tarjeta-general, .contenedor-ahorros-general {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .seccion-encabezado-general h2 {
+        font-size: 1.5rem;
+    }
+    .seccion-encabezado-general p {
+        font-size: 0.9rem;
+    }
+    .tarjeta-general h3, .titulo-ahorros-general {
+        font-size: 1rem;
+    }
+    .info-progreso-general {
+        font-size: 0.9rem;
+    }
+}

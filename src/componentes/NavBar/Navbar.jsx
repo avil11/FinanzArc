@@ -104,10 +104,11 @@ const Navbar = () => {
           <div className="mobile-menu-content">
             {isLoggedIn ? (
               <>
-                <Link to="/Principal" className="mobile-link" onClick={closeMobileMenu}>Principal</Link>
-                <Link to="/horro" className="mobile-link" onClick={closeMobileMenu}>Ahorro</Link>
-                <Link to="/gasto" className="mobile-link" onClick={closeMobileMenu}>Gasto</Link>
-                <Link to="/perfil" className="mobile-link" onClick={closeMobileMenu}>Perfil</Link>
+                <Link to="/principal" className="mobile-link" onClick={closeMobileMenu}>Principal</Link>
+                <Link to="/ingreso" className="mobile-link" onClick={closeMobileMenu}>Ingresos</Link>
+                <Link to="/ahorro" className="mobile-link" onClick={closeMobileMenu}>Ahorros</Link>
+                <Link to="/gasto" className="mobile-link" onClick={closeMobileMenu}>Gastos</Link>
+                <Link to="/perfil" className="mobile-link" onClick={closeMobileMenu}>Mi Perfil</Link>
                 <button onClick={handleLogout} className="mobile-login-button logout-variant">
                   Cerrar Sesión
                 </button>
@@ -116,6 +117,7 @@ const Navbar = () => {
               <>
                 <Link to="/" className="mobile-link" onClick={closeMobileMenu}>Inicio</Link>
                 <Link to="/servicios" className="mobile-link" onClick={closeMobileMenu}>Servicios</Link>
+                <Link to="/propuesta" className="mobile-link" onClick={closeMobileMenu}>Propuesta</Link>
                 <Link to="/contacto" className="mobile-link" onClick={closeMobileMenu}>Contactanos</Link>
                 <button onClick={handleLoginClick} className="mobile-login-button">
                   Ingreso

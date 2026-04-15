@@ -274,3 +274,7 @@
     transform: scale(0.96);
 }
 }
+
+@media (max-width:480px) {
+    
+}
