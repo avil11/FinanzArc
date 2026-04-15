@@ -76,9 +76,9 @@ const Navbar = () => {
 
         {/* Sección Acceso */}
         <div className="auth-section desktop-menu">
-          <div className="auth-pill">
+          <div className="">
             {isLoggedIn ? (
-              <button onClick={handleLogout} className="login-button logout-variant">
+              <button   style={{display: 'none'}}>
                 Cerrar Sesión
               </button>
             ) : (
@@ -105,7 +105,7 @@ const Navbar = () => {
             {isLoggedIn ? (
               <>
                 <Link to="/Principal" className="mobile-link" onClick={closeMobileMenu}>Principal</Link>
-                <Link to="/ahorro" className="mobile-link" onClick={closeMobileMenu}>Ahorro</Link>
+                <Link to="/horro" className="mobile-link" onClick={closeMobileMenu}>Ahorro</Link>
                 <Link to="/gasto" className="mobile-link" onClick={closeMobileMenu}>Gasto</Link>
                 <Link to="/perfil" className="mobile-link" onClick={closeMobileMenu}>Perfil</Link>
                 <button onClick={handleLogout} className="mobile-login-button logout-variant">
