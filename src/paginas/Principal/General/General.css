@@ -65,6 +65,58 @@
     text-align: center;
 }
 
+.grafico-con-leyenda {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.grafico-pie {
+    width: 230px;
+    min-width: 220px;
+    height: 250px;
+}
+
+.leyenda-grafico {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    min-width: 170px;
+}
+
+.item-leyenda {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.item-color-circulo {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.leyenda-texto {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    color: #d5d5d5;
+    font-size: 0.95rem;
+}
+
+.leyenda-texto strong {
+    color: #ffffff;
+}
+
 /* Sección de Ahorros */
 .contenedor-ahorros-general {
     width: 100%;
@@ -137,6 +189,24 @@
 
     .tarjeta-general, .contenedor-ahorros-general {
         padding: 20px;
+
+    }
+    .grafico-con-leyenda {
+        flex-direction: column;
+        align-items: center;
+        display: flex;
+    }
+     .grafico-pie {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+    }
+ 
+     .item-leyenda {
+        justify-content: center;
+    }
+     .leyenda-texto {
+        font-size: 0.9rem;
     }
 }
 
@@ -154,4 +224,101 @@
     .info-progreso-general {
         font-size: 0.9rem;
     }
+}
+
+.capa-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 24px;
+}
+
+.contenido-modal {
+    width: min(100%, 520px);
+    background: #141414;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45);
+}
+
+.contenido-modal h3 {
+    margin-top: 0;
+    margin-bottom: 18px;
+    color: #ffffff;
+    font-size: 1.35rem;
+}
+
+.formulario-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.formulario-grupo label {
+    color: #d5d5d5;
+    font-size: 0.95rem;
+}
+
+.formulario-grupo input,
+.formulario-grupo select {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #1e1e1f;
+    color: #ffffff;
+    padding: 12px 14px;
+    outline: none;
+}
+
+.formulario-grupo input:focus,
+.formulario-grupo select:focus {
+    border-color: #c8b277;
+}
+
+.formulario-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.formulario-acciones button {
+    min-width: 120px;
+}
+
+.boton-primario,
+.boton-secundario {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 18px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.boton-primario {
+    background: linear-gradient(90deg, #8a733f 0%, #c8b277 100%);
+    color: #111111;
+}
+
+.boton-primario:hover {
+    opacity: 0.95;
+}
+
+.boton-secundario {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.boton-secundario:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.modal-btn {
+    width: 140px;
 }
