@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../NavBar/Navbar.css";
+// 1. NUEVO: Importamos el componente del modal (Asegúrate de poner la ruta correcta hacia tu archivo)
+import InicioSesion from "../../paginas/inicio/InicioSesion/InicioSesion"; 
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
+  // 2. NUEVO: Estado para abrir/cerrar el modal desde el Navbar
+  const [modalAbierto, setModalAbierto] = useState(false);
+
   // Usamos un estado para el login para que React re-renderice al cambiar
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("Token"));
 
@@ -23,12 +28,14 @@ const Navbar = () => {
     if (isLoggedIn) {
       navigate("/dashboard");
     } else {
-      navigate("/registro");
+      // 3. MODIFICADO: En lugar de navegar a "/registro", encendemos el modal
+      setModalAbierto(true);
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    // Nota extra: Cambié "token" por "Token" para que coincida exactamente con tu useEffect
+    localStorage.removeItem("Token"); 
     setIsLoggedIn(false);
     closeMobileMenu();
     navigate("/");
@@ -127,6 +134,13 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
+
+      {/* 4. NUEVO: Aquí inyectamos tu modal. Está "escondido" hasta que isOpen sea true */}
+      <InicioSesion 
+        isOpen={modalAbierto} 
+        onClose={() => setModalAbierto(false)} 
+      />
+      
     </header>
   );
 };
