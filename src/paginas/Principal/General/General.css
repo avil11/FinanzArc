@@ -1,8 +1,9 @@
-/* ESTILOS PÁGINA GENERAL (DASHBOARD)*/
+/* =========================================
+   ESTILOS PÁGINA GENERAL (DASHBOARD)
+   ========================================= */
 
 .contenedor-principal-general {
-
-    background-color: transparent; 
+    background-color: transparent;
     width: 100%;
     max-width: 1210px;
     margin: 0 auto;
@@ -14,7 +15,7 @@
     font-family: inherit;
 }
 
-
+/* --- ENCABEZADO --- */
 .seccion-encabezado-general {
     text-align: center;
     margin-bottom: 50px;
@@ -30,15 +31,17 @@
     letter-spacing: 1px;
 }
 
+/* --- PANELES Y TARJETAS --- */
 .panel-graficos-general {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 30px;
     margin-bottom: 40px;
 }
 
-.tarjeta-general, .contenedor-ahorros-general {
+.tarjeta-general, 
+.contenedor-ahorros-general {
     background-color: #1e1e1f;
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 20px;
@@ -48,13 +51,15 @@
     transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.tarjeta-general:hover, .contenedor-ahorros-general:hover {
+.tarjeta-general:hover, 
+.contenedor-ahorros-general:hover {
     transform: translateY(-5px);
-    border-color: rgba(200, 178, 119, 0.3); 
+    border-color: rgba(200, 178, 119, 0.3);
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
 }
 
-.tarjeta-general h3, .titulo-ahorros-general {
+.tarjeta-general h3, 
+.titulo-ahorros-general {
     margin-top: 0;
     margin-bottom: 25px;
     font-size: 1.2rem;
@@ -65,6 +70,7 @@
     text-align: center;
 }
 
+/* --- GRÁFICOS --- */
 .grafico-con-leyenda {
     display: flex;
     align-items: center;
@@ -117,15 +123,32 @@
     color: #ffffff;
 }
 
-/* Sección de Ahorros */
+/* --- SECCIÓN DE AHORROS --- */
 .contenedor-ahorros-general {
     width: 100%;
 }
 
+.encabezado-ahorros-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
 .grid-ahorros-general {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.tarjeta-ahorro-item {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px;
 }
 
 .item-progreso-general {
@@ -165,71 +188,67 @@
     margin-top: 2px;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+.boton-editar-ahorro {
+    background: transparent;
+    color: #c8b277;
+    border: 1px solid rgba(200, 178, 119, 0.5);
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    align-self: flex-end;
+    transition: all 0.3s ease;
 }
 
-/* MEDIA QUERIES (TABLET Y CELULAR) */
-
-@media (max-width: 810px) {
-
-    .contenedor-principal-general {
-        padding: 100px 20px 40px 20px;
-    }
-
-    .seccion-encabezado-general h2 {
-        font-size: 1.8rem; 
-    }
-
-    .panel-graficos-general {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .tarjeta-general, .contenedor-ahorros-general {
-        padding: 20px;
-
-    }
-    .grafico-con-leyenda {
-        flex-direction: column;
-        align-items: center;
-        display: flex;
-    }
-     .grafico-pie {
-        width: 100%;
-        max-width: 300px;
-        height: auto;
-    }
- 
-     .item-leyenda {
-        justify-content: center;
-    }
-     .leyenda-texto {
-        font-size: 0.9rem;
-    }
+.boton-editar-ahorro:hover {
+    background: #c8b277;
+    color: #111;
 }
 
-@media (max-width: 480px) {
-
-    .seccion-encabezado-general h2 {
-        font-size: 1.5rem;
-    }
-    .seccion-encabezado-general p {
-        font-size: 0.9rem;
-    }
-    .tarjeta-general h3, .titulo-ahorros-general {
-        font-size: 1rem;
-    }
-    .info-progreso-general {
-        font-size: 0.9rem;
-    }
+/* --- ESTADOS VACÍOS (EMPTY STATES) --- */
+.aviso-vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    border: 2px dashed rgba(200, 178, 119, 0.2);
+    background: rgba(255, 255, 255, 0.01);
+    text-align: center;
+    padding: 30px;
+    width: 100%;
 }
 
+.contenido-aviso-vacio {
+    max-width: 300px;
+}
+
+.icono-placeholder {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.4;
+    filter: grayscale(1);
+}
+
+.aviso-vacio p {
+    color: #d5d5d5;
+    font-size: 1rem;
+    margin-bottom: 8px;
+}
+
+.sugerencia {
+    font-size: 13px;
+    color: #c8b277;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+/* --- MODALES --- */
 .capa-modal {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -240,40 +259,55 @@
 .contenido-modal {
     width: min(100%, 520px);
     background: #141414;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(200, 178, 119, 0.2);
     border-radius: 24px;
-    padding: 28px;
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45);
-}
+    padding: 35px;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6);
+    animation: fadeIn 0.3s ease-out;
 
+    /*Que no se rompa modal en pantallas chicas:*/
+
+    max-height: 90vh; /* No permite que supere el 90% de la pantalla */
+    display: flex;
+    flex-direction: column;
+}
+.formulario-cuerpo {
+    overflow-y: auto; /* Habilita el scroll solo en los campos */
+    padding-right: 5px; /* Evita que el scroll pise el contenido */
+}
 .contenido-modal h3 {
     margin-top: 0;
-    margin-bottom: 18px;
+    margin-bottom: 25px;
     color: #ffffff;
-    font-size: 1.35rem;
+    font-size: 1.5rem;
+    text-align: center;
 }
 
 .formulario-grupo {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .formulario-grupo label {
-    color: #d5d5d5;
-    font-size: 0.95rem;
+    color: #c8b277;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .formulario-grupo input,
 .formulario-grupo select {
     width: 100%;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     background: #1e1e1f;
     color: #ffffff;
-    padding: 12px 14px;
+    padding: 14px;
     outline: none;
+    font-size: 1rem;
+    transition: border-color 0.3s;
 }
 
 .formulario-grupo input:focus,
@@ -283,42 +317,98 @@
 
 .formulario-acciones {
     display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
 }
 
-.formulario-acciones button {
-    min-width: 120px;
-}
-
+/* --- BOTONES --- */
 .boton-primario,
 .boton-secundario {
     border: none;
     border-radius: 12px;
-    padding: 12px 18px;
+    padding: 14px 24px;
     cursor: pointer;
     font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
 }
 
 .boton-primario {
     background: linear-gradient(90deg, #8a733f 0%, #c8b277 100%);
     color: #111111;
+    box-shadow: 0 4px 15px rgba(200, 178, 119, 0.2);
 }
 
 .boton-primario:hover {
-    opacity: 0.95;
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(200, 178, 119, 0.4);
 }
 
 .boton-secundario {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.05);
     color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .boton-secundario:hover {
-    background: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.1);
 }
 
-.modal-btn {
-    width: 140px;
+/* --- ANIMACIONES --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   MEDIA QUERIES (RESPONSIVE)
+   ========================================= */
+
+@media (max-width: 810px) {
+    .contenedor-principal-general {
+        padding: 100px 20px 40px 20px;
+    }
+
+    .seccion-encabezado-general h2 {
+        font-size: 1.8rem;
+    }
+
+    .panel-graficos-general {
+        grid-template-columns: 1fr;
+    }
+
+    .grafico-con-leyenda {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .grafico-pie {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .leyenda-grafico {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .seccion-encabezado-general h2 {
+        font-size: 1.5rem;
+    }
+
+    .encabezado-ahorros-flex {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .formulario-acciones {
+        flex-direction: column;
+    }
+
+    .boton-primario, .boton-secundario {
+        width: 100%;
+    }
 }

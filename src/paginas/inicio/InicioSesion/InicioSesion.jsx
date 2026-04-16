@@ -4,24 +4,32 @@ import "./InicioSesion.css";
 
 const InicioSesion = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const [nombreUsuario, setNombreUsuario] = useState("");
-  const [password, setPassword] = useState("");
+  const [NombreUsuario, setNombreUsuario] = useState("");
+  const [PasswordHash, setPasswordHash] = useState("");
   const [error, setError] = useState("");
   
-  // NUEVO: Estado para mostrar/ocultar contraseña
-  const [mostrarPassword, setMostrarPassword] = useState(false);
+  // Estado para mostrar/ocultar contraseña
+  const [mostrarPasswordHash, setMostrarPasswordHash] = useState(false);
 
   // Si el modal no está marcado como abierto, no renderizamos nada
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Tu lógica de validación
-    if (nombreUsuario === "admin@test.com" && password === "123456") {
+    
+    // CORRECCIÓN 1: Usar PasswordHash (que es tu variable de estado)
+    if (NombreUsuario === "Ramiro" && PasswordHash === "Ramiro123") {
       localStorage.setItem("Token", "SesionIniciada");
+      
       onClose(); // Cerramos el modal
+      
+      // CORRECCIÓN 2: Redirigir y luego recargar si es necesario 
+      // (aunque con el estado del Navbar que te pasé antes, el navigate debería bastar)
       navigate("/Principal");
-      window.location.reload(); 
+      setTimeout(() => {
+          window.location.reload(); 
+      }, 100);
+      
     } else {
       setError("Credenciales incorrectas.");
     }
@@ -43,9 +51,9 @@ const InicioSesion = ({ isOpen, onClose }) => {
               <label>Nombre de Usuario:</label>
               <input 
                 type="text" 
-                value={nombreUsuario} 
+                value={NombreUsuario} 
                 onChange={(e) => setNombreUsuario(e.target.value)} 
-                placeholder="AgustinGarcia_2002" 
+                placeholder="Ej: Ramiro" 
                 required 
               />
             </div>
@@ -54,19 +62,20 @@ const InicioSesion = ({ isOpen, onClose }) => {
               <label>Contraseña</label>
               <div className="input-con-icono">
                 <input 
-                  type={mostrarPassword ? "text" : "password"} 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)} 
+                  type={mostrarPasswordHash ? "text" : "password"} 
+                  value={PasswordHash} 
+                  onChange={(e) => setPasswordHash(e.target.value)} 
                   placeholder="••••••••" 
                   required 
                 />
                 <button 
                   type="button" 
                   className="btn-ver-password"
-                  onClick={() => setMostrarPassword(!mostrarPassword)}
-                  tabIndex="-1" // Evita seleccionarlo con Tabulador
+                  // CORRECCIÓN 3: Cambiar a mostrarPasswordHash
+                  onClick={() => setMostrarPasswordHash(!mostrarPasswordHash)}
+                  tabIndex="-1"
                 >
-                  {mostrarPassword ? "Ocultar" : "Ver"}
+                  {mostrarPasswordHash ? "Ocultar" : "Ver"}
                 </button>
               </div>
             </div>

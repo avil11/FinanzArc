@@ -1,8 +1,129 @@
-.BotonLogout{
-    background-color: #ff4d4d;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
+/* =========================================
+   PÁGINA DE PERFIL (DASHBOARD STYLE)
+   ========================================= */
+.perfil-pagina-contenedor-general{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.perfil-pagina-contenedor {
+    width: 100%;
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.perfil-tarjeta-premium {
+    background: linear-gradient(145deg, #222224, #1a1a1b);
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+    border-radius: 28px;
+    border: 1px solid rgba(200, 178, 119, 0.2);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+    text-align: center;
+    animation: fadeInPerfil 0.6s ease-out;
+}
+
+/* Avatar circular con borde dorado */
+.perfil-avatar {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #c8b277, #a68b2a);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 20px rgba(200, 178, 119, 0.3);
+}
+
+.avatar-inicial {
+    font-size: 2.5rem;
+    color: #111;
+    font-weight: bold;
+}
+
+.perfil-nombre {
+    color: #ffffff;
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.perfil-status {
+    color: #c8b277;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+}
+
+/* Lista de info */
+.perfil-info-lista {
+    text-align: left;
+    margin-bottom: 40px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 18px;
+    padding: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.info-item:last-child { margin-bottom: 0; }
+
+.info-item label {
+    color: #666;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.info-item span {
+    color: #ddd;
+    font-size: 1.05rem;
+}
+
+.badge-dorado {
+    color: #c8b277 !important;
+    font-weight: 600;
+}
+
+/* BOTÓN DE LOGOUT (ESTILO PELIGRO PERO ELEGANTE) */
+.BotonLogout {
+    width: 100%;
+    background-color: transparent;
+    color: #ff4d4d;
+    border: 1.5px solid rgba(255, 77, 77, 0.3);
+    padding: 14px;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.BotonLogout:hover {
+    background-color: rgba(255, 77, 77, 0.1);
+    border-color: #ff4d4d;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(255, 77, 77, 0.15);
+}
+
+.BotonLogout:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Animación de entrada */
+@keyframes fadeInPerfil {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
 }
