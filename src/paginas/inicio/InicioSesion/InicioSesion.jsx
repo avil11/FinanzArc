@@ -5,35 +5,72 @@ import "./InicioSesion.css";
 const InicioSesion = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const [NombreUsuario, setNombreUsuario] = useState("");
-  const [PasswordHash, setPasswordHash] = useState("");
+  const [PasswordHash, setPasswordHash] = useState(""); // Usamos el nombre que espera la API
   const [error, setError] = useState("");
-  
-  // Estado para mostrar/ocultar contraseña
   const [mostrarPasswordHash, setMostrarPasswordHash] = useState(false);
+  const [cargando, setCargando] = useState(false); // Para feedback visual
 
-  // Si el modal no está marcado como abierto, no renderizamos nada
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // CORRECCIÓN 1: Usar PasswordHash (que es tu variable de estado)
-    if (NombreUsuario === "Ramiro" && PasswordHash === "Ramiro123") {
-      localStorage.setItem("Token", "SesionIniciada");
-      
-      onClose(); // Cerramos el modal
-      
-      // CORRECCIÓN 2: Redirigir y luego recargar si es necesario 
-      // (aunque con el estado del Navbar que te pasé antes, el navigate debería bastar)
-      navigate("/Principal");
-      setTimeout(() => {
-          window.location.reload(); 
-      }, 100);
-      
-    } else {
-      setError("Credenciales incorrectas.");
-    }
+    iniciarSesion();
   };
+
+  function handleCerrarModal() {
+    setError("");
+    setNombreUsuario("");
+    setPasswordHash("");
+    onClose();
+  }
+
+  function iniciarSesion() {
+    setCargando(true);
+    setError("");
+
+    // Ajusta la URL a la que use tu proyecto de Visual Studio (ej: localhost:44332)
+    fetch("http://localhost:60496/api/Usuarios/Login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        NombreUsuario: NombreUsuario,
+        PasswordHash: PasswordHash, // Enviamos los nombres exactos de tu objeto Usuario en C#
+      }),
+    })
+      .then((response) => {
+        if (response.status === 401) {
+          throw new Error("Usuario o contraseña incorrectos.");
+        }
+        if (!response.ok) {
+          throw new Error("Error en el servidor. Inténtalo más tarde.");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Guardamos el JWT real que generó tu API en C#
+        localStorage.setItem("Token", data.Token);
+        localStorage.setItem("Nombre", data.Nombre);
+        localStorage.setItem("Apellido", data.Apellido);
+        localStorage.setItem("PlanActual", data.PlanActual);
+
+        handleCerrarModal();
+        navigate("/Principal");
+        
+        // Pequeño delay para asegurar que el token se guardó antes de recargar
+        setTimeout(() => {
+            window.location.reload(); 
+        }, 100);
+      })
+      .catch((err) => {
+        setError(err.message);
+        console.error("Login Error:", err);
+      })
+      .finally(() => {
+        setCargando(false);
+      });
+  }
 
   return (
     <div className="capa-modal-login" onClick={onClose}>
@@ -53,7 +90,7 @@ const InicioSesion = ({ isOpen, onClose }) => {
                 type="text" 
                 value={NombreUsuario} 
                 onChange={(e) => setNombreUsuario(e.target.value)} 
-                placeholder="Ej: Ramiro" 
+                placeholder="Ej: ramiro_dev" 
                 required 
               />
             </div>
@@ -71,7 +108,6 @@ const InicioSesion = ({ isOpen, onClose }) => {
                 <button 
                   type="button" 
                   className="btn-ver-password"
-                  // CORRECCIÓN 3: Cambiar a mostrarPasswordHash
                   onClick={() => setMostrarPasswordHash(!mostrarPasswordHash)}
                   tabIndex="-1"
                 >
@@ -80,8 +116,12 @@ const InicioSesion = ({ isOpen, onClose }) => {
               </div>
             </div>
 
-            <button type="submit" className="boton-primario login-btn-full">
-              Iniciar Sesión
+            <button 
+              type="submit" 
+              className="boton-primario login-btn-full"
+              disabled={cargando}
+            >
+              {cargando ? "Verificando..." : "Iniciar Sesión"}
             </button>
           </form>
         </div>

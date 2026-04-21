@@ -4,7 +4,14 @@ import "./Ingreso.css";
 
 function Ingreso() {
   const [modalAbierto, setModalAbierto] = useState(false);
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("Token"));
 
+effect(() => {
+    if (!isLoggedIn) {
+      navigate("/"); // Redirige al inicio si no hay token
+    }
+}, [isLoggedIn]);
   // Azul Vibrante, Oro Principal, Oro Oscuro, Gris Plomo
   const COLORES = ["#007AFF", "#c8b277", "#8a733f", "#4a4a4a"];
 
