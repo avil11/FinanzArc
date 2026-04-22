@@ -15,7 +15,7 @@ const GastoIngreso = () => {
   const [datosGastos, setDatosGastos] = useState([]);
   const [datosIngresos, setDatosIngresos] = useState([]);
   const [metasAhorro, setMetasAhorro] = useState([]);
-  
+
   const COLORES = ["#007AFF", "#c8b277", "#8a733f", "#4a4a4a"];
   const [modalAgregarAbierto, setModalAgregarAbierto] = useState(false);
   const [modalEditarAbierto, setModalEditarAbierto] = useState(false);
@@ -47,9 +47,9 @@ const GastoIngreso = () => {
 
     fetch(`${API_BASE_URL}${API_ENDPOINTS.usuarios}/ByToken`, {
       method: "GET",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}` 
+        "Authorization": `Bearer ${token}`
       },
     })
       .then((response) => {
@@ -125,40 +125,40 @@ const GastoIngreso = () => {
   // --- Lógica para Crear / Editar Meta ---
   const manejarGuardarMeta = () => {
     const token = localStorage.getItem("Token");
-    
+
     fetch(`${API_BASE_URL}${API_ENDPOINTS.usuarios}/ByToken`, {
       method: "GET",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}` 
+        "Authorization": `Bearer ${token}`
       },
     })
-    .then(res => res.json())
-    .then(userData => {
-      const metaAGuardar = {
-        IdMetaAhorro: metaForm.IdMetaAhorro,
-        Nombre: metaForm.Nombre,
-        MontoObjetivo: parseFloat(metaForm.MontoObjetivo),
-        MontoGuardado: parseFloat(metaForm.MontoGuardado),
-        FechaMeta: metaForm.FechaObjetivo,
-        FechaInicio: metaForm.FechaInicio,
-        IdDivisa: metaForm.Divisa,
-        IdUsuario: userData.IdUsuario
-      };
-      console.log("Meta a guardar:", metaAGuardar);
-      guardarMetaApi(metaAGuardar);
-    });
+      .then(res => res.json())
+      .then(userData => {
+        const metaAGuardar = {
+          IdMetaAhorro: metaForm.IdMetaAhorro,
+          Nombre: metaForm.Nombre,
+          MontoObjetivo: parseFloat(metaForm.MontoObjetivo),
+          MontoGuardado: parseFloat(metaForm.MontoGuardado),
+          FechaMeta: metaForm.FechaObjetivo,
+          FechaInicio: metaForm.FechaInicio,
+          IdDivisa: metaForm.Divisa,
+          IdUsuario: userData.IdUsuario
+        };
+        console.log("Meta a guardar:", metaAGuardar);
+        guardarMetaApi(metaAGuardar);
+      });
   };
 
   // MODIFICADO: Ahora maneja POST y PUT dinámicamente
   const guardarMetaApi = (metaAGuardar) => {
     const esEdicion = metaAGuardar.IdMetaAhorro !== null && metaAGuardar.IdMetaAhorro !== undefined;
-    
+
     // Si es edición, se agrega el ID al endpoint
-    const url = esEdicion 
+    const url = esEdicion
       ? `${API_BASE_URL}${API_ENDPOINTS.ahorros}/${metaAGuardar.IdMetaAhorro}`
       : `${API_BASE_URL}${API_ENDPOINTS.ahorros}`;
-    
+
     // Si es edición usamos PUT, si no, POST
     const metodo = esEdicion ? "PUT" : "POST";
 
@@ -170,18 +170,18 @@ const GastoIngreso = () => {
       },
       body: JSON.stringify(metaAGuardar)
     })
-    .then((response) => {
-      if (!response.ok) throw new Error(`Error al ${esEdicion ? 'editar' : 'guardar'} la meta`);
-      
-      // Validamos por si el PUT devuelve 204 No Content para evitar errores de parseo
-      return response.text().then(text => text ? JSON.parse(text) : {});
-    })
-    .then(() => {
-      setModalAgregarAbierto(false);
-      setModalEditarAbierto(false);
-      obtenerDatos(); // Recargamos todo
-    })
-    .catch((error) => console.error("Error guardando meta:", error));
+      .then((response) => {
+        if (!response.ok) throw new Error(`Error al ${esEdicion ? 'editar' : 'guardar'} la meta`);
+
+        // Validamos por si el PUT devuelve 204 No Content para evitar errores de parseo
+        return response.text().then(text => text ? JSON.parse(text) : {});
+      })
+      .then(() => {
+        setModalAgregarAbierto(false);
+        setModalEditarAbierto(false);
+        obtenerDatos(); // Recargamos todo
+      })
+      .catch((error) => console.error("Error guardando meta:", error));
   };
 
   // --- Funciones de Renderizado ---
@@ -235,15 +235,15 @@ const GastoIngreso = () => {
         "Authorization": `Bearer ${localStorage.getItem("Token")}`
       }
     })
-    .then((response) => {
-      if (!response.ok) throw new Error("Error al eliminar la meta");
-      setModalEditarAbierto(false);
-      obtenerDatos(); // Recargamos todo
-    })
-    .catch((error) => console.error("Error eliminando meta:", error));
+      .then((response) => {
+        if (!response.ok) throw new Error("Error al eliminar la meta");
+        setModalEditarAbierto(false);
+        obtenerDatos(); // Recargamos todo
+      })
+      .catch((error) => console.error("Error eliminando meta:", error));
 
   }
-  
+
   const nombre = localStorage.getItem("Nombre") || "Usuario";
   const apellido = localStorage.getItem("Apellido") || "";
 
@@ -259,13 +259,13 @@ const GastoIngreso = () => {
       IdMetaAhorro: meta.IdMetaAhorro,
       Nombre: meta.Nombre || "",
       MontoObjetivo: meta.MontoObjetivo || "",
-      MontoGuardado: meta.MontoGuardado || "",
-      FechaObjetivo: meta.FechaObjetivo ? meta.FechaObjetivo.split('T')[0] : "",
+      // CAMBIO AQUÍ: Usamos 'actual' que es el nombre que le diste en obtenerAhorros
+      MontoGuardado: meta.actual || meta.MontoGuardado || 0,
+      FechaObjetivo: meta.FechaMeta ? meta.FechaMeta.split('T')[0] : (meta.FechaObjetivo ? meta.FechaObjetivo.split('T')[0] : ""),
       FechaInicio: meta.FechaInicio ? meta.FechaInicio.split('T')[0] : "",
       IdDivisa: parseInt(meta.IdDivisa) || 1
     });
 
-    
     setModalEditarAbierto(true);
   };
 
@@ -396,48 +396,48 @@ const GastoIngreso = () => {
           <div className="contenido-modal" onClick={(e) => e.stopPropagation()}>
             <h3>Editar Meta de Ahorro</h3>
             <div className="formulario-cuerpo">
-                <div className="formulario-grupo">
-                  <label htmlFor="nombreMeta">Nombre de la Meta</label>
-                  <input type="text" name="Nombre" value={metaForm.Nombre} onChange={manejarCambioInput} id="nombreMeta" placeholder="Ej: Fondo de Emergencia" />
-                </div>
-                <div className="formulario-grupo">
-                  <label htmlFor="montoObjetivo">Monto Objetivo ($)</label>
-                  <input type="number" name="MontoObjetivo" value={metaForm.MontoObjetivo} onChange={manejarCambioInput} id="montoObjetivo" placeholder="0.00" />
-                </div>
-                <div className="formulario-grupo">
-                  <label htmlFor="montoActual">Monto Actual ($)</label>
-                  <input type="number" name="MontoGuardado" value={metaForm.MontoGuardado} onChange={manejarCambioInput} id="montoActual" placeholder="0.00" />
-                </div>
-                <div className="formulario-grupo">
-                  <label htmlFor="fechaObjetivo">Fecha Objetivo</label>
-                  <input type="date" name="FechaObjetivo" value={metaForm.FechaObjetivo} onChange={manejarCambioInput} id="fechaObjetivo" />
-                </div>
-                <div className="formulario-grupo">
-                  <label htmlFor="fechaInicio">Fecha de Inicio</label>
-                  <input type="date" name="FechaInicio" value={metaForm.FechaInicio} onChange={manejarCambioInput} id="fechaInicio" />
-                </div>
-                <div className="formulario-grupo">
-                  <label htmlFor="divisa">Divisa</label>
-                  <select name="Divisa" value={metaForm.IdDivisa} onChange={manejarCambioInput} id="divisa" >
-                    <option value="1" >ARS - Peso Argentino</option>
-                    <option value="2">USD - Dólar Estadounidense</option>
-                    <option value="3">EUR - Euro</option>
-                  </select>
-                </div>
-            </div>
-            <div className="formulario-acciones">
-                <button className="boton-secundario" style={{ backgroundColor: '#dc3545' }} onClick={manejarEliminarMeta}>
-                  Eliminar
-                </button>
-                <button className="boton-secundario" onClick={() => setModalEditarAbierto(false)}>
-                  Cancelar
-                </button>
-                <button className="boton-primario" onClick={manejarGuardarMeta}>
-                  Guardar
-                </button>
+              <div className="formulario-grupo">
+                <label htmlFor="nombreMeta">Nombre de la Meta</label>
+                <input type="text" name="Nombre" value={metaForm.Nombre} onChange={manejarCambioInput} id="nombreMeta" placeholder="Ej: Fondo de Emergencia" />
+              </div>
+              <div className="formulario-grupo">
+                <label htmlFor="montoGuardado">Monto Actual ($)</label>
+                <input type="number" name="MontoGuardado" value={metaForm.MontoGuardado} onChange={manejarCambioInput} id="MontoGuardado" placeholder="0.00" />
+              </div>
+              <div className="formulario-grupo">
+                <label htmlFor="montoObjetivo">Monto Objetivo ($)</label>
+                <input type="number" name="MontoObjetivo" value={metaForm.MontoObjetivo} onChange={manejarCambioInput} id="montoObjetivo" placeholder="0.00" />
+              </div>
+              <div className="formulario-grupo">
+                <label htmlFor="fechaInicio">Fecha de Inicio</label>
+                <input type="date" name="FechaInicio" value={metaForm.FechaInicio} onChange={manejarCambioInput} id="fechaInicio" />
+              </div>
+              <div className="formulario-grupo">
+                <label htmlFor="fechaObjetivo">Fecha Objetivo</label>
+                <input type="date" name="FechaObjetivo" value={metaForm.FechaObjetivo} onChange={manejarCambioInput} id="fechaObjetivo" />
+              </div>
+              <div className="formulario-grupo">
+                <label htmlFor="divisa">Divisa</label>
+                <select name="Divisa" value={metaForm.IdDivisa} onChange={manejarCambioInput} id="divisa" >
+                  <option value="1" >ARS - Peso Argentino</option>
+                  <option value="2">USD - Dólar Estadounidense</option>
+                  <option value="3">EUR - Euro</option>
+                </select>
               </div>
             </div>
+            <div className="formulario-acciones">
+              <button className="boton-secundario" style={{ backgroundColor: '#dc3545' }} onClick={manejarEliminarMeta}>
+                Eliminar
+              </button>
+              <button className="boton-secundario" onClick={() => setModalEditarAbierto(false)}>
+                Cancelar
+              </button>
+              <button className="boton-primario" onClick={manejarGuardarMeta}>
+                Guardar
+              </button>
+            </div>
           </div>
+        </div>
       )}
 
       {/* MODAL AGREGAR */}
@@ -446,45 +446,46 @@ const GastoIngreso = () => {
           <div className="contenido-modal" onClick={(e) => e.stopPropagation()}>
             <h3>Nueva Meta de Ahorro</h3>
             <div className="formulario-cuerpo">
-                <div className="formulario-grupo">
-                  <label htmlFor="nombreMeta">Nombre de la Meta</label>
-                  <input type="text" name="Nombre" value={metaForm.Nombre} onChange={manejarCambioInput} id="nombreMeta" placeholder="Ej: Fondo de Emergencia" />
-                </div>
-                <div className="formulario-grupo">
-                  <label htmlFor="montoObjetivo">Monto Objetivo ($)</label>
-                  <input type="number" name="MontoObjetivo" value={metaForm.MontoObjetivo} onChange={manejarCambioInput} id="montoObjetivo" placeholder="0.00" />
-                </div>
-                <div className="formulario-grupo">
-                  <label htmlFor="montoActual">Monto Actual ($)</label>
-                  <input type="number" name="MontoGuardado" value={metaForm.MontoGuardado} onChange={manejarCambioInput} id="montoActual" placeholder="0.00" />
-                </div>
-                <div className="formulario-grupo">
-                  <label htmlFor="fechaObjetivo">Fecha Objetivo</label>
-                  <input type="date" name="FechaObjetivo" value={metaForm.FechaObjetivo} onChange={manejarCambioInput} id="fechaObjetivo" />
-                </div>
-                <div className="formulario-grupo">
-                  <label htmlFor="fechaInicio">Fecha de Inicio</label>
-                  <input type="date" name="FechaInicio" value={metaForm.FechaInicio} onChange={manejarCambioInput} id="fechaInicio" />
-                </div>
-                <div className="formulario-grupo">
-                  <label htmlFor="divisa">Divisa</label>
-                  <select name="Divisa" value={metaForm.Divisa} onChange={manejarCambioInput} id="divisa">
-                    <option value="1">ARS - Peso Argentino</option>
-                    <option value="2">USD - Dólar Estadounidense</option>
-                    <option value="3">EUR - Euro</option>
-                  </select>
-                </div>
-            </div>
-            <div className="formulario-acciones">
-                <button className="boton-secundario" onClick={() => setModalAgregarAbierto(false)}>
-                  Cancelar
-                </button>
-                <button className="boton-primario" onClick={manejarGuardarMeta}>
-                  Guardar
-                </button>
+              <div className="formulario-grupo">
+                <label htmlFor="nombreMeta">Nombre de la Meta</label>
+                <input type="text" name="Nombre" value={metaForm.Nombre} onChange={manejarCambioInput} id="nombreMeta" placeholder="Ej: Fondo de Emergencia" />
+              </div>
+              <div className="formulario-grupo">
+                <label htmlFor="montoGuardado">Monto Actual ($)</label>
+                <input type="number" name="MontoGuardado" value={metaForm.MontoGuardado} onChange={manejarCambioInput} id="montoGuardado" placeholder="0.00" />
+              </div>
+              <div className="formulario-grupo">
+                <label htmlFor="montoObjetivo">Monto Objetivo ($)</label>
+                <input type="number" name="MontoObjetivo" value={metaForm.MontoObjetivo} onChange={manejarCambioInput} id="montoObjetivo" placeholder="0.00" />
+              </div>
+              <div className="formulario-grupo">
+                <label htmlFor="fechaInicio">Fecha de Inicio</label>
+                <input type="date" name="FechaInicio" value={metaForm.FechaInicio} onChange={manejarCambioInput} id="fechaInicio" />
+              </div>
+              <div className="formulario-grupo">
+                <label htmlFor="fechaObjetivo">Fecha Objetivo</label>
+                <input type="date" name="FechaObjetivo" value={metaForm.FechaObjetivo} onChange={manejarCambioInput} id="fechaObjetivo" />
+              </div>
+
+              <div className="formulario-grupo">
+                <label htmlFor="divisa">Divisa</label>
+                <select name="Divisa" value={metaForm.Divisa} onChange={manejarCambioInput} id="divisa">
+                  <option value="1">ARS - Peso Argentino</option>
+                  <option value="2">USD - Dólar Estadounidense</option>
+                  <option value="3">EUR - Euro</option>
+                </select>
               </div>
             </div>
+            <div className="formulario-acciones">
+              <button className="boton-secundario" onClick={() => setModalAgregarAbierto(false)}>
+                Cancelar
+              </button>
+              <button className="boton-primario" onClick={manejarGuardarMeta}>
+                Guardar
+              </button>
+            </div>
           </div>
+        </div>
       )}
     </div>
   );

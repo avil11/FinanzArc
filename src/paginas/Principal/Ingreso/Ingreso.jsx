@@ -148,13 +148,32 @@ function Ingreso() {
       <div className="pagina-ingreso-tarjeta">
         <div className="tarjeta">
           <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie data={datosGrafico.length > 0 ? datosGrafico : [{ nombre: "Sin datos", valor: 1 }]} cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={5} dataKey="valor">
-                {datosGrafico.map((_, i) => <Cell key={i} fill={COLORES[i % COLORES.length]} stroke="none" />)}
-              </Pie>
-              <Tooltip contentStyle={{ backgroundColor: "#1e1e1f", border: "1px solid rgba(200, 178, 119, 0.3)", color: "#fff", borderRadius: "8px" }} />
-            </PieChart>
-          </ResponsiveContainer>
+  <PieChart>
+    <Pie 
+      data={datosGrafico.length > 0 ? datosGrafico : [{ nombre: "Sin datos", valor: 1 }]} 
+      cx="50%" 
+      cy="50%" 
+      innerRadius={70} 
+      outerRadius={100} 
+      paddingAngle={5} 
+      dataKey="valor"
+      nameKey="nombre" // <--- AGREGÁ ESTO
+    >
+      {datosGrafico.map((_, i) => (
+        <Cell key={i} fill={COLORES[i % COLORES.length]} stroke="none" />
+      ))}
+    </Pie>
+    <Tooltip 
+      contentStyle={{ 
+        backgroundColor: "#1e1e1f", 
+        border: "1px solid rgba(200, 178, 119, 0.3)", 
+        color: "#fff", 
+        borderRadius: "8px" 
+      }} 
+      itemStyle={{ color: "#fff" }} // Opcional: para asegurar que el texto sea blanco
+    />
+  </PieChart>
+</ResponsiveContainer>
         </div>
 
         <div className="contenedor-tabla-filtradaCategoria">
@@ -184,7 +203,7 @@ function Ingreso() {
                 {ingresosFiltrados.map((item, index) => (
                   <tr key={index}>
                     <td>{item.Descripcion}</td>
-                    <td className="monto-destacado">${Number(item.MontoIngreso).toLocaleString()}</td>
+                    <td className="monto-destacado" style={{color: 'rgb(70, 130, 180)'}}>${Number(item.MontoIngreso).toLocaleString()}</td>
                     <td className="texto-gris">{new Date(item.FechaIngreso).toLocaleDateString()}</td>
                     <td>
                       <button className="btn-icon" onClick={() => prepararEdicion(item)}>✏️</button>

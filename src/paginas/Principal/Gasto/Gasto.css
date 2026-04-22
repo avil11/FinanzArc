@@ -6,7 +6,7 @@
     max-width: 1210px;
     /* Ancho máximo en PC, pero en celular será 100% */
     margin: 0 auto;
-    padding: 120px 20px 60px 20px;
+    padding: 100px 20px 60px 20px;
     box-sizing: border-box;
     /* CRUCIAL: Evita que el padding sume ancho extra */
     display: flex;
