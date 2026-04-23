@@ -57,6 +57,7 @@
     align-items: center;
     justify-content: center;
     transition: color 0.3s ease;
+    font-weight: 600;
 }
 .nav-link:after, .login-button:after {
     content: '';

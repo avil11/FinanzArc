@@ -278,6 +278,7 @@ const GastoIngreso = () => {
       </div>
 
       <div className="panel-graficos-general">
+
         {/* GRÁFICO GASTOS */}
         {datosGastos.length > 0 ? (
           <div className="tarjeta-general">
@@ -361,6 +362,7 @@ const GastoIngreso = () => {
         ) : (
           <EstadoVacio titulo="Fuentes de Ingreso" mensaje="No se encontraron ingresos registrados." />
         )}
+        
       </div>
 
       <div className="contenedor-ahorros-general">
