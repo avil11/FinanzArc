@@ -1,20 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom"; // Agregamos useLocation
 import "../NavBar/Navbar.css";
-// 1. NUEVO: Importamos el componente del modal (Asegúrate de poner la ruta correcta hacia tu archivo)
+// 1. NUEVO: Importamos el componente del modal
 import InicioSesion from "../../paginas/inicio/InicioSesion/InicioSesion"; 
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { hash } = useLocation(); // Detectamos el hash de la URL (#inicio, #servicio, etc.)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
-  // 2. NUEVO: Estado para abrir/cerrar el modal desde el Navbar
   const [modalAbierto, setModalAbierto] = useState(false);
-
-  // Usamos un estado para el login para que React re-renderice al cambiar
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("Token"));
 
-  // Sincronizar el estado de login (útil si el token cambia sin recargar la página)
+// --- LÓGICA DE SCROLL CALIBRADA ---
+  useEffect(() => {
+    if (hash) {
+      const id = hash.replace("#", "");
+      const element = document.getElementById(id);
+      if (element) {
+        setTimeout(() => {
+          // Calculamos la posición del elemento menos el alto del navbar (ej: 80px)
+          const yOffset = -80; 
+          const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+          window.scrollTo({ top: y, behavior: "smooth" });
+        }, 100);
+      }
+    }
+  }, [hash]);
+
   useEffect(() => {
     const checkToken = () => {
       setIsLoggedIn(!!localStorage.getItem("Token"));
@@ -28,13 +41,11 @@ const Navbar = () => {
     if (isLoggedIn) {
       navigate("/dashboard");
     } else {
-      // 3. MODIFICADO: En lugar de navegar a "/registro", encendemos el modal
       setModalAbierto(true);
     }
   };
 
   const handleLogout = () => {
-    // Nota extra: Cambié "token" por "Token" para que coincida exactamente con tu useEffect
     localStorage.removeItem("Token"); 
     setIsLoggedIn(false);
     closeMobileMenu();
@@ -72,19 +83,20 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link to="/" className="nav-link">Inicio</Link>
-              <Link to="/servicios" className="nav-link">Servicios</Link>
-              <Link to="/propuesta" className="nav-link">Propuesta</Link>
-              <Link to="/contacto" className="nav-link">Contactanos</Link>
+              {/* Rutas con Hash para redirigir a apartados */}
+              <Link to="/#inicio" className="nav-link">Inicio</Link>
+              <Link to="/#servicio" className="nav-link">Servicios</Link>
+              <Link to="/#propuesta" className="nav-link">Propuesta</Link>
+              <Link to="/#contacto" className="nav-link">Contactanos</Link>
             </>
           )}
         </div>
 
-        {/* Sección Acceso */}
+        {/* --- SECCION DE ACCESO */}
         <div className="auth-section desktop-menu">
           <div className="">
             {isLoggedIn ? (
-              <button   style={{display: 'none'}}>
+              <button style={{display: 'none'}}>
                 Cerrar Sesión
               </button>
             ) : (
@@ -112,7 +124,6 @@ const Navbar = () => {
               <>
                 <Link to="/principal" className="mobile-link" onClick={closeMobileMenu}>Principal</Link>
                 <Link to="/ingreso" className="mobile-link" onClick={closeMobileMenu}>Ingresos</Link>
-                <Link to="/ahorro" className="mobile-link" onClick={closeMobileMenu}>Ahorros</Link>
                 <Link to="/gasto" className="mobile-link" onClick={closeMobileMenu}>Gastos</Link>
                 <Link to="/perfil" className="mobile-link" onClick={closeMobileMenu}>Mi Perfil</Link>
                 <button onClick={handleLogout} className="mobile-login-button logout-variant">
@@ -121,10 +132,11 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Link to="/" className="mobile-link" onClick={closeMobileMenu}>Inicio</Link>
-                <Link to="/servicios" className="mobile-link" onClick={closeMobileMenu}>Servicios</Link>
-                <Link to="/propuesta" className="mobile-link" onClick={closeMobileMenu}>Propuesta</Link>
-                <Link to="/contacto" className="mobile-link" onClick={closeMobileMenu}>Contactanos</Link>
+
+                <Link to="/#inicio" className="mobile-link" onClick={closeMobileMenu}>Inicio</Link>
+                <Link to="/#servicio" className="mobile-link" onClick={closeMobileMenu}>Servicios</Link>
+                <Link to="/#carrousel" className="mobile-link" onClick={closeMobileMenu}>Propuesta</Link>
+                <Link to="/#contacto" className="mobile-link" onClick={closeMobileMenu}>Contactanos</Link>
                 <button onClick={handleLoginClick} className="mobile-login-button">
                   Ingreso
                 </button>
@@ -134,7 +146,6 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* 4. NUEVO: Aquí inyectamos tu modal. Está "escondido" hasta que isOpen sea true */}
       <InicioSesion 
         isOpen={modalAbierto} 
         onClose={() => setModalAbierto(false)} 

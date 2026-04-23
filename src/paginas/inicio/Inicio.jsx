@@ -7,7 +7,7 @@ const Inicio = () => {
     <div className="main-wrapper">
       {/* SECCIÓN HERO */}
       
-      <div className="containerInicio">
+      <div className="containerInicio" id="inicio">
         <div className="contenedorBackground">
           <img
             src="/Imagenes/Gemini_Generated_Image_ebcj9lebcj9lebcj.webp"
@@ -24,10 +24,7 @@ const Inicio = () => {
         </div>
       </div>
 
-
-
-      {/* SECCIÓN SOBRE EL PROYECTO / SERVICIOS */}
-      <div className="containerServicio">
+      <div className="containerServicio" id="servicio">
         <div className="containerProyecto">
           <h1>Sobre el Proyecto</h1>
           <p>
@@ -82,7 +79,7 @@ const Inicio = () => {
         </div>
       </div>
 
-      <div className="containerPropuesta">
+      <div className="containerPropuesta" id="propuesta">
         <div className="containerPropuestaIzquierda">
           <div className="introduccion">
             <h1>Toma el control absoluto de tu patrimonio</h1>
@@ -111,7 +108,7 @@ const Inicio = () => {
           <img src="/Imagenes/ImagenSobrePatrimonio.webp" alt="" />
         </div>
       </div>
-      {/* BLOQUE 2: El nuevo componente de Carrusel */}
+
     <div className="propuesta-solo-movil">
         <CarrouselPropuesta />
     </div>

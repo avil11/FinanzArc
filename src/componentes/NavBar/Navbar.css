@@ -5,21 +5,17 @@
     padding: 0;
     font-family: 'Inter', -apple-system, sans-serif;
 }
-
 .navbar-container {
     width: 100%;
     background-color: #000000;
-    /* Fondo oscuro total */
     display: flex;
     justify-content: center;
     align-items: center;
     height: 90px;
-    /* Un poco más de aire */
     position: sticky;
     top: 0;
     z-index: 1000;
 }
-
 .nav-content {
     background-color: #121212;
     width: 100%;
@@ -30,8 +26,6 @@
     align-items: center;
     padding: 0 20px;
 }
-
-/* --- Logo --- */
 .logo-text {
     font-size: 2rem;
     font-weight: 200;
@@ -39,81 +33,62 @@
     letter-spacing: 1px;
     position: relative;
     z-index: 1100;
-    /* Para que quede por encima del menú móvil */
 }
-
-/* --- Menú Central Estilo Píldora --- */
 .menu-pill {
     display: flex;
     background-color: #272626;
     padding: 6px;
     border-radius: 50px;
-    /* Forma de píldora perfecta */
     gap: 5px;
     transition: box-shadow 0.3s ease;
     align-items: center;
 }
-
 .menu-pill:hover {
     box-shadow: 0px 0px 15px rgba(200, 178, 119, 0.2);
 }
 
-.nav-link {
-    text-decoration: none;
+/* === ANIMACIÓN DE SUBRAYADO CORTO Y CENTRADO ==== */
+.nav-link, .login-button {
+    text-decoration: none !important;
     color: #ffffffd8;
+    position: relative;
     padding: 10px 20px;
-    border-radius: 40px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
+}
+.nav-link:after, .login-button:after {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    width: 0;
+    height: 2px;
+    background-color: white;
+    transition: width 0.3s ease;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
-.nav-link:hover {
-    background-color: #3d3c3c;
+.nav-link:hover, .login-button:hover {
     color: #ffffff;
 }
 
-/* --- Sección Acceso (Copia fiel de la Píldora) --- */
-.auth-pill {
-    display: flex;
-    background-color: #272626;
-    /* Mismo gris que el menú central */
-    padding: 6px;
-    border-radius: 50px;
-    transition: box-shadow 0.3s ease;
-    align-items: center;
+.nav-link:hover:after, .login-button:hover:after {
+    width: 45px;
 }
-
-/* Mismo efecto hover que el menú central */
-.auth-pill:hover {
+.login-button {
+    height: 50px;
+    background-color: #272626;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+.login-button:hover {
     box-shadow: 0px 0px 15px rgba(200, 178, 119, 0.2);
 }
-
-/* --- Estilo del Botón dentro de la píldora --- */
-.login-button {
-    background-color: transparent;
-    /* Fondo transparente para que se vea el de la píldora */
-    color: #ffffffd8;
-    border: none;
-    padding: 10px 24px;
-    border-radius: 40px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-/* Efecto al pasar el mouse sobre el botón (igual que los links del menú) */
-.login-button:hover {
-    background-color: #3d3c3c;
-    color: #ffffff;
-}
-
-.login-button:active {
-    transform: scale(0.96);
-}
-
-/* Ocultar elementos móviles en escritorio por defecto */
 .hamburger-icon {
     display: none;
 }
@@ -122,18 +97,12 @@
     display: none;
 }
 
-
-/* =========================================
-   RESPONSIVE (MENÚ HAMBURGUESA)
-   ========================================= */
+/* === RESPONSIVE (MENÚ HAMBURGUESA) === */
 @media (max-width: 810px) {
 
-    /* 1. Ocultamos los menús normales */
     .desktop-menu {
         display: none !important;
     }
-
-    /* 2. Mostramos y estilizamos el icono de hamburguesa */
     .hamburger-icon {
         display: flex;
         flex-direction: column;
@@ -142,10 +111,7 @@
         height: 24px;
         cursor: pointer;
         z-index: 1100;
-        /* Siempre visible por encima de la capa */
     }
-
-    /* Las 3 rayitas */
     .hamburger-icon span {
         display: block;
         width: 100%;
@@ -155,25 +121,18 @@
         transition: all 0.3s linear;
         transform-origin: 1px;
     }
-
-    /* Animación para convertir en 'X' al abrir */
     .hamburger-icon.open span:nth-child(1) {
         top: 10px;
-        /* EL SECRETO 2: scale(0.85) achica sutilmente la línea para que la X no se vea gigante */
         transform: rotate(45deg) scale(0.85);
     }
 
     .hamburger-icon.open span:nth-child(2) {
         opacity: 0;
-        /* En lugar de moverla, la colapsamos en el centro */
         transform: scale(0);
     }
-
     .hamburger-icon.open span:nth-child(3) {
         transform: rotate(-45deg) scale(0.85);
     }
-
-    /* 3. El Menú Desplegable (Capa que cubre toda la pantalla) */
     .mobile-menu-overlay {
         display: flex;
         position: fixed;
@@ -182,27 +141,20 @@
         width: 100vw;
         height: 100vh;
         background-color: #000000;
-        /* Fondo oscuro */
         z-index: 1050;
-        /* Por debajo del logo y la hamburguesa */
         flex-direction: column;
         justify-content: center;
         align-items: center;
-
-        /* Animación de entrada */
         opacity: 0;
         pointer-events: none;
         transform: translateY(-20px);
         transition: opacity 0.3s ease, transform 0.3s ease;
     }
-
     .mobile-menu-overlay.open {
         opacity: 1;
         pointer-events: all;
         transform: translateY(0);
     }
-
-    /* 4. Estilos de los links dentro del menú móvil */
     .mobile-menu-content {
         display: flex;
         flex-direction: column;
@@ -211,38 +163,30 @@
         width: 100%;
     }
 
-    /* =========================================
-       LINKS DEL MENÚ MÓVIL
-       ========================================= */
+    /* === LINKS DEL MENÚ MÓVIL === */
     .mobile-link {
         color: #ffffff;
         font-size: 1.5rem;
         font-weight: 300;
         text-transform: uppercase;
         letter-spacing: 2px;
-        display: inline-block; /* Obligatorio para que el 'transform' funcione bien en links */
-        
-        /* TRUCO PARA EL SUBRAYADO SUAVE */
-        text-decoration: underline; 
-        text-decoration-color: transparent; /* Empieza invisible */
-        text-underline-offset: 6px; /* Lo separa un poco del texto para más elegancia */
-        
-        /* ANIMACIÓN PARA TODO (Color, tamaño y subrayado) */
-        transition: all 0.3s ease; 
+        display: inline-block;
+        text-decoration: underline;
+        text-decoration-color: transparent;
+        text-underline-offset: 6px;
+        transition: all 0.3s ease;
     }
 
     .mobile-link:hover {
-        text-decoration-color: #ffffff; /* El subrayado aparece suavemente */
+        text-decoration-color: #ffffff;
     }
 
     .mobile-link:active {
-        color: #c8b277; /* Color dorado al presionar */
-        transform: scale(1.05); /* Lo cambié a 1.05 parejo para que no se estire solo a lo alto, se siente más natural */
+        color: #c8b277;
+        transform: scale(1.05);
     }
 
-    /* =========================================
-       BOTÓN DE LOGIN MÓVIL
-       ========================================= */
+    /*--- BOTÓN DE LOGIN MÓVIL ---*/
     .mobile-login-button {
         font-weight: 400;
         text-transform: uppercase;
@@ -254,27 +198,24 @@
         font-size: 1.3rem;
         letter-spacing: 1px;
         cursor: pointer;
-        
+
         /* TRUCO PARA EL SUBRAYADO SUAVE */
         text-decoration: underline;
         text-decoration-color: transparent;
         text-underline-offset: 6px;
-        
+
         /* ANIMACIÓN PARA TODO */
         transition: all 0.3s ease;
     }
 
     .mobile-login-button:hover {
-        text-decoration-color: #ffffff; /* El subrayado aparece suavemente */
+        text-decoration-color: #ffffff;
     }
 
     .mobile-login-button:active {
-    /* 0px X, 0px Y, 20px de difuminado, Color */
-    box-shadow: 0px 5px 15px #c8b277; 
-    transform: scale(0.96);
-}
+        box-shadow: 0px 5px 15px #c8b277;
+        transform: scale(0.96);
+    }
 }
 
-@media (max-width:480px) {
-    
-}
+@media (max-width:480px) {}

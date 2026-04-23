@@ -39,7 +39,7 @@ const CarrouselPropuesta = () => {
   ];
 
   return (
-    <section className="contenedor-carrusel-movil">
+    <section className="contenedor-carrusel-movil" id="carrousel">
       <div className="introduccion-carrusel">
         <h1>Toma el control absoluto de tu patrimonio</h1>
         <p>
@@ -70,8 +70,7 @@ const CarrouselPropuesta = () => {
       >
         {itemsPropuesta.map((item, index) => (
           <SwiperSlide key={index}>
-            <div className="tarjeta-propuesta">
-              
+            <div className="tarjeta-propuesta">  
               {/* Contenedor del Logo */}
               <div className="logo-container">
                 <img 
@@ -86,17 +85,14 @@ const CarrouselPropuesta = () => {
                   }}
                 />
               </div>
-              
               <h2>{item.title}</h2>
               <p>{item.texto}</p>
-              
-              {/* Texto de beneficio (tilde) */}
               <span className="tilde-texto">{item.tilde}</span>
-              
             </div>
           </SwiperSlide>
         ))}
       </Swiper>
+
     </section>
   );
 };

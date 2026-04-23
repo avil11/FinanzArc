@@ -35,7 +35,7 @@ const Footer = () => {
   ];
 
   return (
-    <div className="layou-display">
+    <div className="layou-display" id="contacto">
       <footer className="footer-principal">
         <div className="footer-contenido">
           {/* Izquierda: Branding */}

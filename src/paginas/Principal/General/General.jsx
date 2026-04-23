@@ -271,6 +271,7 @@ const GastoIngreso = () => {
 
   return (
     <div className="contenedor-principal-general">
+      
       <div className="seccion-encabezado-general">
         <h2>{mostrarSaludo ? `¡Bienvenido, ${nombre} ${apellido}!` : "Resumen Financiero"}</h2>
         <p style={{ color: "#888888" }}>Gestioná tu patrimonio en FinanzARC</p>
