@@ -16,13 +16,57 @@
 }
 
 /* --- ENCABEZADO --- */
+/* Contenedor principal de la sección */
 .seccion-encabezado-general {
-    text-align: center;
-    margin-bottom: 50px;
-    width: 100%;
-    animation: fadeIn 0.6s ease-in-out;
+  display: flex;
+  flex-direction: column; /* Título arriba, botones abajo */
+  gap: 20px;
+  padding: 20px;
+  background-color: #000000; /* Fondo negro profundo */
+  align-items: flex-start; /* Alineación a la izquierda */
 }
 
+.titulo-principal-general h2 {
+  font-size: 2rem;
+  color: #ffffff;
+  margin: 0;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.titulo-principal-general p {
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.botones-funciones-comparativas {
+  display: flex;
+  flex-direction: row; 
+  gap: 15px;           
+  margin-top: 10px;
+}
+.botonesComparativa {
+  background: transparent;
+  border: 1px solid #444444; 
+    border-color: #D4AF37; 
+  color: #D4AF37;
+  padding: 10px 20px;
+  border-radius: 4px;       
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.botonesComparativa:hover {
+  background-color: #D4AF37;
+  border-color: #D4AF37;
+  color: #000000;
+  transform: translateY(-2px); 
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
 .seccion-encabezado-general h2 {
     font-size: 2.2rem;
     font-weight: 300;

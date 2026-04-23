@@ -271,10 +271,17 @@ const GastoIngreso = () => {
 
   return (
     <div className="contenedor-principal-general">
-      
+      {/*Botones de función comparativa*/}
       <div className="seccion-encabezado-general">
-        <h2>{mostrarSaludo ? `¡Bienvenido, ${nombre} ${apellido}!` : "Resumen Financiero"}</h2>
-        <p style={{ color: "#888888" }}>Gestioná tu patrimonio en FinanzARC</p>
+        <div className="titulo-principal-general">
+          <h2>{mostrarSaludo ? `¡Bienvenido, ${nombre} ${apellido}!` : "Resumen Financiero"}</h2>
+          <p style={{ color: "#888888" }}>Gestioná tu patrimonio en FinanzARC</p>
+        </div>
+        <div className="botones-funciones-comparativas">
+          <button className="boton-general-dia botonesComparativa">Finalizar Dia</button>
+          <button className="boton-general-semana botonesComparativa">Finalizar Semana</button>
+          <button className="boton-general-mes botonesComparativa">Finalizar Mes</button>
+        </div>
       </div>
 
       <div className="panel-graficos-general">
@@ -362,7 +369,7 @@ const GastoIngreso = () => {
         ) : (
           <EstadoVacio titulo="Fuentes de Ingreso" mensaje="No se encontraron ingresos registrados." />
         )}
-        
+
       </div>
 
       <div className="contenedor-ahorros-general">
