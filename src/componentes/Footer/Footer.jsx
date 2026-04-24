@@ -14,23 +14,23 @@ const Footer = () => {
     {
       nombre: "Ramiro",
       rol: "Frontend Developer",
-      link: "https://www.linkedin.com/",
+      link: "https://www.linkedin.com/in/ramiro-avila-475648348/",
       foto: "",
-      texturaFondo: "/Imagenes/textura2.webp",
+      texturaFondo: "/Imagenes/ramiro.webp",
     },
     {
       nombre: "Cristian",
       rol: "Backend Developer",
       link: "https://www.linkedin.com/in/",
       foto: "",
-      texturaFondo: "/Imagenes/textura3.webp",
+      texturaFondo: "/Imagenes/cristian.webp",
     },
     {
       nombre: "Mateo",
       rol: "UI/UX Designer",
       link: "https://www.linkedin.com/in/",
       foto: "",
-      texturaFondo: "/Imagenes/textura4.webp",
+      texturaFondo: "/Imagenes/mateo.webp",
     },
   ];
 

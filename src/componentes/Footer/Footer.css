@@ -39,7 +39,7 @@
 /* --- GRID DEL EQUIPO --- */
 .grid-equipo {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* 2 integrantes por fila */
+    grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
 
@@ -57,7 +57,7 @@
 
 .tarjeta-miembro:hover {
     transform: translateY(-5px);
-    border: 1px solid rgba(200, 178, 119, 0.4); /* Resplandor oro sutil */
+    border: 1px solid rgba(200, 178, 119, 0.4);
 }
 /* =======================================
    ESTILOS DEL AVATAR (CÍRCULO COMPLETO)
@@ -66,8 +66,6 @@
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    
-    /* Configuración para que la imagen cubra todo el círculo */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -77,7 +75,7 @@
 }
 
 .tarjeta-miembro:hover .avatar-placeholder {
-    border-color: rgba(200, 178, 119, 0.4); /* Brillo dorado en el borde al hacer hover */
+    border-color: rgba(200, 178, 119, 0.4);
 }
 
 /* 3. Animación (Keyframes) */
@@ -86,8 +84,6 @@
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
-/* ======================================= */
-
 .info-miembro h5 {
     color: #ffffff;
     font-size: 0.9rem;

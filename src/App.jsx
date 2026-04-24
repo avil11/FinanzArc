@@ -5,7 +5,7 @@ import Footer from './componentes/Footer/Footer';
 import Inicio from './paginas/inicio/Inicio';
 import Registro from './paginas/inicio/InicioSesion/InicioSesion';
 import Principal from './paginas/Principal/General/General';
-import Ahorro from "./paginas/Principal/Ahorro/Ahorro";
+import Comparativa from "./paginas/Principal/Comparativa/Comparativa";
 import Ingreso from './paginas/Principal/Ingreso/Ingreso';
 import Gasto from './paginas/Principal/Gasto/Gasto';
 import Perfil from './paginas/perfil/Perfil';
@@ -19,15 +19,15 @@ function App() {
       <Routes>
         <Route path="/" element={<Inicio />} />
         <Route path="/registro" element={<Registro />} />
-        <Route path="/dashboard" element={<div style={{padding: '50px'}}><h1>Bienvenido a tu Panel</h1></div>} />
-        <Route path="/principal" element={<Principal />} /> 
-        <Route path="/ahorro" element={<Ahorro />} />
+        <Route path="/dashboard" element={<div style={{ padding: '50px' }}><h1>Bienvenido a tu Panel</h1></div>} />
+        <Route path="/principal" element={<Principal />} />
+        <Route path="/comparativa/:periodo" element={<Comparativa />} />
         <Route path="/ingreso" element={<Ingreso />} />
         <Route path="/gasto" element={<Gasto />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/inicio-sesion" element={<InicioSesion />} />
       </Routes>
-      <Footer/>
+      <Footer />
     </BrowserRouter>
   );
 }

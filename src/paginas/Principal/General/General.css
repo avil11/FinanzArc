@@ -18,61 +18,75 @@
 /* --- ENCABEZADO --- */
 /* Contenedor principal de la sección */
 .seccion-encabezado-general {
-  display: flex;
-  flex-direction: column; /* Título arriba, botones abajo */
-  gap: 20px;
-  padding: 20px;
-  background-color: #000000; /* Fondo negro profundo */
-  align-items: flex-start; /* Alineación a la izquierda */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    /* Título arriba, botones abajo */
+    gap: 20px;
+    padding: 20px;
+    background-color: #000000;
+    /* Fondo negro profundo */
+    align-items: flex-start;
+    /* Alineación a la izquierda */
 }
 
 .titulo-principal-general h2 {
-  font-size: 2rem;
-  color: #ffffff;
-  margin: 0;
-  font-weight: 300;
-  letter-spacing: 1px;
+    font-size: 2rem;
+    color: #ffffff;
+    margin: 0;
+    font-weight: 300;
+    letter-spacing: 1px;
 }
 
 .titulo-principal-general p {
-  font-size: 0.9rem;
-  margin-top: 5px;
+    font-size: 0.9rem;
+    margin-top: 5px;
 }
 
 .botones-funciones-comparativas {
-  display: flex;
-  flex-direction: row; 
-  gap: 15px;           
-  margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    margin-top: 10px;
 }
+
 .botonesComparativa {
-  background: transparent;
-  border: 1px solid #444444; 
-    border-color: #D4AF37; 
-  color: #D4AF37;
-  padding: 10px 20px;
-  border-radius: 4px;       
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+    text-decoration: none;
+    background: transparent;
+    border: 1px solid #444444;
+    border-color: #D4AF37;
+    color: #D4AF37;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .botonesComparativa:hover {
-  background-color: #D4AF37;
-  border-color: #D4AF37;
-  color: #000000;
-  transform: translateY(-2px); 
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+    background-color: #D4AF37;
+    border-color: #D4AF37;
+    color: #000000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
+
 .seccion-encabezado-general h2 {
     font-size: 2.2rem;
     font-weight: 300;
     color: #ffffff;
     margin-bottom: 10px;
     letter-spacing: 1px;
+}
+
+@media (max-width: 435px) {
+    .botones-funciones-comparativas {
+        flex-direction: column;
+        width: 100%;
+    }
 }
 
 /* --- PANELES Y TARJETAS --- */
@@ -84,7 +98,7 @@
     margin-bottom: 40px;
 }
 
-.tarjeta-general, 
+.tarjeta-general,
 .contenedor-ahorros-general {
     background-color: #1e1e1f;
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -95,14 +109,14 @@
     transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.tarjeta-general:hover, 
+.tarjeta-general:hover,
 .contenedor-ahorros-general:hover {
     transform: translateY(-5px);
     border-color: rgba(200, 178, 119, 0.3);
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
 }
 
-.tarjeta-general h3, 
+.tarjeta-general h3,
 .titulo-ahorros-general {
     margin-top: 0;
     margin-bottom: 25px;
@@ -311,14 +325,19 @@
 
     /*Que no se rompa modal en pantallas chicas:*/
 
-    max-height: 90vh; /* No permite que supere el 90% de la pantalla */
+    max-height: 90vh;
+    /* No permite que supere el 90% de la pantalla */
     display: flex;
     flex-direction: column;
 }
+
 .formulario-cuerpo {
-    overflow-y: auto; /* Habilita el scroll solo en los campos */
-    padding-right: 5px; /* Evita que el scroll pise el contenido */
+    overflow-y: auto;
+    /* Habilita el scroll solo en los campos */
+    padding-right: 5px;
+    /* Evita que el scroll pise el contenido */
 }
+
 .contenido-modal h3 {
     margin-top: 0;
     margin-bottom: 25px;
@@ -401,8 +420,15 @@
 
 /* --- ANIMACIONES --- */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* =========================================
@@ -452,7 +478,8 @@
         flex-direction: column;
     }
 
-    .boton-primario, .boton-secundario {
+    .boton-primario,
+    .boton-secundario {
         width: 100%;
     }
 }

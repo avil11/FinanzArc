@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { Link } from "react-router-dom";
 import "./General.css";
 
 const API_BASE_URL = "http://localhost:60496/api";
@@ -278,9 +279,11 @@ const GastoIngreso = () => {
           <p style={{ color: "#888888" }}>Gestioná tu patrimonio en FinanzARC</p>
         </div>
         <div className="botones-funciones-comparativas">
-          <button className="boton-general-dia botonesComparativa">Finalizar Dia</button>
-          <button className="boton-general-semana botonesComparativa">Finalizar Semana</button>
-          <button className="boton-general-mes botonesComparativa">Finalizar Mes</button>
+          <div className="botones-funciones-comparativas">
+            <Link to="/comparativa/dia" className="botonesComparativa">Finalizar Dia</Link>
+            <Link to="/comparativa/semana" className="botonesComparativa">Finalizar Semana</Link>
+            <Link to="/comparativa/mes" className="botonesComparativa">Finalizar Mes</Link>
+          </div>
         </div>
       </div>
 
