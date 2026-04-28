@@ -21,7 +21,7 @@ function App() {
         <Route path="/registro" element={<Registro />} />
         <Route path="/dashboard" element={<div style={{ padding: '50px' }}><h1>Bienvenido a tu Panel</h1></div>} />
         <Route path="/principal" element={<Principal />} />
-        <Route path="/comparativa/:periodo" element={<Comparativa />} />
+        <Route path="/comparativa" element={<Comparativa />} />
         <Route path="/ingreso" element={<Ingreso />} />
         <Route path="/gasto" element={<Gasto />} />
         <Route path="/perfil" element={<Perfil />} />

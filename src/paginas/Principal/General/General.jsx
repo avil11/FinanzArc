@@ -278,12 +278,10 @@ const GastoIngreso = () => {
           <h2>{mostrarSaludo ? `¡Bienvenido, ${nombre} ${apellido}!` : "Resumen Financiero"}</h2>
           <p style={{ color: "#888888" }}>Gestioná tu patrimonio en FinanzARC</p>
         </div>
-        <div className="botones-funciones-comparativas">
-          <div className="botones-funciones-comparativas">
-            <Link to="/comparativa/dia" className="botonesComparativa">Finalizar Dia</Link>
-            <Link to="/comparativa/semana" className="botonesComparativa">Finalizar Semana</Link>
-            <Link to="/comparativa/mes" className="botonesComparativa">Finalizar Mes</Link>
-          </div>
+        <div className="botones-functions-comparativas">
+          <Link to="/comparativa" className="botonesComparativa">
+            Mostrar Balance
+          </Link>
         </div>
       </div>
 
