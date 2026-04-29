@@ -9,7 +9,7 @@ function Comparativa() {
     const [movimientos, setMovimientos] = useState([]);
 
     const userData = JSON.parse(localStorage.getItem("user") || "{}");
-    const idUsuario = userData.IdUsuario || 20;
+    const idUsuario = userData.IdUsuario || 3;
 
     const cargarMesActual = useCallback(async () => {
         setCargando(true);
