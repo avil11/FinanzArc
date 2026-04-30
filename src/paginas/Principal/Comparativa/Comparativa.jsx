@@ -1,93 +1,105 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { Link } from "react-router-dom";
+import '../General/General.css';
 import './Comparativa.css';
 
 const API_BASE_URL = "http://localhost:60496/api";
 
-function Comparativa() {
+const Comparativa = () => {
     const [cargando, setCargando] = useState(true);
-    const [resumen, setResumen] = useState({ ingresos: 0, gastos: 0, neto: 0 });
-    const [movimientos, setMovimientos] = useState([]);
+    const [idUsuario, setIdUsuario] = useState(null);
+    const [modalAbierto, setModalAbierto] = useState(false);
+    const [datosModal, setDatosModal] = useState({ titulo: "", items: [], tipo: "" });
 
-    const userData = JSON.parse(localStorage.getItem("user") || "{}");
-    const idUsuario = userData.IdUsuario || 3;
+    const [offsets, setOffsets] = useState({
+        gastoA: 0, gastoB: -1,
+        ingresoA: 0, ingresoB: -1
+    });
 
-    const cargarMesActual = useCallback(async () => {
-        setCargando(true);
+    const [datos, setDatos] = useState({
+        gastoA: 0, gastoB: 0,
+        ingresoA: 0, ingresoB: 0
+    });
+
+    const validarUsuario = useCallback(async () => {
+        const token = localStorage.getItem("Token");
+        if (!token) return;
         try {
-            const [resI, resG, resHI, resHG] = await Promise.all([
-                fetch(`${API_BASE_URL}/Ingreso/ByUsuario/${idUsuario}`),
-                fetch(`${API_BASE_URL}/Gasto/ByUsuario/${idUsuario}`),
-                fetch(`${API_BASE_URL}/HistorialIngreso/ByUsuario/${idUsuario}`),
-                fetch(`${API_BASE_URL}/HistorialGasto/ByUsuario/${idUsuario}`)
+            const res = await fetch(`${API_BASE_URL}/Usuarios/ByToken`, {
+                headers: { "Authorization": `Bearer ${token}` },
+            });
+            if (res.ok) {
+                const user = await res.json();
+                setIdUsuario(user.IdUsuario);
+            }
+        } catch (error) { console.error("Error validando usuario:", error); }
+    }, []);
+
+    const getNombreMes = (offset) => {
+        const d = new Date();
+        d.setDate(1); // Evita error de desbordamiento (ej. 29 de febrero)
+        d.setMonth(d.getMonth() + offset);
+        return d.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    };
+
+    const getRangoMes = (offset) => {
+        const ahora = new Date();
+        const inicio = new Date(ahora.getFullYear(), ahora.getMonth() + offset, 1, 6, 0, 0);
+        const fin = new Date(ahora.getFullYear(), ahora.getMonth() + offset + 1, 1, 5, 59, 59);
+        return { inicio: inicio.toISOString(), fin: fin.toISOString() };
+    };
+
+    // --- CARGA UNIFICADA (Vivos + Historial) ---
+    const cargarDatoIndividual = useCallback(async (tipo, offset, clave) => {
+        if (!idUsuario) return;
+        const { inicio, fin } = getRangoMes(offset);
+        
+        // Definimos los endpoints según el tipo
+        const epVivo = tipo === 'gasto' ? `/Gasto/ByUsuario/${idUsuario}` : `/Ingreso/ByUsuario/${idUsuario}`;
+        const epHist = tipo === 'gasto' ? `/HistorialGasto/ByUsuario/${idUsuario}` : `/HistorialIngreso/ByUsuario/${idUsuario}`;
+
+        try {
+            const [resV, resH] = await Promise.all([
+                fetch(`${API_BASE_URL}${epVivo}`),
+                fetch(`${API_BASE_URL}${epHist}`)
             ]);
 
-            const ingresosVivos = resI.ok ? await resI.json() : [];
-            const gastosVivos = resG.ok ? await resG.json() : [];
-            const histIngresos = resHI.ok ? await resHI.json() : [];
-            const histGastos = resHG.ok ? await resHG.json() : [];
+            const vivos = resV.ok ? await resV.json() : [];
+            const historial = resH.ok ? await resH.json() : [];
 
-            // --- LÓGICA DE 6 AM ---
-            const ahora = new Date();
-            // "ahoraAjustado" nos dice en qué mes estamos según el horario de 6am a 6am
-            const ahoraAjustado = new Date(ahora.getTime());
-            ahoraAjustado.setHours(ahoraAjustado.getHours() - 6);
+            // Combinamos y filtramos por fecha (Corte 6 AM)
+            const total = [...vivos, ...historial].reduce((acc, item) => {
+                const fechaStr = item.FechaGasto || item.FechaIngreso || item.Fecha;
+                if (!fechaStr) return acc;
 
-            const mesCorriente = ahoraAjustado.getMonth();
-            const anioCorriente = ahoraAjustado.getFullYear();
+                const f = new Date(fechaStr);
+                return (f >= new Date(inicio) && f <= new Date(fin)) 
+                    ? acc + (item.MontoGasto || item.MontoIngreso || item.Monto || 0) 
+                    : acc;
+            }, 0);
 
-            const filtro6AM = (item) => {
-                const fechaStr = item.FechaIngreso || item.FechaGasto || item.Fecha;
-                if (!fechaStr) return false;
-                
-                const fechaOriginal = new Date(fechaStr);
-                // Restamos 6 horas: si son las 05:00 AM del día 1, 
-                // para JS pasará a ser las 23:00 PM del día anterior (mes anterior).
-                const fechaVirtual = new Date(fechaOriginal.getTime());
-                fechaVirtual.setHours(fechaVirtual.getHours() - 6);
-
-                return fechaVirtual.getMonth() === mesCorriente && 
-                       fechaVirtual.getFullYear() === anioCorriente;
-            };
-
-            // 1. BALANCE (Solo tablas vivas filtradas por 6AM)
-            const totalI = ingresosVivos.filter(filtro6AM).reduce((acc, curr) => acc + (curr.MontoIngreso || 0), 0);
-            const totalG = gastosVivos.filter(filtro6AM).reduce((acc, curr) => acc + (curr.MontoGasto || 0), 0);
-            setResumen({ ingresos: totalI, gastos: totalG, neto: totalI - totalG });
-            
-            // 2. DETALLE (Normalización de nombres + filtro 6AM)
-            const listaIngresos = [
-                ...ingresosVivos.filter(filtro6AM).map(i => ({
-                    tipo: 'ingreso', monto: i.MontoIngreso, desc: i.NombreIngreso || "Ingreso",
-                    fechaObj: new Date(i.FechaIngreso)
-                })),
-                ...histIngresos.filter(filtro6AM).map(i => ({
-                    tipo: 'ingreso', monto: i.Monto, desc: "Ingreso Archivado",
-                    fechaObj: new Date(i.Fecha)
-                }))
-            ];
-
-            const listaGastos = [
-                ...gastosVivos.filter(filtro6AM).map(g => ({
-                    tipo: 'gasto', monto: g.MontoGasto, desc: g.NombreGasto || "Gasto",
-                    fechaObj: new Date(g.FechaGasto)
-                })),
-                ...histGastos.filter(filtro6AM).map(g => ({
-                    tipo: 'gasto', monto: g.Monto, desc: "Gasto Archivado",
-                    fechaObj: new Date(g.Fecha)
-                }))
-            ];
-
-            setMovimientos([...listaIngresos, ...listaGastos].sort((a, b) => b.fechaObj - a.fechaObj));
-
-        } catch (error) {
-            console.error("Error cargando datos:", error);
-        } finally {
-            setCargando(false);
-        }
+            setDatos(prev => ({ ...prev, [clave]: total }));
+        } catch (error) { console.error("Error cargando datos:", error); }
     }, [idUsuario]);
 
-    const archivarMesActual = async () => {
-        if (!window.confirm("¿Archivar mes? El balance volverá a cero según el horario 6AM-6AM.")) return;
+    const cargarTodosLosDatos = useCallback(async () => {
+        if (!idUsuario) return;
+        setCargando(true);
+        await Promise.all([
+            cargarDatoIndividual('gasto', offsets.gastoA, 'gastoA'),
+            cargarDatoIndividual('gasto', offsets.gastoB, 'gastoB'),
+            cargarDatoIndividual('ingreso', offsets.ingresoA, 'ingresoA'),
+            cargarDatoIndividual('ingreso', offsets.ingresoB, 'ingresoB')
+        ]);
+        setCargando(false);
+    }, [idUsuario, offsets, cargarDatoIndividual]);
+
+    const archivarMesActual = async (offset) => {
+        if (!idUsuario) return;
+        const nombreMes = getNombreMes(offset);
+        if (!window.confirm(`¿Archivar mes de ${nombreMes}?`)) return;
+        
         try {
             setCargando(true);
             const response = await fetch(`${API_BASE_URL}/Cierre/FinalizarMes`, {
@@ -95,69 +107,161 @@ function Comparativa() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ IdUsuario: idUsuario })
             });
+
             if (response.ok) {
                 alert("¡Mes archivado!");
-                await cargarMesActual(); 
+                await cargarTodosLosDatos(); 
             }
-        } catch (error) {
-            console.error("Error:", error);
-        } finally {
-            setCargando(false);
-        }
+        } catch (error) { console.error(error); }
+        finally { setCargando(false); }
     };
 
-    useEffect(() => { cargarMesActual(); }, [cargarMesActual]);
+    const abrirDetalleMes = async (tipo, offset, titulo) => {
+        if (!idUsuario) return;
+        const { inicio, fin } = getRangoMes(offset);
+        const epVivo = tipo === 'gasto' ? `/Gasto/ByUsuario/${idUsuario}` : `/Ingreso/ByUsuario/${idUsuario}`;
+        const epHist = tipo === 'gasto' ? `/HistorialGasto/ByUsuario/${idUsuario}` : `/HistorialIngreso/ByUsuario/${idUsuario}`;
 
-    // ... (El resto del return del componente se mantiene igual que antes)
-    if (cargando) return <div className="comparativaFlex"><div className="loader-mes">Sincronizando...</div></div>;
+        try {
+            const [resV, resH] = await Promise.all([fetch(`${API_BASE_URL}${epVivo}`), fetch(`${API_BASE_URL}${epHist}`)]);
+            const combinados = [...(resV.ok ? await resV.json() : []), ...(resH.ok ? await resH.json() : [])];
+            
+            const filtrados = combinados.filter(item => {
+                const f = new Date(item.FechaGasto || item.FechaIngreso || item.Fecha);
+                return f >= new Date(inicio) && f <= new Date(fin);
+            });
+
+            setDatosModal({ titulo: `${titulo} - ${getNombreMes(offset)}`, items: filtrados, tipo });
+            setModalAbierto(true);
+        } catch (error) { console.error(error); }
+    };
+
+    useEffect(() => { validarUsuario(); }, [validarUsuario]);
+
+    useEffect(() => {
+        if (idUsuario) { cargarTodosLosDatos(); }
+    }, [idUsuario, cargarTodosLosDatos]);
+
+    // --- RENDERIZADO (Gráficos y Modal iguales a los anteriores) ---
+    const calcularDiferencia = (valorA, valorB, esGasto = true) => {
+        const diferencia = valorA - valorB;
+        const porcentaje = valorB !== 0 ? ((diferencia / valorB) * 100).toFixed(1) : "100";
+        const esPositivo = esGasto ? diferencia <= 0 : diferencia >= 0;
+        return {
+            monto: Math.abs(diferencia),
+            porcentaje: Math.abs(porcentaje),
+            clase: esPositivo ? "tendencia-positiva" : "tendencia-negativa",
+            texto: diferencia >= 0 ? "más que" : "menos que"
+        };
+    };
+
+    const GraficoConNav = ({ titulo, valor, offset, setOffsetKey, tipo }) => {
+        const esVacio = valor === 0;
+        return (
+            <div className="tarjeta-general grafico-ajustado">
+                <button className="btn-archivar-icono" onClick={() => archivarMesActual(offset)}>📁</button>
+                <div className="encabezado-grafico-nav">
+                    <span className="badge-periodo">{titulo}</span>
+                    <div className="selector-mes-nav">
+                        <button onClick={() => setOffsets(p => ({ ...p, [setOffsetKey]: offset - 1 }))}>❮</button>
+                        <span>{getNombreMes(offset)}</span>
+                        <button onClick={() => setOffsets(p => ({ ...p, [setOffsetKey]: offset + 1 }))} disabled={offset >= 0}>❯</button>
+                    </div>
+                </div>
+                <div className="contenedor-chart-relativo">
+                    {esVacio ? (
+                        <div className="estado-vacio-grafico"><div className="circulo-vacio"><span>Sin datos</span></div></div>
+                    ) : (
+                        <ResponsiveContainer width="100%" height={220}>
+                            <PieChart>
+                                <Pie data={[{v: valor}]} cx="50%" cy="50%" innerRadius={60} outerRadius={80} dataKey="v" stroke="none">
+                                    <Cell fill="#007AFF" />
+                                </Pie>
+                                <Tooltip contentStyle={{ background: "#1a1a1b", border: "none" }} />
+                                <text x="50%" y="45%" textAnchor="middle" fill="#888" fontSize="12">Total</text>
+                                <text x="50%" y="60%" textAnchor="middle" fill="#c8b277" fontSize="18" fontWeight="bold">${valor.toLocaleString()}</text>
+                            </PieChart>
+                        </ResponsiveContainer>
+                    )}
+                </div>
+                <button className="btn-ver-detalles" onClick={() => abrirDetalleMes(tipo, offset, titulo)} disabled={esVacio}>Ver Detalle</button>
+            </div>
+        );
+    };
+
+    if (!idUsuario && !cargando) return <div className="toast-loading">Identificando...</div>;
 
     return (
-        <div className="comparativaFlex">
-            {/* Aquí va todo tu JSX que ya tenías */}
-            <div className='comparativa-seccion-root'>
-                <div className="comparativa-container layout-split">
-                    <div className='comparativa-main-card'>
-                        <h1>Balance Mensual (6AM-6AM)</h1>
-                        <div className="comparativa-stats-grid">
-                            <div className="stat-box income">
-                                <span className='ingresoSpan'>INGRESOS</span>
-                                <span className='ingresoSpanDinero'>+ ${resumen.ingresos.toLocaleString()}</span>
-                            </div>
-                            <div className="stat-box expense">
-                                <span className='gastoSpan'>GASTOS</span>
-                                <span className='gastoSpanDinero'>- ${resumen.gastos.toLocaleString()}</span>
-                            </div>
-                        </div>
-                        <div className="net-balance-hero">
-                            <h2 className={resumen.neto >= 0 ? 'net-pos' : 'net-neg'}>
-                                ${resumen.neto.toLocaleString()}
-                            </h2>
-                        </div>
-                        <button className="btn-finalizar-ciclo-azul" onClick={archivarMesActual}>
-                            ARCHIVAR MES
-                        </button>
-                    </div>
+        <div className="contenedor-principal-general">
+             <div className="seccion-encabezado-general">
+                <div className="titulo-principal-general">
+                    <h2>Comparativa Inteligente</h2>
+                    <p style={{ color: "#888" }}>Datos unificados: Registros actuales e históricos.</p>
+                </div>
+                <Link to="/home" className="botonesComparativa" style={{textDecoration: 'none'}}>Cerrar</Link>
+            </div>
 
-                    <div className="comparativa-details-sidebar">
-                        <h3>Detalle del Mes</h3>
-                        <div className="sidebar-scroll-area">
-                            {movimientos.map((m, idx) => (
-                                <div key={idx} className="movimiento-item-card">
-                                    <div className="mov-info">
-                                        <small>{m.fechaObj.toLocaleDateString()}</small>
-                                        <p>{m.desc}</p>
-                                    </div>
-                                    <span className={m.tipo === 'ingreso' ? 'm-pos' : 'm-neg'}>
-                                        ${m.monto.toLocaleString()}
-                                    </span>
-                                </div>
-                            ))}
+            <div className="comparativa-grid-layout">
+                <div className="seccion-comparativa-fila">
+                    <h2 className="subtitulo-seccion">Gastos</h2>
+                    <div className="fila-comparativa-master">
+                        <GraficoConNav titulo="Periodo A" valor={datos.gastoA} offset={offsets.gastoA} setOffsetKey="gastoA" tipo="gasto" />
+                        <div className="tarjeta-balance-central">
+                            <div className="icon-comparar">vs</div>
+                            <div className={`info-balance ${calcularDiferencia(datos.gastoA, datos.gastoB, true).clase}`}>
+                                <p className="monto-balance">${calcularDiferencia(datos.gastoA, datos.gastoB, true).monto.toLocaleString()}</p>
+                                <span className="porcentaje-balance">{calcularDiferencia(datos.gastoA, datos.gastoB, true).texto} B ({calcularDiferencia(datos.gastoA, datos.gastoB, true).porcentaje}%)</span>
+                            </div>
                         </div>
+                        <GraficoConNav titulo="Periodo B" valor={datos.gastoB} offset={offsets.gastoB} setOffsetKey="gastoB" tipo="gasto" />
+                    </div>
+                </div>
+
+                <div className="seccion-comparativa-fila" style={{marginTop: '50px'}}>
+                    <h2 className="subtitulo-seccion">Ingresos</h2>
+                    <div className="fila-comparativa-master">
+                        <GraficoConNav titulo="Periodo A" valor={datos.ingresoA} offset={offsets.ingresoA} setOffsetKey="ingresoA" tipo="ingreso" />
+                        <div className="tarjeta-balance-central">
+                            <div className="icon-comparar">vs</div>
+                            <div className={`info-balance ${calcularDiferencia(datos.ingresoA, datos.ingresoB, false).clase}`}>
+                                <p className="monto-balance">${calcularDiferencia(datos.ingresoA, datos.ingresoB, false).monto.toLocaleString()}</p>
+                                <span className="porcentaje-balance">{calcularDiferencia(datos.ingresoA, datos.ingresoB, false).texto} B ({calcularDiferencia(datos.ingresoA, datos.ingresoB, false).porcentaje}%)</span>
+                            </div>
+                        </div>
+                        <GraficoConNav titulo="Periodo B" valor={datos.ingresoB} offset={offsets.ingresoB} setOffsetKey="ingresoB" tipo="ingreso" />
                     </div>
                 </div>
             </div>
+
+            {modalAbierto && (
+                <div className="modal-overlay" onClick={() => setModalAbierto(false)}>
+                    <div className="modal-contenido" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3>{datosModal.titulo}</h3>
+                            <button className="btn-cerrar" onClick={() => setModalAbierto(false)}>&times;</button>
+                        </div>
+                        <div className="modal-body">
+                            <table className="tabla-detalle">
+                                <thead><tr><th>Fecha</th><th>Descripción</th><th>Monto</th></tr></thead>
+                                <tbody>
+                                    {datosModal.items.map((item, i) => (
+                                        <tr key={i}>
+                                            <td>{new Date(item.FechaGasto || item.FechaIngreso || item.Fecha).toLocaleDateString()}</td>
+                                            <td>{item.Descripcion || item.NombreIngreso || "Registro Histórico"}</td>
+                                            <td className={datosModal.tipo === 'gasto' ? 'texto-rojo' : 'texto-verde'}>
+                                                ${(item.MontoGasto || item.MontoIngreso || item.Monto).toLocaleString()}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {cargando && <div className="toast-loading">Actualizando...</div>}
         </div>
     );
-}
+};
 
 export default Comparativa;
