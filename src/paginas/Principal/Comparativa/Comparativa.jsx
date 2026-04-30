@@ -196,9 +196,10 @@ const Comparativa = () => {
              <div className="seccion-encabezado-general">
                 <div className="titulo-principal-general">
                     <h2>Comparativa Inteligente</h2>
-                    <p style={{ color: "#888" }}>Datos unificados: Registros actuales e históricos.</p>
+                    <p style={{ color: "#888", fontWeight: "600", fontSize: "1rem" }}>Datos unificados: Registros actuales e históricos.</p>
                 </div>
                 <Link to="/home" className="botonesComparativa" style={{textDecoration: 'none'}}>Cerrar</Link>
+                <p style={{ color: "#888", fontWeight: "600", fontSize: "1rem" }}>Del lado izquierdo vas a encontrar los gráficos de comparación. Se comapara el "A siempre con el B"</p>
             </div>
 
             <div className="comparativa-grid-layout">
