@@ -18,6 +18,8 @@ const GastoIngreso = () => {
   const [metasAhorro, setMetasAhorro] = useState([]);
 
   const COLORES = ["#007AFF", "#c8b277", "#8a733f", "#4a4a4a"];
+  const COLORESgasto = ["#FF4B4B", "#c8b277", "#8a733f", "#4a4a4a"]; // Rojo para gastos
+
   const [modalAgregarAbierto, setModalAgregarAbierto] = useState(false);
   const [modalEditarAbierto, setModalEditarAbierto] = useState(false);
 
@@ -275,8 +277,8 @@ const GastoIngreso = () => {
       {/*Botones de función comparativa*/}
       <div className="seccion-encabezado-general">
         <div className="titulo-principal-general">
-          <h2>{mostrarSaludo ? `¡Bienvenido, ${nombre} ${apellido}!` : "Resumen Financiero"}</h2>
-          <p style={{ color: "#888888" }}>Gestioná tu patrimonio en FinanzARC</p>
+          <h2>{mostrarSaludo ? `¡Bienvenido, ${nombre} ${apellido}!` : "El Control Total de tu Economía"}</h2>
+          <p style={{ color: "#888888" }}>Ya sea para organizar los gastos del hogar o administrar tu emprendimiento, centralizá toda tu información en un solo lugar. Olvidate de las anotaciones sueltas o planillas complicadas y accedé a métricas en tiempo real desde cualquier dispositivo para tomar las mejores decisiones.</p>
         </div>
         <div className="botones-functions-comparativas">
           <Link to="/comparativa" className="botonesComparativa">
@@ -305,7 +307,7 @@ const GastoIngreso = () => {
                       labelLine={false}
                     >
                       {datosGastos.map((_, i) => (
-                        <Cell key={i} fill={COLORES[i % COLORES.length]} stroke="none" />
+                        <Cell key={i} fill={COLORESgasto[i % COLORESgasto.length]} stroke="none" />
                       ))}
                     </Pie>
                     <Tooltip contentStyle={{ backgroundColor: "#1e1e1f", border: "1px solid rgba(200,178,119,0.3)", color: "#fff", borderRadius: "8px" }} />
@@ -315,7 +317,7 @@ const GastoIngreso = () => {
               <div className="leyenda-grafico">
                 {obtenerTopCinco(datosGastos).map((item, index) => (
                   <div className="item-leyenda" key={index}>
-                    <span className="item-color-circulo" style={{ backgroundColor: COLORES[index % COLORES.length] }} />
+                    <span className="item-color-circulo" style={{ backgroundColor: COLORESgasto[index % COLORESgasto.length] }} />
                     <div className="leyenda-texto">
                       <span>{item.name}</span>
                       <strong>${item.valor.toLocaleString()}</strong>
@@ -372,6 +374,9 @@ const GastoIngreso = () => {
         )}
 
       </div>
+
+
+       {/* SECCIÓN DE AHORROS */} 
 
       <div className="contenedor-ahorros-general">
         <div className="encabezado-ahorros-flex">

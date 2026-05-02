@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import "./Gasto.css"; // Puedes renombrar este CSS a Finanzas.css para usarlo en ambos
+import "./Gasto.css";
 
 const API_BASE_URL = "http://localhost:60496/api";
 
@@ -11,7 +11,6 @@ function Gasto() {
   const [vermas, setVerMas] = useState(false);
   const [itemSeleccionado, setItemSeleccionado] = useState(null);
 
-  // Estado del formulario basado en tu tabla SQL [dbo].[Gasto]
   const [form, setForm] = useState({
     IdGasto: null,
     IdUsuario: null,
@@ -24,14 +23,13 @@ function Gasto() {
     Descripcion: ""
   });
 
-  const COLORES = ["#FF4B4B", "#c8b277", "#8a733f", "#4a4a4a"]; // Rojo para gastos
+  const COLORES = ["#FF4B4B", "#c8b277", "#8a733f", "#4a4a4a"];
 
   useEffect(() => {
     obtenerDatosUsuarioYRegistros();
   }, []);
 
   // --- LÓGICA DE API ---
-
   const obtenerDatosUsuarioYRegistros = async () => {
     const token = localStorage.getItem("Token");
     try {
@@ -88,16 +86,34 @@ function Gasto() {
     }).then(() => obtenerDatosUsuarioYRegistros());
   };
 
-  // --- AYUDANTES DE UI ---
+  // --- PROCESAMIENTO DE DATOS (Optimizado con useMemo) ---
+  const gastosFiltrados = useMemo(() => {
+    return listaGastos.filter(i =>
+      i.Descripcion?.toLowerCase().includes(busqueda.toLowerCase())
+    );
+  }, [listaGastos, busqueda]);
 
+  const datosGrafico = useMemo(() => {
+    const data = gastosFiltrados.map(i => ({
+      nombre: i.Descripcion,
+      valor: Number(i.MontoGasto)
+    })).slice(0, 5);
+    return data.length > 0 ? data : [{ nombre: "Sin datos", valor: 0 }];
+  }, [gastosFiltrados]);
+
+  const totalMonto = useMemo(() => {
+    return gastosFiltrados.reduce((acc, item) => acc + Number(item.MontoGasto), 0);
+  }, [gastosFiltrados]);
+
+  // --- AYUDANTES DE UI ---
   const resetearForm = () => {
-    setForm({
-      ...form,
+    setForm(prev => ({
+      ...prev,
       IdGasto: null,
       MontoGasto: "",
       Descripcion: "",
       FechaGasto: new Date().toISOString().split('T')[0]
-    });
+    }));
   };
 
   const prepararEdicion = (item) => {
@@ -115,25 +131,11 @@ function Gasto() {
     setModalAbierto(true);
   };
 
-  const verDetalles = (item) => {
-    setItemSeleccionado(item);
-    setVerMas(true);
-  };
-
-  const gastosFiltrados = listaGastos.filter(i =>
-    i.Descripcion?.toLowerCase().includes(busqueda.toLowerCase())
-  );
-
-  const datosGrafico = gastosFiltrados.map(i => ({
-    nombre: i.Descripcion,
-    valor: Number(i.MontoGasto)
-  })).slice(0, 5);
-
   return (
     <div className="pagina-ingreso-contenedor">
       <div className="encabezado-simple">
         <h1 className="titulo-seccion">Control de Gastos</h1>
-        <p className="texto-gris">Visualiza y gestiona tus salidas de dinero.</p>
+        <p className="texto-gris">Administra todos tus consumos y pagos de forma centralizada. Consulta el historial de tus gastos fijos y variables, categoriza tus salidas y visualiza el impacto total en tu economía en tiempo real.</p>
       </div>
 
       <div className="pagina-ingreso-tarjeta">
@@ -141,27 +143,34 @@ function Gasto() {
           <ResponsiveContainer width="100%" height={280}>
             <PieChart>
               <Pie
-                data={datosGrafico.length > 0 ? datosGrafico : [{ nombre: "Sin datos", valor: 1 }]}
+                data={datosGrafico}
                 cx="50%"
                 cy="50%"
                 innerRadius={70}
                 outerRadius={100}
                 paddingAngle={5}
                 dataKey="valor"
-                nameKey="nombre" // <--- AGREGÁ ESTO
+                nameKey="nombre"
+                stroke="none"
               >
-                {datosGrafico.map((_, i) => (
-                  <Cell key={i} fill={COLORES[i % COLORES.length]} stroke="none" />
+                {datosGrafico.map((entry, i) => (
+                  <Cell key={`cell-${i}`} fill={entry.valor === 0 ? "#333" : COLORES[i % COLORES.length]} />
                 ))}
               </Pie>
+              {/* Texto central posicionado manualmente */}
+              <text x="50%" y="50%" fill="#fff" textAnchor="middle" dominantBaseline="central">
+                <tspan x="50%" dy="-0.5em" fontSize="14" fill="#a0a0a0">Total</tspan>
+                <tspan x="50%" dy="1.5em" fontSize="20" fontWeight="bold">
+                  ${totalMonto.toLocaleString()}
+                </tspan>
+              </text>
               <Tooltip
                 contentStyle={{
                   backgroundColor: "#1e1e1f",
                   border: "1px solid rgba(200, 178, 119, 0.3)",
-                  color: "#fff",
                   borderRadius: "8px"
                 }}
-                itemStyle={{ color: "#fff" }} // Opcional: para asegurar que el texto sea blanco
+                itemStyle={{ color: "#fff" }}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -189,15 +198,17 @@ function Gasto() {
                 </tr>
               </thead>
               <tbody>
-                {gastosFiltrados.map((item, index) => (
-                  <tr key={index}>
+                {gastosFiltrados.map((item) => (
+                  <tr key={item.IdGasto || Math.random()}>
                     <td>{item.Descripcion}</td>
-                    <td className="monto-destacado" style={{ color: 'rgb(180, 70, 70)' }}>${Number(item.MontoGasto).toLocaleString()}</td>
+                    <td className="monto-destacado" style={{ color: 'rgb(180, 70, 70)' }}>
+                      ${Number(item.MontoGasto).toLocaleString()}
+                    </td>
                     <td className="texto-gris">{new Date(item.FechaGasto).toLocaleDateString()}</td>
                     <td>
                       <button className="btn-icon" onClick={() => prepararEdicion(item)}>✏️</button>
                       <button className="btn-icon" onClick={() => eliminarGasto(item.IdGasto)}>🗑️</button>
-                      <button className="btn-icon" onClick={() => verDetalles(item)}>📊</button>
+                      <button className="btn-icon" onClick={() => { setItemSeleccionado(item); setVerMas(true); }}>📊</button>
                     </td>
                   </tr>
                 ))}

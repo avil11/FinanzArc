@@ -12,6 +12,9 @@ const Comparativa = () => {
     const [modalAbierto, setModalAbierto] = useState(false);
     const [datosModal, setDatosModal] = useState({ titulo: "", items: [], tipo: "" });
 
+    const coloresIngreso = ["#007AFF", "#c8b277", "#8a733f", "#4a4a4a"];
+    const coloresGasto = ["#FF4B4B", "#c8b277", "#8a733f", "#4a4a4a"];
+
     const [offsets, setOffsets] = useState({
         gastoA: 0, gastoB: -1,
         ingresoA: 0, ingresoB: -1
@@ -54,7 +57,7 @@ const Comparativa = () => {
     const cargarDatoIndividual = useCallback(async (tipo, offset, clave) => {
         if (!idUsuario) return;
         const { inicio, fin } = getRangoMes(offset);
-        
+
         // Definimos los endpoints según el tipo
         const epVivo = tipo === 'gasto' ? `/Gasto/ByUsuario/${idUsuario}` : `/Ingreso/ByUsuario/${idUsuario}`;
         const epHist = tipo === 'gasto' ? `/HistorialGasto/ByUsuario/${idUsuario}` : `/HistorialIngreso/ByUsuario/${idUsuario}`;
@@ -74,8 +77,8 @@ const Comparativa = () => {
                 if (!fechaStr) return acc;
 
                 const f = new Date(fechaStr);
-                return (f >= new Date(inicio) && f <= new Date(fin)) 
-                    ? acc + (item.MontoGasto || item.MontoIngreso || item.Monto || 0) 
+                return (f >= new Date(inicio) && f <= new Date(fin))
+                    ? acc + (item.MontoGasto || item.MontoIngreso || item.Monto || 0)
                     : acc;
             }, 0);
 
@@ -99,7 +102,7 @@ const Comparativa = () => {
         if (!idUsuario) return;
         const nombreMes = getNombreMes(offset);
         if (!window.confirm(`¿Archivar mes de ${nombreMes}?`)) return;
-        
+
         try {
             setCargando(true);
             const response = await fetch(`${API_BASE_URL}/Cierre/FinalizarMes`, {
@@ -110,7 +113,7 @@ const Comparativa = () => {
 
             if (response.ok) {
                 alert("¡Mes archivado!");
-                await cargarTodosLosDatos(); 
+                await cargarTodosLosDatos();
             }
         } catch (error) { console.error(error); }
         finally { setCargando(false); }
@@ -125,7 +128,7 @@ const Comparativa = () => {
         try {
             const [resV, resH] = await Promise.all([fetch(`${API_BASE_URL}${epVivo}`), fetch(`${API_BASE_URL}${epHist}`)]);
             const combinados = [...(resV.ok ? await resV.json() : []), ...(resH.ok ? await resH.json() : [])];
-            
+
             const filtrados = combinados.filter(item => {
                 const f = new Date(item.FechaGasto || item.FechaIngreso || item.Fecha);
                 return f >= new Date(inicio) && f <= new Date(fin);
@@ -151,12 +154,16 @@ const Comparativa = () => {
             monto: Math.abs(diferencia),
             porcentaje: Math.abs(porcentaje),
             clase: esPositivo ? "tendencia-positiva" : "tendencia-negativa",
-            texto: diferencia >= 0 ? "más que" : "menos que"
+            texto: diferencia >= 0 ? "Mas que periodo" : "Menos que periodo"
         };
     };
 
     const GraficoConNav = ({ titulo, valor, offset, setOffsetKey, tipo }) => {
         const esVacio = valor === 0;
+
+        // Seleccionamos la paleta de colores según el tipo
+        const paleta = tipo === 'gasto' ? coloresGasto : coloresIngreso;
+
         return (
             <div className="tarjeta-general grafico-ajustado">
                 <button className="btn-archivar-icono" onClick={() => archivarMesActual(offset)}>📁</button>
@@ -174,10 +181,21 @@ const Comparativa = () => {
                     ) : (
                         <ResponsiveContainer width="100%" height={220}>
                             <PieChart>
-                                <Pie data={[{v: valor}]} cx="50%" cy="50%" innerRadius={60} outerRadius={80} dataKey="v" stroke="none">
-                                    <Cell fill="#007AFF" />
+                                <Pie
+                                    data={[{ v: valor }]}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={60}
+                                    outerRadius={80}
+                                    dataKey="v"
+                                    stroke="none"
+                                    startAngle={90}
+                                    endAngle={450}
+                                >
+                                    {/* Aplicamos el primer color de la paleta correspondiente */}
+                                    <Cell fill={paleta[0]} />
                                 </Pie>
-                                <Tooltip contentStyle={{ background: "#1a1a1b", border: "none" }} />
+                                <Tooltip contentStyle={{ background: "#1a1a1b", border: "none", color: "#fff" }} />
                                 <text x="50%" y="45%" textAnchor="middle" fill="#888" fontSize="12">Total</text>
                                 <text x="50%" y="60%" textAnchor="middle" fill="#c8b277" fontSize="18" fontWeight="bold">${valor.toLocaleString()}</text>
                             </PieChart>
@@ -193,13 +211,12 @@ const Comparativa = () => {
 
     return (
         <div className="contenedor-principal-general">
-             <div className="seccion-encabezado-general">
+            <div className="seccion-encabezado-general">
                 <div className="titulo-principal-general">
-                    <h2>Comparativa Inteligente</h2>
-                    <p style={{ color: "#888", fontWeight: "600", fontSize: "1rem" }}>Datos unificados: Registros actuales e históricos.</p>
+                    <h2>Comparativa Mensual de Resultados</h2>
+                    <p style={{ color: "#888", fontWeight: "600", fontSize: "1rem" }}>Analizá la evolución de tu negocio a través de nuestros gráficos interactivos. En este panel, vas a poder contrastar directamente los ingresos o gastos totales de un mes frente a otro. Esta vista te permite identificar fluctuaciones, medir tu crecimiento y ajustar tus estrategias financieras con datos precisos.</p>
                 </div>
-                <Link to="/home" className="botonesComparativa" style={{textDecoration: 'none'}}>Cerrar</Link>
-                <p style={{ color: "#888", fontWeight: "600", fontSize: "1rem" }}>Del lado izquierdo vas a encontrar los gráficos de comparación. Se comapara el "A siempre con el B"</p>
+                <Link to="/Principal" className="botonesComparativa" style={{ textDecoration: 'none' }}>Volver</Link>
             </div>
 
             <div className="comparativa-grid-layout">
@@ -218,7 +235,7 @@ const Comparativa = () => {
                     </div>
                 </div>
 
-                <div className="seccion-comparativa-fila" style={{marginTop: '50px'}}>
+                <div className="seccion-comparativa-fila" style={{ marginTop: '50px' }}>
                     <h2 className="subtitulo-seccion">Ingresos</h2>
                     <div className="fila-comparativa-master">
                         <GraficoConNav titulo="Periodo A" valor={datos.ingresoA} offset={offsets.ingresoA} setOffsetKey="ingresoA" tipo="ingreso" />

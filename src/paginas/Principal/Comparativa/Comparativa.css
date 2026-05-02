@@ -62,7 +62,7 @@
 .porcentaje-balance { font-size: 0.8rem; font-weight: 500; opacity: 0.8; }
 
 /* Utilidades de Color Agrupadas */
-.info-balance.tendencia-positiva .monto-balance, .info-balance.tendencia-positiva .porcentaje-balance, .texto-verde { color: var(--success-green); }
+.info-balance.tendencia-positiva .monto-balance, .info-balance.tendencia-positiva .porcentaje-balance, .texto-verde { color: #007AFF; }
 .info-balance.tendencia-negativa .monto-balance, .info-balance.tendencia-negativa .porcentaje-balance, .texto-rojo { color: var(--danger-red); }
 .texto-verde, .texto-rojo { font-weight: 600; text-align: right; }
 

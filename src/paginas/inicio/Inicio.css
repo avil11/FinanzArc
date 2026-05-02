@@ -1,260 +1,49 @@
 /* Reset y Tipografía Unificada */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    /* Aplicamos la misma fuente a toda la web */
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
 /* Contenedor padre para centrar todas las secciones */
-.main-wrapper {
-    max-width: 1210px;
-    margin: 0 auto;
-    padding: 0 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #121212;
-}
+.main-wrapper { max-width: 1210px; margin: 0 auto; padding: 0 20px; display: flex; flex-direction: column; align-items: center; background: #121212; }
 
 /* --- SECCIÓN HERO --- */
-.containerInicio {
-    width: 100%;
-    margin-top: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-.contenedorBackground {
-    width: 100%;
-    border-radius: 40px;
-    overflow: hidden;
-    border: 1px solid rgba(200, 178, 119, 0.3);
-    box-shadow: 5px 5px 10px 0px rgba(200, 178, 119, 0.5);
-    margin-bottom: 30px;
-}
-.contenedorBackground img {
-    width: 100%;
-    height: auto;
-    display: block;
-    object-fit: cover;
-}
-.logos {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 1000px;
-}
-.logos img {
-    width: 140px;
-    transition: transform 0.3s ease, opacity 0.3s;
-}
-.logos img:hover {
-    transform: scale(1.1);
-    opacity: 1;
-}
+.containerInicio { width: 100%; margin-top: 40px; display: flex; flex-direction: column; align-items: center; }
+.contenedorBackground { width: 100%; border-radius: 40px; overflow: hidden; border: 1px solid rgba(200, 178, 119, .3); box-shadow: 5px 5px 10px 0 rgba(200, 178, 119, .5); margin-bottom: 30px; }
+.contenedorBackground img { width: 100%; height: auto; display: block; object-fit: cover; }
+.logos { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1000px; }
+.logos img { width: 140px; transition: transform .3s ease, opacity .3s; }
+.logos img:hover { transform: scale(1.1); opacity: 1; }
+
 /* --- SECCIÓN SERVICIOS --- */
-.containerServicio {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 80px;
-    margin-top: 20px;
-    width: 100%;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 50px 5px 5px 5px;
-}
+.containerServicio { display: flex; justify-content: space-between; align-items: flex-start; gap: 80px; margin-top: 20px; width: 100%; border-top: 1px solid rgba(255, 255, 255, .2); padding: 50px 5px 5px; }
+.containerProyecto { flex: 1; max-width: 480px; display: flex; flex-direction: column; }
+.containerProyecto h1, .introduccion h1 { font-size: 2.5rem; font-weight: 300; line-height: 1.1; margin-bottom: 20px; color: #fff; text-align: left; }
+.containerProyecto p { color: #6C6C6C; font-size: 1rem; line-height: 1.6; text-align: left; }
+.containerProyecto img { width: 100%; border-radius: 30px; border: 1px solid rgba(200, 178, 119, .3); box-shadow: 5px 5px 15px rgba(200, 178, 119, .2); margin-top: 30px; }
+.containerTarjetas { flex: 1.2; display: flex; flex-direction: column; gap: 40px; }
+.containerTarjetas1, .containerTarjetas2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+.containerTarjetas1 { border-bottom: 1px solid rgba(255, 255, 255, .1); padding-bottom: 40px; }
+.containerTarjetas h4 { font-size: 17px; font-weight: 600; letter-spacing: .5px; margin: 15px 0 10px; color: #fff; text-align: left; }
+.containerTarjetas p { font-size: 1rem; color: #6C6C6C; line-height: 1.5; text-align: left; }
+.containerTarjetas img { width: 120px; height: 120px; object-fit: contain; }
 
-.containerProyecto {
-    flex: 1;
-    max-width: 480px;
-    display: flex;
-    flex-direction: column;
-}
-.containerProyecto h1 {
-    font-size: 2.5rem;
-    font-weight: 300; 
-    line-height: 1.1; 
-    margin-bottom: 20px;
-    color: #ffffff;
-    text-align: left;
-}
-.containerProyecto p {
-    color: #6C6C6C;
-    font-size: 1rem;
-    line-height: 1.6; 
-    text-align: left;
-}
-.containerProyecto img {
-    width: 100%;
-    border-radius: 30px;
-    border: 1px solid rgba(200, 178, 119, 0.3);
-    box-shadow: 5px 5px 15px rgba(200, 178, 119, 0.2);
-    margin-top: 30px;
-}
-.containerTarjetas {
-    flex: 1.2;
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-}
-.containerTarjetas1, .containerTarjetas2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-}
-.containerTarjetas1 {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 40px;
-}
-.containerTarjetas h4 {
-    font-size: 17px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    margin: 15px 0 10px 0; 
-    color: #ffffff;
-    text-align: left;
-}
+/* --- SECCIÓN PROPUESTA --- */
+.containerPropuesta { display: flex; justify-content: space-between; align-items: center; margin-top: 50px; width: 100%; max-width: 1210px; padding: 60px 5px; border-top: 1px solid rgba(255, 255, 255, .1); }
+.containerPropuestaIzquierda { flex: 1.2; display: flex; flex-direction: column; gap: 40px; }
+.introduccion p { font-size: 1.1rem; color: #6C6C6C; line-height: 1.6; max-width: 600px; text-align: left; }
+.items { display: grid; grid-template-columns: 1fr 1fr; gap: 40px 30px; }
+.item1, .item2, .item3, .item4 { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid rgba(255, 255, 255, .1); }
+.items h2 { font-size: 1.5rem; font-weight: 700; color: #C5A05F; opacity: .9; }
+.items p { font-size: .9rem; color: #6C6C6C; line-height: 1.5; text-align: left; }
+.containerPropuestaDerecha { flex: .8; display: flex; justify-content: flex-end; }
+.containerPropuestaDerecha img { width: 100%; max-width: 450px; border-radius: 40px; border: 1px solid rgba(200, 178, 119, .3); box-shadow: 5px 5px 10px 0 rgba(200, 178, 119, .5); }
 
+/* --- CARROUSEL Y RESPONSIVE --- */
+.propuesta-solo-movil { display: none; }
 
-.containerTarjetas p {
-    font-size: 1rem;
-    
-    color: #6C6C6C;
-    line-height: 1.5;
-    text-align: left;
-}
-
-.containerTarjetas img {
-    width: 120px;
-    height: 120px;
-    object-fit: contain;
-}
-
-
-/*CONTAINER PROPUESTA:*/
-.containerPropuesta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 50px;
-    width: 100%;
-    max-width: 1210px;
-    padding: 60px 5px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-
-.containerPropuestaIzquierda {
-    flex: 1.2;
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-}
-
-.introduccion h1 {
-    font-size: 2.5rem;
-    font-weight: 300;
-    line-height: 1.1;
-    color: #ffffff;
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.introduccion p {
-    font-size: 1.1rem;
-    color: #6C6C6C;
-    line-height: 1.6;
-    max-width: 600px;
-    text-align: left;
-}
-
-.items {
-    display: grid;
-    grid-template-columns: 1fr 1fr; 
-    gap: 40px 30px; 
-}
-
-.item1, .item2, .item3, .item4 {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1); 
-
-}
-
-
-.items h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #C5A05F;
-    opacity: 0.9;
-}
-
-.items p {
-    font-size: 0.9rem;
-    color: #6C6C6C;
-    line-height: 1.5;
-    text-align: left;
-}
-
-
-.containerPropuestaDerecha {
-    flex: 0.8;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.containerPropuestaDerecha img {
-    width: 100%;
-    max-width: 450px; 
-    border-radius: 40px;
-    border: 1px solid rgba(200, 178, 119, 0.3);
-    box-shadow: 5px 5px 10px 0px rgba(200, 178, 119, 0.5);
-}
-
-
-
-/*CARROUSEL PROPUESTAS*/
-
-/* El carrusel nace "apagado" */
-.propuesta-solo-movil {
-    display: none;
-}
-
-/* El contenedor original está "encendido" */
-.containerPropuesta {
-    display: flex;
-    /* ... resto de tus estilos de escritorio ... */
-}
 @media (max-width: 1200px) {
-   .containerPropuestaDerecha {
-        display: none;
-    }
-    .containerProyecto{
-        display: none ;
-    }
-    .contenedorLogos{
-        display: none;
-    }
+    .containerPropuestaDerecha, .containerProyecto, .contenedorLogos { display: none; }
 }
-
-/* --- 2. PUNTO DE QUIEBRE (A partir de 720px para abajo) --- */
-
 
 @media (max-width: 850px) {
-    
-    /* Matamos el contenedor con imagen */
-    .containerPropuesta {
-        display: none !important;
-    }
-
-    /* Encendemos el Carrusel */
-    .propuesta-solo-movil {
-        display: block !important;
-        width: 100%;
-    }
-
+    .containerPropuesta { display: none !important; }
+    .propuesta-solo-movil { display: block !important; width: 100%; }
 }

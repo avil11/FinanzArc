@@ -1,158 +1,45 @@
-.layou-display{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.footer-principal {
-    width: 1210px;
-    background-color: #0c0c0d; /* Negro profundo igual al Navbar */
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+/* =========================================
+   FOOTER (ESTILOS Y LAYOUT)
+   ========================================= */
+.layou-display { display: flex; align-items: center; justify-content: center; }
+.footer-principal { width: 100%; background: #0c0c0d; border-top: 1px solid rgba(255, 255, 255, .1); padding-top: 60px; }
+.footer-contenido { max-width: 1210px; margin: 0 auto; padding: 0 20px 40px; display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 60px; }
 
-    padding-top: 60px;
-}
-
-.footer-contenido {
-    max-width: 1210px;
-    margin: 0 auto;
-    padding: 0 20px 40px 20px;
-    display: grid;
-    /* 1 parte marca, 2 partes equipo, 1 parte links */
-    grid-template-columns: 1fr 2fr 1fr; 
-    gap: 60px;
-}
-
-/* --- ESTILOS DE TEXTO (ALINEADOS) --- */
-.footer-contenido h4 {
-    color: #ffffff;
-    font-size: 1.1rem;
-    margin-bottom: 25px;
-    font-weight: 600;
-}
-
-.descripcion-footer {
-    color: #6C6C6C;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    margin-top: 15px;
-}
+/* --- TEXTOS --- */
+.footer-contenido h4 { color: #fff; font-size: 1.1rem; margin-bottom: 25px; font-weight: 600; }
+.descripcion-footer { color: #6c6c6c; font-size: .9rem; line-height: 1.6; margin-top: 15px; }
 
 /* --- GRID DEL EQUIPO --- */
-.grid-equipo {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
+.grid-equipo { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.tarjeta-miembro { background: #1e1e1f; padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 15px; text-decoration: none; transition: transform .3s ease, border .3s ease; border: 1px solid transparent; }
+.tarjeta-miembro:hover { transform: translateY(-5px); border: 1px solid rgba(200, 178, 119, .4); }
 
-.tarjeta-miembro {
-    background-color: #1e1e1f;
-    padding: 15px;
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    text-decoration: none;
-    transition: transform 0.3s ease, border 0.3s ease;
-    border: 1px solid transparent;
-}
+/* --- AVATAR --- */
+.avatar-placeholder { width: 45px; height: 45px; border-radius: 50%; background-size: cover; background-position: center; background-repeat: no-repeat; border: 2px solid rgba(255, 255, 255, .05); transition: all .3s ease; }
+.tarjeta-miembro:hover .avatar-placeholder { border-color: rgba(200, 178, 119, .4); }
 
-.tarjeta-miembro:hover {
-    transform: translateY(-5px);
-    border: 1px solid rgba(200, 178, 119, 0.4);
-}
-/* =======================================
-   ESTILOS DEL AVATAR (CÍRCULO COMPLETO)
-   ======================================= */
-.avatar-placeholder {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    
-    border: 2px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
-}
+@keyframes recorridoTextura { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-.tarjeta-miembro:hover .avatar-placeholder {
-    border-color: rgba(200, 178, 119, 0.4);
-}
+.info-miembro h5 { color: #fff; font-size: .9rem; margin-bottom: 2px; }
+.info-miembro p { color: #6c6c6c; font-size: .75rem; }
 
-/* 3. Animación (Keyframes) */
-@keyframes recorridoTextura {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-.info-miembro h5 {
-    color: #ffffff;
-    font-size: 0.9rem;
-    margin-bottom: 2px;
-}
-
-.info-miembro p {
-    color: #6C6C6C;
-    font-size: 0.75rem;
-}
-
-/* --- COLUMNA LINKS --- */
-.footer-col-links nav {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.footer-col-links a {
-    color: #6C6C6C;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: color 0.2s;
-}
-
-.footer-col-links a:hover {
-    color: #ffffff;
-}
+/* --- LINKS --- */
+.footer-col-links nav { display: flex; flex-direction: column; gap: 12px; }
+.footer-col-links a { color: #6c6c6c; text-decoration: none; font-size: .9rem; transition: color .2s; }
+.footer-col-links a:hover { color: #fff; }
 
 /* --- COPYRIGHT --- */
-.footer-copyright {
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 25px 0;
-    text-align: center;
-}
+.footer-copyright { border-top: 1px solid rgba(255, 255, 255, .05); padding: 25px 0; text-align: center; }
+.footer-copyright p { color: #444; font-size: .8rem; }
+.titulo p { color: #fff; }
 
-.footer-copyright p {
-    color: #444;
-    font-size: 0.8rem;
-}
-
-.titulo p{
-    color: white;
-}
-
-@media (max-width: 810px){
-    .footer-contenido{
-    width: 100%;
-    margin: 0 auto;
-    padding: 0 20px 40px 20px;
-    display: flex;
-    }
-    .footer-contenido h4{
-        text-align: center;
-        font-size: 25px;
-        font-weight: 500;
-        letter-spacing: 1px;
-    }
-
-    .footer-col-marca{
-        display: none;
-    }
-    .footer-col-links{
-        display: none;
-    }
-    .footer-col-equipo{
-        width: 100%;
-    }
-    .grid-equipo {
-        grid-template-columns: 1fr; /* En móvil, mejor poner 1 por fila */
-    }
+/* =========================================
+   MEDIA QUERIES (RESPONSIVE FOOTER)
+   ========================================= */
+@media (max-width: 810px) {
+    .footer-contenido { width: 100%; padding: 0 20px 40px; display: flex; }
+    .footer-contenido h4 { text-align: center; font-size: 25px; font-weight: 500; letter-spacing: 1px; }
+    .footer-col-marca, .footer-col-links { display: none; }
+    .footer-col-equipo { width: 100%; }
+    .grid-equipo { grid-template-columns: 1fr; }
 }
