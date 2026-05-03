@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import "./InicioSesion.css"; 
+import "./InicioSesion.css";
 
 const InicioSesion = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -57,10 +58,10 @@ const InicioSesion = ({ isOpen, onClose }) => {
 
         handleCerrarModal();
         navigate("/Principal");
-        
+
         // Pequeño delay para asegurar que el token se guardó antes de recargar
         setTimeout(() => {
-            window.location.reload(); 
+          window.location.reload();
         }, 100);
       })
       .catch((err) => {
@@ -76,37 +77,36 @@ const InicioSesion = ({ isOpen, onClose }) => {
     <div className="capa-modal-login" onClick={onClose}>
       <div className="contenido-modal-login" onClick={(e) => e.stopPropagation()}>
         <button className="boton-cerrar-modal" onClick={onClose}>×</button>
-        
+
         <div className="login-form-container">
           <h2 className="login-titulo">Bienvenido</h2>
           <p className="login-subtitulo">Ingresa a tu cuenta premium</p>
 
           <form onSubmit={handleSubmit} className="login-form">
             {error && <p className="login-error-msg">{error}</p>}
-            
             <div className="formulario-grupo">
               <label>Nombre de Usuario:</label>
-              <input 
-                type="text" 
-                value={NombreUsuario} 
-                onChange={(e) => setNombreUsuario(e.target.value)} 
-                placeholder="Ej: ramiro_dev" 
-                required 
+              <input
+                type="text"
+                value={NombreUsuario}
+                onChange={(e) => setNombreUsuario(e.target.value)}
+                placeholder="Ej: ramiro_dev"
+                required
               />
             </div>
-
             <div className="formulario-grupo">
               <label>Contraseña</label>
               <div className="input-con-icono">
-                <input 
-                  type={mostrarPasswordHash ? "text" : "password"} 
-                  value={PasswordHash} 
-                  onChange={(e) => setPasswordHash(e.target.value)} 
-                  placeholder="••••••••" 
-                  required 
+                <input
+                  type={mostrarPasswordHash ? "text" : "password"}
+                  value={PasswordHash}
+                  onChange={(e) => setPasswordHash(e.target.value)}
+                  placeholder="••••••••"
+                  required
                 />
-                <button 
-                  type="button" 
+
+                <button
+                  type="button"
                   className="btn-ver-password"
                   onClick={() => setMostrarPasswordHash(!mostrarPasswordHash)}
                   tabIndex="-1"
@@ -115,14 +115,23 @@ const InicioSesion = ({ isOpen, onClose }) => {
                 </button>
               </div>
             </div>
+            <Link
+              to="/crear-cuenta"
+              className="gold-link"
+              onClick={onClose} // Cerramos el modal antes de irnos a la otra página
+            >
+              ¿No tienes cuenta todavía?
+            </Link>
 
-            <button 
-              type="submit" 
+
+            <button
+              type="submit"
               className="boton-primario login-btn-full"
               disabled={cargando}
             >
               {cargando ? "Verificando..." : "Iniciar Sesión"}
             </button>
+
           </form>
         </div>
       </div>

@@ -4,6 +4,7 @@ import "../NavBar/Navbar.css";
 // 1. NUEVO: Importamos el componente del modal
 import InicioSesion from "../../paginas/inicio/InicioSesion/InicioSesion"; 
 
+
 const Navbar = () => {
   const navigate = useNavigate();
   const { hash } = useLocation(); // Detectamos el hash de la URL (#inicio, #servicio, etc.)

@@ -4,6 +4,7 @@ import Footer from './componentes/Footer/Footer';
 
 import Inicio from './paginas/inicio/Inicio';
 import Registro from './paginas/inicio/InicioSesion/InicioSesion';
+import CrearCuenta from './paginas/CrearCuenta/CrearCuenta';
 import Principal from './paginas/Principal/General/General';
 import Comparativa from "./paginas/Principal/Comparativa/Comparativa";
 import Ingreso from './paginas/Principal/Ingreso/Ingreso';
@@ -26,6 +27,7 @@ function App() {
         <Route path="/gasto" element={<Gasto />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/inicio-sesion" element={<InicioSesion />} />
+        <Route path="/crear-cuenta" element={<CrearCuenta />} />
       </Routes>
       <Footer />
     </BrowserRouter>
