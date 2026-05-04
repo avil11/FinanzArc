@@ -50,7 +50,7 @@ const Comparativa = () => {
     // --- UTILIDADES DE FECHAS ---
     const getNombreMes = (offset) => {
         const d = new Date();
-        d.setDate(1); 
+        d.setDate(1);
         d.setMonth(d.getMonth() + (offset || 0));
         return d.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
     };
@@ -76,7 +76,7 @@ const Comparativa = () => {
             ]);
             const vivos = resV.ok ? await resV.json() : [];
             const historial = resH.ok ? await resH.json() : [];
-            
+
             // Sumar montos filtrando por el rango de fechas del offset
             const total = [...vivos, ...historial].reduce((acc, item) => {
                 const fechaStr = item.FechaGasto || item.FechaIngreso || item.Fecha;
@@ -86,7 +86,7 @@ const Comparativa = () => {
                     ? acc + (item.MontoGasto || item.MontoIngreso || item.Monto || 0)
                     : acc;
             }, 0);
-            
+
             setDatos(prev => ({ ...prev, [clave]: total }));
         } catch (error) { console.error("Error cargando datos:", error); }
     }, [idUsuario]);
@@ -246,7 +246,7 @@ const Comparativa = () => {
                             <GraficoConNav titulo="Ingresos A" valor={datos.ingresoA} offset={offsets.ingresoA} setOffsetKey="ingresoA" tipo="ingreso" syncOffsets={["gastoA"]} />
                             <div className="tarjeta-balance-central">
                                 <div className="icon-comparar">DIF</div>
-                                <div className={`info-balance ${ (datos.ingresoA - datos.gastoA) >= 0 ? "tendencia-positiva" : "tendencia-negativa"}`}>
+                                <div className={`info-balance ${(datos.ingresoA - datos.gastoA) >= 0 ? "tendencia-positiva" : "tendencia-negativa"}`}>
                                     <p className="monto-balance">${(datos.ingresoA - datos.gastoA).toLocaleString()}</p>
                                     <span className="porcentaje-balance">Resultado Neto</span>
                                 </div>
@@ -260,7 +260,7 @@ const Comparativa = () => {
                             <GraficoConNav titulo="Ingresos B" valor={datos.ingresoB} offset={offsets.ingresoB} setOffsetKey="ingresoB" tipo="ingreso" syncOffsets={["gastoB"]} />
                             <div className="tarjeta-balance-central">
                                 <div className="icon-comparar">DIF</div>
-                                <div className={`info-balance ${ (datos.ingresoB - datos.gastoB) >= 0 ? "tendencia-positiva" : "tendencia-negativa"}`}>
+                                <div className={`info-balance ${(datos.ingresoB - datos.gastoB) >= 0 ? "tendencia-positiva" : "tendencia-negativa"}`}>
                                     <p className="monto-balance">${(datos.ingresoB - datos.gastoB).toLocaleString()}</p>
                                     <span className="porcentaje-balance">Resultado Neto</span>
                                 </div>
@@ -276,27 +276,40 @@ const Comparativa = () => {
     return (
         <div className="contenedor-principal-general">
             {/* ENCABEZADO PRINCIPAL */}
-            <div className="seccion-encabezado-general">
-                <div className="titulo-principal-general">
-                    <h2>Comparativa {tipoPresentacion === 1 ? "Mensual" : "Ingreso vs Gasto"}</h2>
-                    <p style={{ color: "#888", fontWeight: "600", fontSize: "1rem" }}>
-                        {tipoPresentacion === 1 
-                            ? "Compará el mismo rubro entre dos meses diferentes para ver el crecimiento o decrecimiento." 
-                            : "Compará cuánto ganaste vs cuánto gastaste dentro del mismo periodo seleccionado."}
-                    </p>
-                </div>
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                    <button 
-                        onClick={() => setTipoPresentacion(tipoPresentacion === 1 ? 2 : 1)} 
-                        className='botonesComparativa'
-                        style={{ background: '#c8b277', color: '#000' }}
-                    >
-                        {tipoPresentacion === 1 ? "Ver Balances mensuales" : "Ver Comparativa Mensual"}
-                    </button>
-                    <Link to="/Principal" className="botonesComparativa" style={{ textDecoration: 'none' }}>Volver</Link>
-                    <button onClick={() => setModalArchivarAbierto(true)} className='botonesComparativa' >Archivar datos actuales</button>
-                </div>
-            </div>
+           <div className="seccion-encabezado-general">
+    <div className="titulo-principal-general">
+        <h2>Comparativa {tipoPresentacion === 1 ? "Mensual" : "Ingreso vs Gasto"}</h2>
+        <p className="descripcion-encabezado">
+            {tipoPresentacion === 1
+                ? "Seleccione dos meses diferentes para contrastar los registros y determinar el porcentaje de crecimiento o decrecimiento. Esta funcionalidad es clave para entender cómo evolucionan sus hábitos financieros y asegurar un control riguroso sobre cada partida presupuestaria."
+                : "Esta función te permite ver, de forma segura y clara, cuánta plata entró y cuánta plata salió en el mes que elijas. Al seleccionar un mes, la aplicación ajusta automáticamente ambos valores para que siempre veas la información del mismo período. Así, vas a tener la tranquilidad de saber exactamente si tus cuentas están en equilibrio, con datos precisos y sin errores de confusión."}
+        </p>
+    </div>
+
+    <div className='botonesFuncionesComparativa'>
+        <div className='botonesBalanceComparativa'>
+            <button
+                onClick={() => setTipoPresentacion(tipoPresentacion === 1 ? 2 : 1)}
+                className='botonesComparativa btn-principal'
+            >
+                {tipoPresentacion === 1 ? "Ver Balances mensuales" : "Ver Comparativa Mensual"}
+            </button>
+            
+            <button 
+                onClick={() => setModalArchivarAbierto(true)} 
+                className='botonesComparativa btn-secundario'
+            >
+                Archivar datos actuales
+            </button>
+        </div>
+
+        <div className='botonVolverPrincipal'>
+            <Link to="/Principal" className="botonesComparativa btn-volver">
+                Volver
+            </Link>
+        </div>
+    </div>
+</div>
 
             {renderContenido()}
 
@@ -331,18 +344,38 @@ const Comparativa = () => {
             {/* MODAL: CONFIRMACIÓN DE ARCHIVADO */}
             {modalArchivarAbierto && (
                 <div className="modal-overlay" onClick={() => setModalArchivarAbierto(false)}>
-                    <div className="modal-contenido" style={{ maxWidth: '450px' }} onClick={e => e.stopPropagation()}>
+                    <div className="modal-contenido" onClick={e => e.stopPropagation()}>
+
                         <div className="modal-header">
                             <h3>Archivar Mes Actual</h3>
                             <button className="btn-cerrar" onClick={() => setModalArchivarAbierto(false)}>&times;</button>
                         </div>
-                        <div className="modal-body" style={{ textAlign: 'center', padding: '20px' }}>
-                            <p style={{ color: '#fff', marginBottom: '15px', fontSize: '1.1rem' }}>
+
+                        <div className="modal-body">
+                            <h3>
                                 ¿Estás seguro de que deseas archivar los datos de <strong>{getNombreMes(0)}</strong>?
+                            </h3>
+
+                            <p>
+                                ¡Cuidado! Si apretás el botón, los números de este mes se guardan en una caja cerrada y ya no los vas a poder cambiar.
+                                Esto sirve para que las listas de 'Ingresos' y 'Gastos' queden vacías y limpias, así no te confundís con los gastos viejos
+                                y podés anotar lo nuevo sin problemas.
                             </p>
-                            <div style={{ marginTop: '25px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                                <button className="botonesComparativa" onClick={() => setModalArchivarAbierto(false)} style={{ background: '#444' }}>Cancelar</button>
-                                <button className="botonesComparativa" onClick={archivarMesActual}>Confirmar y Archivar</button>
+
+                            <div className="modal-acciones">
+                                <button
+                                    className="botonesComparativa btn-cancelar-modal"
+                                    onClick={() => setModalArchivarAbierto(false)}
+                                >
+                                    Cancelar
+                                </button>
+
+                                <button
+                                    className="botonesComparativa btn-confirmar-modal"
+                                    onClick={archivarMesActual}
+                                >
+                                    Confirmar y Archivar
+                                </button>
                             </div>
                         </div>
                     </div>

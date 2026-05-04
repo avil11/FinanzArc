@@ -30,7 +30,7 @@
 .titulo-principal-general { display: flex; flex-direction: column; gap: 10px; }
 .titulo-principal-general h2 { font-weight: 600; margin-bottom: 0.3rem; }
 .subtitulo-seccion { color: var(--gold-accent); font-size: 1.2rem; font-weight: 500; margin-bottom: 1.5rem; padding-left: 12px; border-left: 3px solid var(--blue-accent); display: flex; align-items: center; }
-
+ 
 .botonesComparativa { background: rgba(200, 178, 119, 0.1); color: var(--gold-accent); border: 1px solid var(--gold-accent); padding: 8px 24px; border-radius: var(--border-radius-sm); font-weight: 600; font-size: 0.85rem; transition: var(--transition-fast); }
 .botonesComparativa:hover { background: var(--gold-accent); color: var(--carbon-black); }
 
@@ -130,4 +130,80 @@
      .seccion-encabezado-general a{ width: 150px; text-align: center;} 
      .seccion-encabezado-general p { text-align: center;}
      .seccion-encabezado-general{text-align: center}
+}
+
+
+
+/* --- Modal Overlay (Efecto Glassmorphism) --- */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 2000; animation: fadeInModal 0.3s ease; }
+
+/* --- Tarjeta del Modal --- */
+.modal-contenido { background: #141414; border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 28px; width: 90%; max-width: 480px; box-shadow: 0 25px 80px rgba(0, 0, 0, 0.9); overflow: hidden; animation: slideUpModal 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* --- Header y Título --- */
+.modal-header { padding: 25px 30px; display: flex; justify-content: space-between; align-items: center; background: rgba(212, 175, 55, 0.03); border-bottom: 1px solid rgba(212, 175, 55, 0.1); }
+.modal-header h3 { color: #D4AF37; font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin: 0; }
+.btn-cerrar { background: none; border: none; color: #555; font-size: 2rem; cursor: pointer; transition: all 0.3s ease; line-height: 1; }
+.btn-cerrar:hover { color: #D4AF37; transform: rotate(90deg); }
+
+/* --- Cuerpo del Mensaje --- */
+.modal-body { padding: 35px 30px; text-align: center; }
+.modal-body h3 { color: #fff; font-size: 1.2rem; font-weight: 500; line-height: 1.5; margin-bottom: 15px; }
+.modal-body strong { color: #FFD700; font-weight: 800; text-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+.modal-body p { color: #888; font-size: 0.95rem; line-height: 1.6; margin-bottom: 30px; }
+
+/* --- Contenedor de Botones --- */
+.modal-acciones { display: flex; gap: 15px; justify-content: center; }
+
+/* --- Botones Base --- */
+.botonesComparativa { padding: 14px 28px; border-radius: 14px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: none; text-transform: uppercase; letter-spacing: 1px; }
+
+/* Botón Cancelar (Estilo Dark) */
+.btn-cancelar-modal { background: #222; color: #777; border: 1px solid rgba(255, 255, 255, 0.05); }
+.btn-cancelar-modal:hover { background: #2a2a2a; color: #fff; border-color: rgba(212, 175, 55, 0.3); }
+
+/* Botón Confirmar (Estilo Golden Premium) */
+.btn-confirmar-modal { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #000; box-shadow: 0 10px 20px rgba(184, 134, 11, 0.2); }
+.btn-confirmar-modal:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(212, 175, 55, 0.4); filter: brightness(1.1); }
+.btn-confirmar-modal:active { transform: translateY(0) scale(0.97); }
+
+/* --- Animaciones --- */
+@keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUpModal { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+/* --- Contenedor Encabezado --- */
+.seccion-encabezado-general { width: 100%; padding: 40px 0; display: flex; flex-direction: column; gap: 30px; }
+.titulo-principal-general { width: 100%; text-align: left; }
+.titulo-principal-general h2 { color: #D4AF37; font-size: 2rem; margin-bottom: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+.descripcion-encabezado { color: #888; font-weight: 600; font-size: 1rem; line-height: 1.6; max-width: 900px; }
+
+/* --- Contenedores de Botones --- */
+.botonesFuncionesComparativa { display: flex; gap: 15px; flex-wrap: wrap; width: 100%; justify-content: space-between; align-items: center; }
+.botonesBalanceComparativa { display: flex; gap: 15px; flex-wrap: wrap; }
+.botonVolverPrincipal { display: flex; align-items: center; justify-content: center; }
+
+/* --- Botones Estilo Premium (Sincronizados) --- */
+.botonesComparativa { height: 50px; padding: 0 25px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; border: none; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+
+/* Variantes de Botón */
+.btn-principal { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #000; box-shadow: 0 4px 15px rgba(184, 134, 11, 0.2); }
+.btn-principal:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4); filter: brightness(1.1); }
+
+.btn-secundario { background: #141414; color: #D4AF37; border: 1px solid rgba(212, 175, 55, 0.3); }
+.btn-secundario:hover { background: rgba(212, 175, 55, 0.05); border-color: #D4AF37; color: #FFD700; }
+
+.btn-volver { background: #222; color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); }
+.btn-volver:hover { background: #333; border-color: rgba(255, 255, 255, 0.3); }
+
+/* --- RESPONSIVE (Ajustado) --- */
+@media (max-width: 810px) {
+    .seccion-encabezado-general { padding: 20px 10px; text-align: center; }
+    .titulo-principal-general h2 { font-size: 1.6rem; text-align: center; }
+    .descripcion-encabezado { font-size: 0.9rem; text-align: center; margin: 0 auto; }
+    
+    .botonesFuncionesComparativa { flex-direction: column; gap: 20px; align-items: center; height: auto; }
+    .botonesBalanceComparativa { flex-direction: column; width: 100%; align-items: center; gap: 12px; }
+    
+    .botonesComparativa { width: 100%; max-width: 320px; height: 55px; } /* Más grandes para touch */
+    .botonVolverPrincipal { width: 100%; }
 }

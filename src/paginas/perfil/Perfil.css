@@ -1,125 +1,28 @@
-/* =========================================
-   PÁGINA DE PERFIL (DASHBOARD STYLE)
-   ========================================= */
-.perfil-pagina-contenedor-general,
-.perfil-pagina-contenedor {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+/* --- Página de Perfil (Dashboard Style - Golden Sinergy) --- */
+.perfil-pagina-contenedor-general, .perfil-pagina-contenedor { width: 100%; display: flex; justify-content: center; align-items: center; }
+.perfil-pagina-contenedor { min-height: 80vh; padding: 20px; background: #0a0a0a; }
+.perfil-tarjeta-premium { width: 100%; max-width: 450px; padding: 40px; background: #141414; border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 28px; box-shadow: 0 30px 60px rgba(0, 0, 0, .8); text-align: center; animation: fadeInPerfil .6s ease-out; position: relative; }
 
-.perfil-pagina-contenedor {
-    min-height: 80vh;
-    padding: 20px;
-}
+/* Avatar circular con el Oro del Navbar */
+.perfil-avatar { width: 100px; height: 100px; margin: 0 auto 20px; display: flex; justify-content: center; align-items: center; background: linear-gradient(145deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%); border-radius: 50%; box-shadow: 0 0 25px rgba(212, 175, 55, 0.3); border: 2px solid rgba(255, 255, 255, 0.1); }
+.avatar-inicial { color: #000; font-size: 2.5rem; font-weight: 800; }
 
-.perfil-tarjeta-premium {
-    width: 100%;
-    max-width: 450px;
-    padding: 40px;
-    background: linear-gradient(145deg, #222224, #1a1a1b);
-    border: 1px solid rgba(200, 178, 119, .2);
-    border-radius: 28px;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, .6);
-    text-align: center;
-    animation: fadeInPerfil .6s ease-out;
-}
+/* Textos y Status */
+.perfil-nombre { margin-bottom: 5px; color: #fff; font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
+.perfil-status { margin-bottom: 30px; color: #D4AF37; font-size: .85rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
 
-/* Avatar circular con borde dorado */
-.perfil-avatar {
-    width: 100px;
-    height: 100px;
-    margin: 0 auto 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(135deg, #c8b277, #a68b2a);
-    border-radius: 50%;
-    box-shadow: 0 0 20px rgba(200, 178, 119, .3);
-}
-
-.avatar-inicial {
-    color: #111;
-    font-size: 2.5rem;
-    font-weight: bold;
-}
-
-.perfil-nombre {
-    margin-bottom: 5px;
-    color: #fff;
-    font-size: 1.8rem;
-    font-weight: 500;
-}
-
-.perfil-status {
-    margin-bottom: 30px;
-    color: #c8b277;
-    font-size: .9rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-/* Lista de info */
-.perfil-info-lista {
-    margin-bottom: 40px;
-    padding: 20px;
-    background: rgba(0, 0, 0, .2);
-    border-radius: 18px;
-    text-align: left;
-}
-
-.info-item {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
-}
-
+/* Lista de Información con Estilo Glass */
+.perfil-info-lista { margin-bottom: 40px; padding: 25px; background: rgba(0, 0, 0, .3); border: 1px solid rgba(212, 175, 55, 0.1); border-radius: 18px; text-align: left; }
+.info-item { display: flex; flex-direction: column; margin-bottom: 18px; }
 .info-item:last-child { margin-bottom: 0; }
+.info-item label { margin-bottom: 6px; color: #666; font-size: .7rem; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
+.info-item span { color: #eee; font-size: 1rem; font-weight: 400; }
+.badge-dorado { color: #FFD700 !important; font-weight: 700; text-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
 
-.info-item label {
-    margin-bottom: 4px;
-    color: #666;
-    font-size: .75rem;
-    letter-spacing: .5px;
-    text-transform: uppercase;
-}
-
-.info-item span {
-    color: #ddd;
-    font-size: 1.05rem;
-}
-
-.badge-dorado {
-    color: #c8b277 !important;
-    font-weight: 600;
-}
-
-/* BOTÓN DE LOGOUT (ESTILO PELIGRO PERO ELEGANTE) */
-.BotonLogout {
-    width: 100%;
-    padding: 14px;
-    background: transparent;
-    color: #ff4d4d;
-    font-size: .95rem;
-    font-weight: 600;
-    border: 1.5px solid rgba(255, 77, 77, .3);
-    border-radius: 14px;
-    cursor: pointer;
-    transition: all .3s cubic-bezier(.25, .8, .25, 1);
-}
-
-.BotonLogout:hover {
-    background: rgba(255, 77, 77, .1);
-    border-color: #ff4d4d;
-    box-shadow: 0 8px 15px rgba(255, 77, 77, .15);
-    transform: translateY(-2px);
-}
-
-.BotonLogout:active { transform: translateY(0) scale(.98); }
+/* Botón de Logout (Estilo Peligro Elegante) */
+.BotonLogout { width: 100%; padding: 16px; background: transparent; color: #ff4d4d; font-size: .9rem; font-weight: 700; border: 1.5px solid rgba(255, 77, 77, .3); border-radius: 14px; cursor: pointer; transition: all .3s cubic-bezier(.4, 0, .2, 1); text-transform: uppercase; letter-spacing: 1px; }
+.BotonLogout:hover { background: rgba(255, 77, 77, .1); border-color: #ff4d4d; box-shadow: 0 8px 20px rgba(255, 77, 77, .2); transform: translateY(-3px); }
+.BotonLogout:active { transform: translateY(0) scale(.97); }
 
 /* Animación de entrada */
-@keyframes fadeInPerfil {
-    from { opacity: 0; transform: scale(.9); }
-    to { opacity: 1; transform: scale(1); }
-}
+@keyframes fadeInPerfil { from { opacity: 0; transform: scale(.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
