@@ -10,6 +10,7 @@ const Comparativa = () => {
     const [cargando, setCargando] = useState(true);
     const [idUsuario, setIdUsuario] = useState(null);
     const [modalAbierto, setModalAbierto] = useState(false);
+    const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false); // NUEVO ESTADO
     const [datosModal, setDatosModal] = useState({ titulo: "", items: [], tipo: "" });
 
     const coloresIngreso = ["#007AFF", "#c8b277", "#8a733f", "#4a4a4a"];
@@ -41,8 +42,8 @@ const Comparativa = () => {
 
     const getNombreMes = (offset) => {
         const d = new Date();
-        d.setDate(1); // Evita error de desbordamiento (ej. 29 de febrero)
-        d.setMonth(d.getMonth() + offset);
+        d.setDate(1); 
+        d.setMonth(d.getMonth() + (offset || 0));
         return d.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
     };
 
@@ -53,12 +54,10 @@ const Comparativa = () => {
         return { inicio: inicio.toISOString(), fin: fin.toISOString() };
     };
 
-    // --- CARGA UNIFICADA (Vivos + Historial) ---
     const cargarDatoIndividual = useCallback(async (tipo, offset, clave) => {
         if (!idUsuario) return;
         const { inicio, fin } = getRangoMes(offset);
 
-        // Definimos los endpoints según el tipo
         const epVivo = tipo === 'gasto' ? `/Gasto/ByUsuario/${idUsuario}` : `/Ingreso/ByUsuario/${idUsuario}`;
         const epHist = tipo === 'gasto' ? `/HistorialGasto/ByUsuario/${idUsuario}` : `/HistorialIngreso/ByUsuario/${idUsuario}`;
 
@@ -71,7 +70,6 @@ const Comparativa = () => {
             const vivos = resV.ok ? await resV.json() : [];
             const historial = resH.ok ? await resH.json() : [];
 
-            // Combinamos y filtramos por fecha (Corte 6 AM)
             const total = [...vivos, ...historial].reduce((acc, item) => {
                 const fechaStr = item.FechaGasto || item.FechaIngreso || item.Fecha;
                 if (!fechaStr) return acc;
@@ -98,13 +96,12 @@ const Comparativa = () => {
         setCargando(false);
     }, [idUsuario, offsets, cargarDatoIndividual]);
 
-    const archivarMesActual = async (offset) => {
+    const archivarMesActual = async () => {
         if (!idUsuario) return;
-        const nombreMes = getNombreMes(offset);
-        if (!window.confirm(`¿Archivar mes de ${nombreMes}?`)) return;
-
+        
         try {
             setCargando(true);
+            setModalArchivarAbierto(false); // Cerrar modal antes de procesar
             const response = await fetch(`${API_BASE_URL}/Cierre/FinalizarMes`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -112,7 +109,7 @@ const Comparativa = () => {
             });
 
             if (response.ok) {
-                alert("¡Mes archivado!");
+                alert("¡Mes archivado correctamente!");
                 await cargarTodosLosDatos();
             }
         } catch (error) { console.error(error); }
@@ -145,7 +142,6 @@ const Comparativa = () => {
         if (idUsuario) { cargarTodosLosDatos(); }
     }, [idUsuario, cargarTodosLosDatos]);
 
-    // --- RENDERIZADO (Gráficos y Modal iguales a los anteriores) ---
     const calcularDiferencia = (valorA, valorB, esGasto = true) => {
         const diferencia = valorA - valorB;
         const porcentaje = valorB !== 0 ? ((diferencia / valorB) * 100).toFixed(1) : "100";
@@ -160,13 +156,10 @@ const Comparativa = () => {
 
     const GraficoConNav = ({ titulo, valor, offset, setOffsetKey, tipo }) => {
         const esVacio = valor === 0;
-
-        // Seleccionamos la paleta de colores según el tipo
         const paleta = tipo === 'gasto' ? coloresGasto : coloresIngreso;
 
         return (
             <div className="tarjeta-general grafico-ajustado">
-                <button className="btn-archivar-icono" onClick={() => archivarMesActual(offset)}>📁</button>
                 <div className="encabezado-grafico-nav">
                     <span className="badge-periodo">{titulo}</span>
                     <div className="selector-mes-nav">
@@ -183,16 +176,11 @@ const Comparativa = () => {
                             <PieChart>
                                 <Pie
                                     data={[{ v: valor }]}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={80}
-                                    dataKey="v"
-                                    stroke="none"
-                                    startAngle={90}
-                                    endAngle={450}
+                                    cx="50%" cy="50%"
+                                    innerRadius={60} outerRadius={80}
+                                    dataKey="v" stroke="none"
+                                    startAngle={90} endAngle={450}
                                 >
-                                    {/* Aplicamos el primer color de la paleta correspondiente */}
                                     <Cell fill={paleta[0]} />
                                 </Pie>
                                 <Tooltip contentStyle={{ background: "#1a1a1b", border: "none", color: "#fff" }} />
@@ -217,9 +205,12 @@ const Comparativa = () => {
                     <p style={{ color: "#888", fontWeight: "600", fontSize: "1rem" }}>Analizá la evolución de tu negocio a través de nuestros gráficos interactivos. En este panel, vas a poder contrastar directamente los ingresos o gastos totales de un mes frente a otro. Esta vista te permite identificar fluctuaciones, medir tu crecimiento y ajustar tus estrategias financieras con datos precisos.</p>
                 </div>
                 <Link to="/Principal" className="botonesComparativa" style={{ textDecoration: 'none' }}>Volver</Link>
+                {/* BOTÓN MODIFICADO PARA ABRIR EL NUEVO MODAL */}
+                <button onClick={() => setModalArchivarAbierto(true)} className='botonesComparativa' >Archivar datos actuales</button>
             </div>
 
             <div className="comparativa-grid-layout">
+                {/* Sección Gastos */}
                 <div className="seccion-comparativa-fila">
                     <h2 className="subtitulo-seccion">Gastos</h2>
                     <div className="fila-comparativa-master">
@@ -235,6 +226,7 @@ const Comparativa = () => {
                     </div>
                 </div>
 
+                {/* Sección Ingresos */}
                 <div className="seccion-comparativa-fila" style={{ marginTop: '50px' }}>
                     <h2 className="subtitulo-seccion">Ingresos</h2>
                     <div className="fila-comparativa-master">
@@ -251,6 +243,7 @@ const Comparativa = () => {
                 </div>
             </div>
 
+            {/* MODAL DE DETALLES EXISTENTE */}
             {modalAbierto && (
                 <div className="modal-overlay" onClick={() => setModalAbierto(false)}>
                     <div className="modal-contenido" onClick={e => e.stopPropagation()}>
@@ -277,6 +270,36 @@ const Comparativa = () => {
                     </div>
                 </div>
             )}
+
+            {/* NUEVO MODAL PARA EXPLICAR LA FUNCIÓN DE ARCHIVAR */}
+            {modalArchivarAbierto && (
+                <div className="modal-overlay" onClick={() => setModalArchivarAbierto(false)}>
+                    <div className="modal-contenido" style={{ maxWidth: '450px' }} onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3>Archivar Mes Actual</h3>
+                            <button className="btn-cerrar" onClick={() => setModalArchivarAbierto(false)}>&times;</button>
+                        </div>
+                        <div className="modal-body" style={{ textAlign: 'center', padding: '20px' }}>
+                            <p style={{ color: '#fff', marginBottom: '15px', fontSize: '1.1rem' }}>
+                                ¿Estás seguro de que deseas archivar los datos de <strong>{getNombreMes(0)}</strong>?
+                            </p>
+                            <p style={{ color: '#888', fontSize: '0.9rem', lineHeight: '1.5' }}>
+                                Al realizar esta acción, todos tus ingresos y gastos actuales se moverán al <strong>Historial</strong>. 
+                                Esto permite limpiar tu panel principal para comenzar el nuevo mes, manteniendo todos tus registros previos consultables en este apartado de comparativa.
+                            </p>
+                            <div style={{ marginTop: '25px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                                <button className="botonesComparativa" onClick={() => setModalArchivarAbierto(false)} style={{ background: '#444' }}>
+                                    Cancelar
+                                </button>
+                                <button className="botonesComparativa" onClick={archivarMesActual}>
+                                    Confirmar y Archivar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {cargando && <div className="toast-loading">Actualizando...</div>}
         </div>
     );
