@@ -11,6 +11,7 @@ const Comparativa = () => {
     // --- ESTADOS GLOBALES ---
     const [cargando, setCargando] = useState(true);
     const [idUsuario, setIdUsuario] = useState(null);
+    const [rolHabilitado, setRolHabilitado] = useState(true); // Estado para controlar el acceso por rol
     const [tipoPresentacion, setTipoPresentacion] = useState(1); // 1: Mes vs Mes, 2: Ingreso vs Gasto
     const [modalAbierto, setModalAbierto] = useState(false);
     const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
@@ -35,16 +36,35 @@ const Comparativa = () => {
     // --- LÓGICA DE USUARIO Y TOKEN ---
     const validarUsuario = useCallback(async () => {
         const token = localStorage.getItem("Token");
-        if (!token) return;
+        if (!token) {
+            setCargando(false);
+            return;
+        }
         try {
             const res = await fetch(`${API_BASE_URL}/Usuarios/ByToken`, {
                 headers: { "Authorization": `Bearer ${token}` },
             });
             if (res.ok) {
                 const user = await res.json();
-                setIdUsuario(user.IdUsuario);
+                
+                // Extraemos el ID de Rol (Asegúrate de cambiar 'IdRol' si en tu BD se llama 'idRol' o similar)
+                const rolUsuario = user.IdRol || user.idRol; 
+
+                // Validamos si cumple con el rol habilitante (3 o 4)
+                if (rolUsuario === 3 || rolUsuario === 4) {
+                    setIdUsuario(user.IdUsuario);
+                    setRolHabilitado(true);
+                } else {
+                    setRolHabilitado(false);
+                    setCargando(false); // Apagamos la carga para mostrar el cartel de bloqueo
+                }
+            } else {
+                setCargando(false);
             }
-        } catch (error) { console.error("Error validando usuario:", error); }
+        } catch (error) { 
+            console.error("Error validando usuario:", error); 
+            setCargando(false);
+        }
     }, []);
 
     // --- UTILIDADES DE FECHAS ---
@@ -141,7 +161,7 @@ const Comparativa = () => {
     };
 
     useEffect(() => { validarUsuario(); }, [validarUsuario]);
-    useEffect(() => { if (idUsuario) { cargarTodosLosDatos(); } }, [idUsuario, cargarTodosLosDatos]);
+    useEffect(() => { if (idUsuario && rolHabilitado) { cargarTodosLosDatos(); } }, [idUsuario, rolHabilitado, cargarTodosLosDatos]);
 
     // Función para calcular variaciones porcentuales
     const calcularDiferencia = (valorA, valorB, esGasto = true) => {
@@ -150,7 +170,7 @@ const Comparativa = () => {
         const esPositivo = esGasto ? diferencia <= 0 : diferencia >= 0;
         return {
             monto: Math.abs(diferencia),
-            porcentaje: Math.abs(porcentaje),
+            percentage: Math.abs(porcentaje),
             clase: esPositivo ? "tendencia-positiva" : "tendencia-negativa",
             texto: diferencia >= 0 ? "Más que periodo" : "Menos que periodo"
         };
@@ -273,43 +293,66 @@ const Comparativa = () => {
         }
     };
 
+    // --- RENDERIZADO PRINCIPAL CON VERIFICADOR ---
+    if (!rolHabilitado) {
+        return (
+            <div className="contenedor-principal-general" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+                <div className="tarjeta-general" style={{ textAlign: 'center', padding: '40px', maxWidth: '500px' }}>
+                    <div style={{ fontSize: '50px', marginBottom: '20px' }}>🔒</div>
+                    <h2 style={{ color: '#FF4B4B', marginBottom: '15px' }}>Apartado No Habilitado</h2>
+                    <p style={{ color: '#888', marginBottom: '25px', lineHeight: '1.6' }}>
+                        Para acceder a las métricas avanzadas de comparativas y balances mensuales, necesitas mejorar tu suscripción actual.
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                        <button className="botonesComparativa btn-principal" onClick={() => alert("Redirigiendo a planes...")}>
+                            Mejorar mi Plan🚀
+                        </button>
+                        <Link to="/Principal" className="botonesComparativa btn-volver" style={{ textDecoration: 'none', display: 'block', textAlign: 'center' }}>
+                            Volver al Inicio
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="contenedor-principal-general">
             {/* ENCABEZADO PRINCIPAL */}
-           <div className="seccion-encabezado-general">
-    <div className="titulo-principal-general">
-        <h2>Comparativa {tipoPresentacion === 1 ? "Mensual" : "Ingreso vs Gasto"}</h2>
-        <p className="descripcion-encabezado">
-            {tipoPresentacion === 1
-                ? "Seleccione dos meses diferentes para contrastar los registros y determinar el porcentaje de crecimiento o decrecimiento. Esta funcionalidad es clave para entender cómo evolucionan sus hábitos financieros y asegurar un control riguroso sobre cada partida presupuestaria."
-                : "Esta función te permite ver, de forma segura y clara, cuánta plata entró y cuánta plata salió en el mes que elijas. Al seleccionar un mes, la aplicación ajusta automáticamente ambos valores para que siempre veas la información del mismo período. Así, vas a tener la tranquilidad de saber exactamente si tus cuentas están en equilibrio, con datos precisos y sin errores de confusión."}
-        </p>
-    </div>
+            <div className="seccion-encabezado-general">
+                <div className="titulo-principal-general">
+                    <h2>Comparativa {tipoPresentacion === 1 ? "Mensual" : "Ingreso vs Gasto"}</h2>
+                    <p className="descripcion-encabezado">
+                        {tipoPresentacion === 1
+                            ? "Seleccione dos meses diferentes para contrastar los registros y determinar el porcentaje de crecimiento o decrecimiento. Esta funcionalidad es clave para entender cómo evolucionan sus hábitos financieros y asegurar un control riguroso sobre cada partida presupuestaria."
+                            : "Esta función te permite ver, de forma segura y clara, cuánta plata entró y cuánta plata salió en el mes que elijas. Al seleccionar un mes, la aplicación ajusta automáticamente ambos valores para que siempre veas la información del mismo período. Así, vas a tener la tranquilidad de saber exactamente si tus cuentas están en equilibrio, con datos precisos y sin errores de confusión."}
+                    </p>
+                </div>
 
-    <div className='botonesFuncionesComparativa'>
-        <div className='botonesBalanceComparativa'>
-            <button
-                onClick={() => setTipoPresentacion(tipoPresentacion === 1 ? 2 : 1)}
-                className='botonesComparativa btn-principal'
-            >
-                {tipoPresentacion === 1 ? "Ver Balances mensuales" : "Ver Comparativa Mensual"}
-            </button>
-            
-            <button 
-                onClick={() => setModalArchivarAbierto(true)} 
-                className='botonesComparativa btn-secundario'
-            >
-                Archivar datos actuales
-            </button>
-        </div>
+                <div className='botonesFuncionesComparativa'>
+                    <div className='botonesBalanceComparativa'>
+                        <button
+                            onClick={() => setTipoPresentacion(tipoPresentacion === 1 ? 2 : 1)}
+                            className='botonesComparativa btn-principal'
+                        >
+                            {tipoPresentacion === 1 ? "Ver Balances mensuales" : "Ver Comparativa Mensual"}
+                        </button>
+                        
+                        <button 
+                            onClick={() => setModalArchivarAbierto(true)} 
+                            className='botonesComparativa btn-secundario'
+                        >
+                            Archivar datos actuales
+                        </button>
+                    </div>
 
-        <div className='botonVolverPrincipal'>
-            <Link to="/Principal" className="botonesComparativa btn-volver">
-                Volver
-            </Link>
-        </div>
-    </div>
-</div>
+                    <div className='botonVolverPrincipal'>
+                        <Link to="/Principal" className="botonesComparativa btn-volver">
+                            Volver
+                        </Link>
+                    </div>
+                </div>
+            </div>
 
             {renderContenido()}
 
@@ -345,7 +388,6 @@ const Comparativa = () => {
             {modalArchivarAbierto && (
                 <div className="modal-overlay" onClick={() => setModalArchivarAbierto(false)}>
                     <div className="modal-contenido" onClick={e => e.stopPropagation()}>
-
                         <div className="modal-header">
                             <h3>Archivar Mes Actual</h3>
                             <button className="btn-cerrar" onClick={() => setModalArchivarAbierto(false)}>&times;</button>
