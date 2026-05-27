@@ -8,63 +8,88 @@ const API_ENDPOINTS = {
   gastos: "/Gasto",
   ingresos: "/Ingreso",
   usuarios: "/Usuarios",
-  ahorros: "/MetaAhorro"
+  ahorros: "/MetaAhorro",
+  cuentas: "/Cuenta",
+  transacciones: "/Transacciones"
 };
+
+// Instituciones simuladas para la conexión de Open Banking
+const institucionesSoportadas = [
+  { id: 1, nombre: "Banco Galicia", tipo: "galicia", divisa: 1, saldo: 450000 },
+  { id: 2, nombre: "Mercado Pago", tipo: "mp", divisa: 1, saldo: 125000 },
+  { id: 3, nombre: "BBVA Francés", tipo: "bbva", divisa: 1, saldo: 890000 },
+  { id: 4, nombre: "Brubank (USD)", tipo: "bru-usd", divisa: 2, saldo: 1500 }
+];
 
 const GastoIngreso = () => {
   const [mostrarSaludo, setMostrarSaludo] = useState(true);
   const [datosGastos, setDatosGastos] = useState([]);
   const [datosIngresos, setDatosIngresos] = useState([]);
   const [metasAhorro, setMetasAhorro] = useState([]);
-
-  const COLORES = ["#007AFF", "#c8b277", "#8a733f", "#4a4a4a"];
-  const COLORESgasto = ["#FF4B4B", "#c8b277", "#8a733f", "#4a4a4a"]; // Rojo para gastos
-
+  const [cuentas, setCuentas] = useState([]);
+  const [idUsuarioActual, setIdUsuarioActual] = useState(null);
+  const [modalConectarAbierto, setModalConectarAbierto] = useState(false);
+  const [modalImportarAbierto, setModalImportarAbierto] = useState(false);
   const [modalAgregarAbierto, setModalAgregarAbierto] = useState(false);
   const [modalEditarAbierto, setModalEditarAbierto] = useState(false);
+  const [cargandoConexion, setCargandoConexion] = useState(false);
+  const [cargandoCsv, setCargandoCsv] = useState(false);
+  const [archivoCsv, setArchivoCsv] = useState(null);
 
-  // Estado para controlar los valores del formulario
   const [metaForm, setMetaForm] = useState({
-    IdMetaAhorro: null,
-    Nombre: "",
-    MontoObjetivo: "",
-    MontoGuardado: "",
-    FechaObjetivo: "",
-    FechaInicio: "",
-    Divisa: "ARS"
+    IdMetaAhorro: null, Nombre: "", MontoObjetivo: "", MontoGuardado: "", FechaObjetivo: "", FechaInicio: "", Divisa: "1"
   });
+
+  const COLORES = ["#007AFF", "#c8b277", "#8a733f", "#4a4a4a"];
+  const COLORESgasto = ["#FF4B4B", "#c8b277", "#8a733f", "#4a4a4a"];
 
   useEffect(() => {
     const temporizador = setTimeout(() => setMostrarSaludo(false), 4000);
+    obtenerDatos();
     return () => clearTimeout(temporizador);
   }, []);
 
-  useEffect(() => {
-    obtenerDatos();
-  }, []);
-
-  // --- Lógica de API ---
   const obtenerDatos = () => {
     const token = localStorage.getItem("Token");
     if (!token) return;
-
     fetch(`${API_BASE_URL}${API_ENDPOINTS.usuarios}/ByToken`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
+      headers: { "Authorization": `Bearer ${token}` }
     })
-      .then((response) => {
-        if (!response.ok) throw new Error("Error al validar sesión");
-        return response.json();
-      })
-      .then((data) => {
-        obtenerGastos(data.IdUsuario);
-        obtenerIngresos(data.IdUsuario);
-        obtenerAhorros(data.IdUsuario);
-      })
-      .catch((error) => console.error("Error identificando usuario:", error));
+    .then(res => res.json())
+    .then(data => {
+      setIdUsuarioActual(data.IdUsuario);
+      obtenerGastos(data.IdUsuario);
+      obtenerIngresos(data.IdUsuario);
+      obtenerAhorros(data.IdUsuario);
+      obtenerCuentas(data.IdUsuario);
+    });
+  };
+
+  const obtenerCuentas = (idusuario) => {
+    fetch(`${API_BASE_URL}${API_ENDPOINTS.cuentas}/ByUsuario/${idusuario}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("Token")}` }
+    })
+    .then(res => res.json())
+    .then(data => setCuentas(data || []));
+  };
+
+  const manejarDesvincularCuenta = (idCuenta) => {
+    if (!window.confirm("¿Seguro que deseas eliminar esta cuenta?")) return;
+    fetch(`${API_BASE_URL}${API_ENDPOINTS.cuentas}/${idCuenta}`, {
+      method: "DELETE",
+      headers: { "Authorization": `Bearer ${localStorage.getItem("Token")}` }
+    })
+    .then(res => {
+      if (res.ok) {
+        obtenerCuentas(idUsuarioActual);
+      } else {
+        alert("Error al desvincular la cuenta.");
+      }
+    })
+    .catch(error => {
+      console.error("Error al desvincular:", error);
+      alert("Hubo un problema de red al intentar desvincular la cuenta.");
+    });
   };
 
   const obtenerGastos = (idusuario) => {
@@ -117,7 +142,93 @@ const GastoIngreso = () => {
       .catch((error) => console.error("Error ahorros:", error));
   };
 
-  // Función para actualizar el estado cuando se escribe en los inputs
+  const manejarSeleccionCsv = (e) => {
+    const file = e.target.files[0];
+    if (file && !file.name.endsWith(".csv")) {
+      alert("Por favor, selecciona un archivo en formato CSV.");
+      setArchivoCsv(null);
+      e.target.value = null;
+      return;
+    }
+    setArchivoCsv(file);
+  };
+
+  const manejarSubidaCsv = async () => {
+    if (!archivoCsv) {
+      alert("Debes seleccionar un archivo primero.");
+      return;
+    }
+
+    setCargandoCsv(true);
+    const formData = new FormData();
+    formData.append("archivo", archivoCsv);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.transacciones}/importar-csv`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("Token")}`
+        },
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(data.message);
+        setModalImportarAbierto(false);
+        setArchivoCsv(null);
+        obtenerDatos();
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Error de red al subir CSV:", error);
+      alert("Hubo un problema al procesar el archivo. Verifica tu conexión.");
+    } finally {
+      setCargandoCsv(false);
+    }
+  };
+
+  const simularConexionBancaria = (institucion) => {
+    if (!idUsuarioActual) return;
+    setCargandoConexion(true);
+
+    setTimeout(() => {
+      const tokenSincronizacionGenerado = `${institucion.tipo}-${Math.floor(Math.random() * 10000)}`;
+
+      const nuevaCuentaExterna = {
+        IdUsuario: idUsuarioActual,
+        IdDivisa: institucion.divisa,
+        Nombre: institucion.nombre,
+        SaldoActual: institucion.saldo,
+        EsExterna: true, 
+        TokenSincronizacion: tokenSincronizacionGenerado,
+        FechaCreacion: new Date().toISOString()
+      };
+
+      fetch(`${API_BASE_URL}${API_ENDPOINTS.cuentas}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("Token")}`
+        },
+        body: JSON.stringify(nuevaCuentaExterna)
+      })
+        .then((response) => {
+          if (!response.ok) throw new Error("Error guardando la cuenta bancaria externa");
+          return response.text().then(text => text ? JSON.parse(text) : {});
+        })
+        .then(() => {
+          alert(`¡${institucion.nombre} vinculada e importada de forma segura!`);
+          setModalConectarAbierto(false);
+          obtenerCuentas(idUsuarioActual); 
+        })
+        .catch((error) => console.error("Error guardando cuenta externa:", error))
+        .finally(() => setCargandoConexion(false));
+    }, 2500);
+  };
+
   const manejarCambioInput = (e) => {
     setMetaForm({
       ...metaForm,
@@ -125,7 +236,6 @@ const GastoIngreso = () => {
     });
   };
 
-  // --- Lógica para Crear / Editar Meta ---
   const manejarGuardarMeta = () => {
     const token = localStorage.getItem("Token");
 
@@ -148,21 +258,16 @@ const GastoIngreso = () => {
           IdDivisa: metaForm.Divisa,
           IdUsuario: userData.IdUsuario
         };
-        console.log("Meta a guardar:", metaAGuardar);
         guardarMetaApi(metaAGuardar);
       });
   };
 
-  // MODIFICADO: Ahora maneja POST y PUT dinámicamente
   const guardarMetaApi = (metaAGuardar) => {
     const esEdicion = metaAGuardar.IdMetaAhorro !== null && metaAGuardar.IdMetaAhorro !== undefined;
-
-    // Si es edición, se agrega el ID al endpoint
     const url = esEdicion
       ? `${API_BASE_URL}${API_ENDPOINTS.ahorros}/${metaAGuardar.IdMetaAhorro}`
       : `${API_BASE_URL}${API_ENDPOINTS.ahorros}`;
 
-    // Si es edición usamos PUT, si no, POST
     const metodo = esEdicion ? "PUT" : "POST";
 
     fetch(url, {
@@ -175,19 +280,16 @@ const GastoIngreso = () => {
     })
       .then((response) => {
         if (!response.ok) throw new Error(`Error al ${esEdicion ? 'editar' : 'guardar'} la meta`);
-
-        // Validamos por si el PUT devuelve 204 No Content para evitar errores de parseo
         return response.text().then(text => text ? JSON.parse(text) : {});
       })
       .then(() => {
         setModalAgregarAbierto(false);
         setModalEditarAbierto(false);
-        obtenerDatos(); // Recargamos todo
+        obtenerDatos();
       })
       .catch((error) => console.error("Error guardando meta:", error));
   };
 
-  // --- Funciones de Renderizado ---
   const calcularTotal = (datos) => datos.reduce((acum, item) => acum + Number(item.valor || 0), 0);
   const obtenerTopCinco = (items) => [...items].sort((a, b) => b.valor - a.valor).slice(0, 5);
 
@@ -230,7 +332,6 @@ const GastoIngreso = () => {
   };
 
   const manejarEliminarMeta = () => {
-    console.log("Eliminar meta ID:", metaForm.IdMetaAhorro);
     fetch(`${API_BASE_URL}${API_ENDPOINTS.ahorros}/${metaForm.IdMetaAhorro}`, {
       method: "DELETE",
       headers: {
@@ -241,40 +342,34 @@ const GastoIngreso = () => {
       .then((response) => {
         if (!response.ok) throw new Error("Error al eliminar la meta");
         setModalEditarAbierto(false);
-        obtenerDatos(); // Recargamos todo
+        obtenerDatos();
       })
       .catch((error) => console.error("Error eliminando meta:", error));
-
-  }
+  };
 
   const nombre = localStorage.getItem("Nombre") || "Usuario";
   const apellido = localStorage.getItem("Apellido") || "";
 
-  // Helper para resetear el formulario al agregar
   const abrirModalAgregar = () => {
-    setMetaForm({ IdMetaAhorro: null, Nombre: "", MontoObjetivo: "", MontoGuardado: "", FechaObjetivo: "", FechaInicio: "", Divisa: "ARS" });
+    setMetaForm({ IdMetaAhorro: null, Nombre: "", MontoObjetivo: "", MontoGuardado: "", FechaObjetivo: "", FechaInicio: "", Divisa: "1" });
     setModalAgregarAbierto(true);
   };
 
-  // Helper para cargar los datos de la meta seleccionada
   const abrirModalEditar = (meta) => {
     setMetaForm({
       IdMetaAhorro: meta.IdMetaAhorro,
       Nombre: meta.Nombre || "",
       MontoObjetivo: meta.MontoObjetivo || "",
-      // CAMBIO AQUÍ: Usamos 'actual' que es el nombre que le diste en obtenerAhorros
       MontoGuardado: meta.actual || meta.MontoGuardado || 0,
       FechaObjetivo: meta.FechaMeta ? meta.FechaMeta.split('T')[0] : (meta.FechaObjetivo ? meta.FechaObjetivo.split('T')[0] : ""),
       FechaInicio: meta.FechaInicio ? meta.FechaInicio.split('T')[0] : "",
       IdDivisa: parseInt(meta.IdDivisa) || 1
     });
-
     setModalEditarAbierto(true);
   };
 
   return (
     <div className="contenedor-principal-general">
-      {/*Botones de función comparativa*/}
       <div className="seccion-encabezado-general">
         <div className="titulo-principal-general">
           <h2>{mostrarSaludo ? `¡Bienvenido, ${nombre} ${apellido}!` : "El Control Total de tu Economía"}</h2>
@@ -287,8 +382,68 @@ const GastoIngreso = () => {
         </div>
       </div>
 
-      <div className="panel-graficos-general">
+      <div className="contenedor-ahorros-general" style={{ marginBottom: "30px" }}>
+        <div className="encabezado-ahorros-flex">
+          <h3 className="titulo-ahorros-general">Cuentas y Tarjetas Conectadas</h3>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button onClick={() => setModalImportarAbierto(true)} className="boton-secundario">
+              📄 Importar CSV
+            </button>
+            <button onClick={() => setModalConectarAbierto(true)} className="boton-primario">
+              🔌 Vincular Tarjeta / Banco
+            </button>
+          </div>
+        </div>
 
+        {cuentas.length > 0 ? (
+          <div className="grid-ahorros-general" style={{ marginTop: "15px" }}>
+            {cuentas.map((cuenta) => (
+              <div key={cuenta.IdCuenta} className="tarjeta-ahorro-item" style={{ borderLeft: cuenta.EsExterna ? "4px solid #007AFF" : "4px solid #c8b277" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <strong style={{ color: "#ffffff", fontSize: "15px" }}>{cuenta.Nombre}</strong>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    {cuenta.EsExterna && (
+                      <span style={{ fontSize: "11px", backgroundColor: "#007AFF", color: "#fff", padding: "2px 8px", borderRadius: "10px", fontWeight: "600" }}>
+                        Sincronizada
+                      </span>
+                    )}
+                    <button 
+                      onClick={() => manejarDesvincularCuenta(cuenta.IdCuenta)}
+                      style={{ 
+                        background: "none", 
+                        border: "none", 
+                        color: "#FF4B4B", 
+                        cursor: "pointer", 
+                        fontSize: "11px", 
+                        fontWeight: "600",
+                        textDecoration: "underline",
+                        padding: "2px 4px"
+                      }}
+                      title="Eliminar vinculación de esta cuenta"
+                    >
+                      Desvincular
+                    </button>
+                  </div>
+                </div>
+                <h3 style={{ margin: "12px 0 6px 0", color: cuenta.SaldoActual < 0 ? "#FF4B4B" : "#c8b277", fontSize: "20px" }}>
+                  {cuenta.IdDivisa === 2 ? "USD" : "$"} {cuenta.SaldoActual.toLocaleString()}
+                </h3>
+                <small style={{ color: "#666" }}>
+                  {cuenta.EsExterna ? `Token: ${cuenta.TokenSincronizacion}` : "Registro Manual"}
+                </small>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <EstadoVacio
+            icono="💳"
+            mensaje="No posees tarjetas ni cuentas corrientes vinculadas para sincronización automática."
+            sugerencia="Hacé clic en 'Vincular Tarjeta / Banco' o importa tus movimientos con CSV."
+          />
+        )}
+      </div>
+
+      <div className="panel-graficos-general">
         {/* GRÁFICO GASTOS */}
         {datosGastos.length > 0 ? (
           <div className="tarjeta-general">
@@ -372,11 +527,7 @@ const GastoIngreso = () => {
         ) : (
           <EstadoVacio titulo="Fuentes de Ingreso" mensaje="No se encontraron ingresos registrados." />
         )}
-
       </div>
-
-
-       {/* SECCIÓN DE AHORROS */} 
 
       <div className="contenedor-ahorros-general">
         <div className="encabezado-ahorros-flex">
@@ -406,8 +557,98 @@ const GastoIngreso = () => {
         )}
       </div>
 
-      {/* MODAL EDITAR */}
-      {(modalEditarAbierto) && (
+      {/* MODAL: IMPORTAR CSV */}
+      {modalImportarAbierto && (
+        <div className="capa-modal" onClick={() => !cargandoCsv && setModalImportarAbierto(false)}>
+          <div className="contenido-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "450px" }}>
+            <h3 style={{ textAlign: "center", marginBottom: "10px" }}>Importar Movimientos (CSV)</h3>
+            
+            <div className="formulario-cuerpo">
+              <p style={{ color: "#aaa", marginBottom: "20px", fontSize: "13px", textAlign: "center", lineHeight: "1.5" }}>
+                Sube el archivo <strong>.csv</strong> descargado de tu Home Banking. Asegúrate de que las columnas del archivo sean: <strong>Fecha, Descripcion, Monto</strong>.
+              </p>
+              
+              <div style={{
+                  border: "2px dashed rgba(200, 178, 119, 0.5)",
+                  borderRadius: "12px",
+                  padding: "40px 20px",
+                  backgroundColor: "rgba(0,0,0,0.2)",
+                  marginBottom: "20px",
+                  textAlign: "center"
+              }}>
+                <input 
+                  type="file" 
+                  accept=".csv" 
+                  onChange={manejarSeleccionCsv} 
+                  style={{ display: "block", margin: "0 auto", color: "#fff" }}
+                />
+              </div>
+            </div>
+
+            <div className="formulario-acciones" style={{ marginTop: "20px", justifyContent: "center" }}>
+              <button 
+                className="boton-secundario" 
+                onClick={() => setModalImportarAbierto(false)}
+                disabled={cargandoCsv}
+              >
+                Cancelar
+              </button>
+              <button 
+                className="boton-primario" 
+                onClick={manejarSubidaCsv} 
+                disabled={cargandoCsv || !archivoCsv}
+                style={{ opacity: (cargandoCsv || !archivoCsv) ? 0.5 : 1 }}
+              >
+                {cargandoCsv ? "Procesando Archivo..." : "Subir e Importar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: CONEXIÓN ENTORNO SEGURO OPEN BANKING */}
+      {modalConectarAbierto && (
+        <div className="capa-modal" onClick={() => !cargandoConexion && setModalConectarAbierto(false)}>
+          <div className="contenido-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "420px" }}>
+            <h3 style={{ textAlign: "center", marginBottom: "10px" }}>Vincular Proveedor Financiero</h3>
+            
+            {cargandoConexion ? (
+              <div style={{ textAlign: "center", padding: "30px 0" }}>
+                <div className="spinner-carga" style={{ margin: "0 auto", border: "4px solid rgba(200,178,119,0.1)", borderTop: "4px solid #c8b277", borderRadius: "50%", width: "40px", height: "40px", animation: "spin 1s linear infinite" }}></div>
+                <p style={{ marginTop: "20px", color: "#c8b277", fontWeight: "600" }}>Estableciendo túnel cifrado...</p>
+                <small style={{ color: "#777" }}>Autorizando Token de lectura con el emisor bancario.</small>
+              </div>
+            ) : (
+              <div className="formulario-cuerpo">
+                <p style={{ color: "#aaa", marginBottom: "20px", fontSize: "13px", textAlign: "center", lineHeight: "1.5" }}>
+                  Seleccioná la tarjeta o billetera virtual que deseas integrar. Al proceder, otorgarás permisos de lectura segura sobre los movimientos históricos.
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {institucionesSoportadas.map((inst) => (
+                    <button 
+                      key={inst.id}
+                      className="boton-secundario" 
+                      style={{ justifyContent: "flex-start", padding: "14px", border: "1px solid #2d2d2e", display: "flex", gap: "10px", width: "100%", textAlign: "left" }}
+                      onClick={() => simularConexionBancaria(inst)}
+                    >
+                      <span>💳</span> {inst.nombre}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {!cargandoConexion && (
+               <div className="formulario-acciones" style={{ marginTop: "20px", justifyContent: "center" }}>
+                 <button className="boton-secundario" onClick={() => setModalConectarAbierto(false)}>Cancelar Conexión</button>
+               </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* MODAL EDITAR META */}
+      {modalEditarAbierto && (
         <div className="capa-modal" onClick={() => setModalEditarAbierto(false)}>
           <div className="contenido-modal" onClick={(e) => e.stopPropagation()}>
             <h3>Editar Meta de Ahorro</h3>
@@ -456,8 +697,8 @@ const GastoIngreso = () => {
         </div>
       )}
 
-      {/* MODAL AGREGAR */}
-      {(modalAgregarAbierto) && (
+      {/* MODAL AGREGAR META */}
+      {modalAgregarAbierto && (
         <div className="capa-modal" onClick={() => setModalAgregarAbierto(false)}>
           <div className="contenido-modal" onClick={(e) => e.stopPropagation()}>
             <h3>Nueva Meta de Ahorro</h3>
@@ -482,7 +723,6 @@ const GastoIngreso = () => {
                 <label htmlFor="fechaObjetivo">Fecha Objetivo</label>
                 <input type="date" name="FechaObjetivo" value={metaForm.FechaObjetivo} onChange={manejarCambioInput} id="fechaObjetivo" />
               </div>
-
               <div className="formulario-grupo">
                 <label htmlFor="divisa">Divisa</label>
                 <select name="Divisa" value={metaForm.Divisa} onChange={manejarCambioInput} id="divisa">

@@ -20,7 +20,7 @@
 /* ==========================================================================
    ESTRUCTURA Y COMPONENTES GLOBALES
    ========================================================================== */
-.contenedor-principal-general { background: var(--carbon-black); color: var(--crisp-white); min-height: 100vh; padding: 2rem 5%; }
+.contenedor-principal-general {  color: var(--crisp-white); min-height: 100vh; padding: 2rem 5%; }
 .comparativa-grid-layout { padding: 20px 0; animation: fadeIn 0.4s ease-out forwards; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .seccion-comparativa-fila { margin-bottom: 3rem; }

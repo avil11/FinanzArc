@@ -11,6 +11,7 @@ import Ingreso from './paginas/Principal/Ingreso/Ingreso';
 import Gasto from './paginas/Principal/Gasto/Gasto';
 import Perfil from './paginas/perfil/Perfil';
 import InicioSesion from './paginas/inicio/InicioSesion/InicioSesion';
+import PlanesCompra from './paginas/planes/planes';
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/inicio-sesion" element={<InicioSesion />} />
         <Route path="/crear-cuenta" element={<CrearCuenta />} />
+        <Route path="/planes" element={<PlanesCompra />} />
       </Routes>
       <Footer />
     </BrowserRouter>
