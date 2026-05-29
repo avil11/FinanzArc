@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import "./General.css";
 
 const API_BASE_URL = "http://localhost:60496/api";
+
 const API_ENDPOINTS = {
   gastos: "/Gasto",
   ingresos: "/Ingreso",
@@ -13,7 +14,6 @@ const API_ENDPOINTS = {
   transacciones: "/Transacciones"
 };
 
-// Instituciones simuladas para la conexión de Open Banking
 const institucionesSoportadas = [
   { id: 1, nombre: "Banco Galicia", tipo: "galicia", divisa: 1, saldo: 450000 },
   { id: 2, nombre: "Mercado Pago", tipo: "mp", divisa: 1, saldo: 125000 },
@@ -23,187 +23,343 @@ const institucionesSoportadas = [
 
 const GastoIngreso = () => {
   const [mostrarSaludo, setMostrarSaludo] = useState(true);
+
   const [datosGastos, setDatosGastos] = useState([]);
   const [datosIngresos, setDatosIngresos] = useState([]);
   const [metasAhorro, setMetasAhorro] = useState([]);
   const [cuentas, setCuentas] = useState([]);
+
   const [idUsuarioActual, setIdUsuarioActual] = useState(null);
+
+  const [cotizaciones, setCotizaciones] = useState({
+    USD: 1300,
+    EUR: 1450
+  });
+
   const [modalConectarAbierto, setModalConectarAbierto] = useState(false);
   const [modalImportarAbierto, setModalImportarAbierto] = useState(false);
   const [modalAgregarAbierto, setModalAgregarAbierto] = useState(false);
   const [modalEditarAbierto, setModalEditarAbierto] = useState(false);
+
   const [cargandoConexion, setCargandoConexion] = useState(false);
   const [cargandoCsv, setCargandoCsv] = useState(false);
+
   const [archivoCsv, setArchivoCsv] = useState(null);
 
   const [metaForm, setMetaForm] = useState({
-    IdMetaAhorro: null, Nombre: "", MontoObjetivo: "", MontoGuardado: "", FechaObjetivo: "", FechaInicio: "", Divisa: "1"
+    IdMetaAhorro: null,
+    Nombre: "",
+    MontoObjetivo: "",
+    MontoGuardado: "",
+    FechaObjetivo: "",
+    FechaInicio: "",
+    Divisa: "1"
   });
 
   const COLORES = ["#007AFF", "#c8b277", "#8a733f", "#4a4a4a"];
   const COLORESgasto = ["#FF4B4B", "#c8b277", "#8a733f", "#4a4a4a"];
 
   useEffect(() => {
-    const temporizador = setTimeout(() => setMostrarSaludo(false), 4000);
+    const temporizador = setTimeout(() => {
+      setMostrarSaludo(false);
+    }, 4000);
+
+    obtenerCotizaciones();
     obtenerDatos();
+
     return () => clearTimeout(temporizador);
   }, []);
 
+  // =========================
+  // COTIZACIONES
+  // =========================
+
+  const obtenerCotizaciones = async () => {
+    try {
+      const responseUsd = await fetch("https://dolarapi.com/v1/dolares/oficial");
+      const dataUsd = await responseUsd.json();
+
+      const usd = dataUsd?.venta || 1300;
+
+      const eurEstimado = usd * 1.15;
+
+      setCotizaciones({
+        USD: usd,
+        EUR: eurEstimado
+      });
+
+      console.log("Cotizaciones actualizadas:", {
+        USD: usd,
+        EUR: eurEstimado
+      });
+
+    } catch (error) {
+      console.error("Error obteniendo cotizaciones:", error);
+
+      setCotizaciones({
+        USD: 1300,
+        EUR: 1450
+      });
+    }
+  };
+
+  const convertirAPesos = (monto, divisa) => {
+    const valor = Number(monto) || 0;
+
+    switch (Number(divisa)) {
+      case 2:
+        return valor * cotizaciones.USD;
+
+      case 3:
+        return valor * cotizaciones.EUR;
+
+      default:
+        return valor;
+    }
+  };
+
+  // =========================
+  // DATOS
+  // =========================
+
   const obtenerDatos = () => {
     const token = localStorage.getItem("Token");
+
     if (!token) return;
+
     fetch(`${API_BASE_URL}${API_ENDPOINTS.usuarios}/ByToken`, {
-      headers: { "Authorization": `Bearer ${token}` }
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
-    .then(res => res.json())
-    .then(data => {
-      setIdUsuarioActual(data.IdUsuario);
-      obtenerGastos(data.IdUsuario);
-      obtenerIngresos(data.IdUsuario);
-      obtenerAhorros(data.IdUsuario);
-      obtenerCuentas(data.IdUsuario);
-    });
+      .then(res => res.json())
+      .then(data => {
+        setIdUsuarioActual(data.IdUsuario);
+
+        obtenerGastos(data.IdUsuario);
+        obtenerIngresos(data.IdUsuario);
+        obtenerAhorros(data.IdUsuario);
+        obtenerCuentas(data.IdUsuario);
+      });
   };
+
+  // =========================
+  // CUENTAS
+  // =========================
 
   const obtenerCuentas = (idusuario) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.cuentas}/ByUsuario/${idusuario}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("Token")}` }
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
+      }
     })
-    .then(res => res.json())
-    .then(data => setCuentas(data || []));
+      .then(res => res.json())
+      .then(data => setCuentas(data || []));
   };
 
   const manejarDesvincularCuenta = (idCuenta) => {
     if (!window.confirm("¿Seguro que deseas eliminar esta cuenta?")) return;
+
     fetch(`${API_BASE_URL}${API_ENDPOINTS.cuentas}/${idCuenta}`, {
       method: "DELETE",
-      headers: { "Authorization": `Bearer ${localStorage.getItem("Token")}` }
-    })
-    .then(res => {
-      if (res.ok) {
-        obtenerCuentas(idUsuarioActual);
-      } else {
-        alert("Error al desvincular la cuenta.");
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
       }
     })
-    .catch(error => {
-      console.error("Error al desvincular:", error);
-      alert("Hubo un problema de red al intentar desvincular la cuenta.");
-    });
+      .then(res => {
+        if (res.ok) {
+          obtenerCuentas(idUsuarioActual);
+        } else {
+          alert("Error al desvincular la cuenta.");
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      });
   };
+
+  // =========================
+  // GASTOS
+  // =========================
 
   const obtenerGastos = (idusuario) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.gastos}/ByUsuario/${idusuario}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("Token")}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
+      }
     })
-      .then((response) => response.json())
-      .then((data) => {
-        const gastosProcesados = data.map((item) => ({
+      .then(res => res.json())
+      .then(data => {
+
+        const gastosProcesados = data.map(item => ({
           name: item.Descripcion || "Sin descripción",
-          valor: Number(item.MontoGasto) || 0,
+
+          valor: convertirAPesos(
+            item.MontoGasto,
+            item.IdDivisa
+          ),
+
+          monedaOriginal:
+            Number(item.IdDivisa) === 2
+              ? "USD"
+              : Number(item.IdDivisa) === 3
+              ? "EUR"
+              : "ARS"
         }));
+
         setDatosGastos(gastosProcesados);
       })
-      .catch((error) => console.error("Error gastos:", error));
+      .catch(error => console.error(error));
   };
+
+  // =========================
+  // INGRESOS
+  // =========================
 
   const obtenerIngresos = (idusuario) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.ingresos}/ByUsuario/${idusuario}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("Token")}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
+      }
     })
-      .then((response) => response.json())
-      .then((data) => {
-        const ingresosProcesados = data.map((item) => ({
+      .then(res => res.json())
+      .then(data => {
+
+        const ingresosProcesados = data.map(item => ({
           name: item.Descripcion || "Sin Descripción",
-          valor: Number(item.MontoIngreso) || 0,
+
+          valor: convertirAPesos(
+            item.MontoIngreso,
+            item.IdDivisa
+          ),
+
+          monedaOriginal:
+            Number(item.IdDivisa) === 2
+              ? "USD"
+              : Number(item.IdDivisa) === 3
+              ? "EUR"
+              : "ARS"
         }));
+
         setDatosIngresos(ingresosProcesados);
       })
-      .catch((error) => console.error("Error ingresos:", error));
+      .catch(error => console.error(error));
   };
+
+  // =========================
+  // AHORROS
+  // =========================
 
   const obtenerAhorros = (idusuario) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.ahorros}/ByUsuario/${idusuario}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("Token")}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
+      }
     })
-      .then((response) => response.json())
-      .then((data) => {
-        const metasProcesadas = data.map((item) => ({
+      .then(res => res.json())
+      .then(data => {
+
+        const metasProcesadas = data.map(item => ({
           ...item,
+
           etiqueta: item.Nombre || "Meta de ahorro",
-          actual: Number(item.MontoGuardado ?? 0),
-          objetivo: Number(item.MontoObjetivo ?? 0),
+
+          actual: convertirAPesos(
+            item.MontoGuardado,
+            item.IdDivisa
+          ),
+
+          objetivo: convertirAPesos(
+            item.MontoObjetivo,
+            item.IdDivisa
+          )
         }));
+
         setMetasAhorro(metasProcesadas);
       })
-      .catch((error) => console.error("Error ahorros:", error));
+      .catch(error => console.error(error));
   };
+
+  // =========================
+  // CSV
+  // =========================
 
   const manejarSeleccionCsv = (e) => {
     const file = e.target.files[0];
+
     if (file && !file.name.endsWith(".csv")) {
-      alert("Por favor, selecciona un archivo en formato CSV.");
-      setArchivoCsv(null);
-      e.target.value = null;
+      alert("Selecciona un archivo CSV.");
       return;
     }
+
     setArchivoCsv(file);
   };
 
   const manejarSubidaCsv = async () => {
     if (!archivoCsv) {
-      alert("Debes seleccionar un archivo primero.");
+      alert("Selecciona un archivo.");
       return;
     }
 
     setCargandoCsv(true);
+
     const formData = new FormData();
+
     formData.append("archivo", archivoCsv);
 
     try {
-      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.transacciones}/importar-csv`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${localStorage.getItem("Token")}`
-        },
-        body: formData
-      });
+      const response = await fetch(
+        `${API_BASE_URL}${API_ENDPOINTS.transacciones}/importar-csv`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("Token")}`
+          },
+          body: formData
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
         alert(data.message);
+
         setModalImportarAbierto(false);
-        setArchivoCsv(null);
+
         obtenerDatos();
       } else {
-        alert(`Error: ${data.message}`);
+        alert(data.message);
       }
+
     } catch (error) {
-      console.error("Error de red al subir CSV:", error);
-      alert("Hubo un problema al procesar el archivo. Verifica tu conexión.");
+      console.error(error);
+
     } finally {
       setCargandoCsv(false);
     }
   };
 
+  // =========================
+  // OPEN BANKING
+  // =========================
+
   const simularConexionBancaria = (institucion) => {
     if (!idUsuarioActual) return;
+
     setCargandoConexion(true);
 
     setTimeout(() => {
-      const tokenSincronizacionGenerado = `${institucion.tipo}-${Math.floor(Math.random() * 10000)}`;
 
       const nuevaCuentaExterna = {
         IdUsuario: idUsuarioActual,
         IdDivisa: institucion.divisa,
         Nombre: institucion.nombre,
         SaldoActual: institucion.saldo,
-        EsExterna: true, 
-        TokenSincronizacion: tokenSincronizacionGenerado,
+        EsExterna: true,
+        TokenSincronizacion: `${institucion.tipo}-${Math.floor(Math.random() * 10000)}`,
         FechaCreacion: new Date().toISOString()
       };
 
@@ -215,19 +371,21 @@ const GastoIngreso = () => {
         },
         body: JSON.stringify(nuevaCuentaExterna)
       })
-        .then((response) => {
-          if (!response.ok) throw new Error("Error guardando la cuenta bancaria externa");
-          return response.text().then(text => text ? JSON.parse(text) : {});
-        })
         .then(() => {
-          alert(`¡${institucion.nombre} vinculada e importada de forma segura!`);
+          alert(`${institucion.nombre} vinculada`);
+
           setModalConectarAbierto(false);
-          obtenerCuentas(idUsuarioActual); 
+
+          obtenerCuentas(idUsuarioActual);
         })
-        .catch((error) => console.error("Error guardando cuenta externa:", error))
         .finally(() => setCargandoConexion(false));
+
     }, 2500);
   };
+
+  // =========================
+  // METAS
+  // =========================
 
   const manejarCambioInput = (e) => {
     setMetaForm({
@@ -240,11 +398,9 @@ const GastoIngreso = () => {
     const token = localStorage.getItem("Token");
 
     fetch(`${API_BASE_URL}${API_ENDPOINTS.usuarios}/ByToken`, {
-      method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
+        Authorization: `Bearer ${token}`
+      }
     })
       .then(res => res.json())
       .then(userData => {
@@ -258,12 +414,18 @@ const GastoIngreso = () => {
           IdDivisa: metaForm.Divisa,
           IdUsuario: userData.IdUsuario
         };
+
         guardarMetaApi(metaAGuardar);
-      });
+      })
+      .catch(error => console.error("Error obteniendo usuario:", error));
   };
 
+ 
   const guardarMetaApi = (metaAGuardar) => {
-    const esEdicion = metaAGuardar.IdMetaAhorro !== null && metaAGuardar.IdMetaAhorro !== undefined;
+    const esEdicion =
+      metaAGuardar.IdMetaAhorro !== null &&
+      metaAGuardar.IdMetaAhorro !== undefined;
+
     const url = esEdicion
       ? `${API_BASE_URL}${API_ENDPOINTS.ahorros}/${metaAGuardar.IdMetaAhorro}`
       : `${API_BASE_URL}${API_ENDPOINTS.ahorros}`;
@@ -274,61 +436,18 @@ const GastoIngreso = () => {
       method: metodo,
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("Token")}`
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
       },
       body: JSON.stringify(metaAGuardar)
     })
-      .then((response) => {
-        if (!response.ok) throw new Error(`Error al ${esEdicion ? 'editar' : 'guardar'} la meta`);
-        return response.text().then(text => text ? JSON.parse(text) : {});
-      })
       .then(() => {
+
         setModalAgregarAbierto(false);
         setModalEditarAbierto(false);
+
         obtenerDatos();
       })
-      .catch((error) => console.error("Error guardando meta:", error));
-  };
-
-  const calcularTotal = (datos) => datos.reduce((acum, item) => acum + Number(item.valor || 0), 0);
-  const obtenerTopCinco = (items) => [...items].sort((a, b) => b.valor - a.valor).slice(0, 5);
-
-  const renderCenterLabel = ({ cx, cy }, total) => (
-    <g>
-      <text x={cx} y={cy - 12} textAnchor="middle" fill="#ffffff" fontSize={13} fontWeight="600">Total</text>
-      <text x={cx} y={cy + 12} textAnchor="middle" fill="#c8b277" fontSize={16} fontWeight="700">
-        ${total.toLocaleString()}
-      </text>
-    </g>
-  );
-
-  const EstadoVacio = ({ titulo, mensaje, icono = "📊", sugerencia }) => (
-    <div className="tarjeta-general aviso-vacio">
-      {titulo && <h3>{titulo}</h3>}
-      <div className="contenido-aviso-vacio">
-        <div className="icono-placeholder">{icono}</div>
-        <p>{mensaje}</p>
-        <span className="sugerencia">{sugerencia || "Registra movimientos para ver el progreso aquí."}</span>
-      </div>
-    </div>
-  );
-
-  const BarraProgreso = ({ actual, objetivo, etiqueta }) => {
-    const porcentaje = objetivo > 0 ? Math.min(100, (actual / objetivo) * 100) : 0;
-    return (
-      <div className="item-progreso-general">
-        <div className="info-progreso-general">
-          <span style={{ fontWeight: "500", color: "#ffffff" }}>{etiqueta}</span>
-          <span style={{ color: "#c8b277", fontWeight: "bold" }}>{porcentaje.toFixed(0)}%</span>
-        </div>
-        <div className="pista-barra-general">
-          <div className="relleno-barra-general" style={{ width: `${porcentaje}%` }} />
-        </div>
-        <div className="texto-monto-general">
-          ${actual.toLocaleString()} / ${objetivo.toLocaleString()}
-        </div>
-      </div>
-    );
+      .catch(error => console.error(error));
   };
 
   const manejarEliminarMeta = () => {
@@ -336,22 +455,147 @@ const GastoIngreso = () => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("Token")}`
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
       }
     })
-      .then((response) => {
-        if (!response.ok) throw new Error("Error al eliminar la meta");
+      .then(() => {
+
         setModalEditarAbierto(false);
+
         obtenerDatos();
       })
-      .catch((error) => console.error("Error eliminando meta:", error));
+      .catch(error => console.error(error));
   };
 
-  const nombre = localStorage.getItem("Nombre") || "Usuario";
-  const apellido = localStorage.getItem("Apellido") || "";
+  // =========================
+  // HELPERS
+  // =========================
+
+  const calcularTotal = (datos) => {
+    return datos.reduce((acum, item) => {
+      return acum + Number(item.valor || 0);
+    }, 0);
+  };
+
+  const obtenerTopCinco = (items) => {
+    return [...items]
+      .sort((a, b) => b.valor - a.valor)
+      .slice(0, 5);
+  };
+
+  const renderCenterLabel = ({ cx, cy }, total) => (
+    <g>
+      <text
+        x={cx}
+        y={cy - 12}
+        textAnchor="middle"
+        fill="#ffffff"
+        fontSize={13}
+        fontWeight="600"
+      >
+        Total
+      </text>
+
+      <text
+        x={cx}
+        y={cy + 12}
+        textAnchor="middle"
+        fill="#c8b277"
+        fontSize={16}
+        fontWeight="700"
+      >
+        ${total.toLocaleString("es-AR")}
+      </text>
+    </g>
+  );
+
+  const EstadoVacio = ({
+    titulo,
+    mensaje,
+    icono = "📊",
+    sugerencia
+  }) => (
+    <div className="tarjeta-general aviso-vacio">
+      {titulo && <h3>{titulo}</h3>}
+
+      <div className="contenido-aviso-vacio">
+        <div className="icono-placeholder">{icono}</div>
+
+        <p>{mensaje}</p>
+
+        <span className="sugerencia">
+          {sugerencia || "Registra movimientos para ver información."}
+        </span>
+      </div>
+    </div>
+  );
+
+  const BarraProgreso = ({
+    actual,
+    objetivo,
+    etiqueta
+  }) => {
+
+    const porcentaje =
+      objetivo > 0
+        ? Math.min(100, (actual / objetivo) * 100)
+        : 0;
+
+    return (
+      <div className="item-progreso-general">
+
+        <div className="info-progreso-general">
+          <span
+            style={{
+              fontWeight: "500",
+              color: "#ffffff"
+            }}
+          >
+            {etiqueta}
+          </span>
+
+          <span
+            style={{
+              color: "#c8b277",
+              fontWeight: "bold"
+            }}
+          >
+            {porcentaje.toFixed(0)}%
+          </span>
+        </div>
+
+        <div className="pista-barra-general">
+          <div
+            className="relleno-barra-general"
+            style={{
+              width: `${porcentaje}%`
+            }}
+          />
+        </div>
+
+        <div className="texto-monto-general">
+          ${actual.toLocaleString("es-AR")} / $
+          {objetivo.toLocaleString("es-AR")}
+        </div>
+      </div>
+    );
+  };
+
+  // =========================
+  // MODALES
+  // =========================
 
   const abrirModalAgregar = () => {
-    setMetaForm({ IdMetaAhorro: null, Nombre: "", MontoObjetivo: "", MontoGuardado: "", FechaObjetivo: "", FechaInicio: "", Divisa: "1" });
+    setMetaForm({
+      IdMetaAhorro: null,
+      Nombre: "",
+      MontoObjetivo: "",
+      MontoGuardado: "",
+      FechaObjetivo: "",
+      FechaInicio: "",
+      Divisa: "1"
+    });
+
     setModalAgregarAbierto(true);
   };
 
@@ -360,21 +604,49 @@ const GastoIngreso = () => {
       IdMetaAhorro: meta.IdMetaAhorro,
       Nombre: meta.Nombre || "",
       MontoObjetivo: meta.MontoObjetivo || "",
-      MontoGuardado: meta.actual || meta.MontoGuardado || 0,
-      FechaObjetivo: meta.FechaMeta ? meta.FechaMeta.split('T')[0] : (meta.FechaObjetivo ? meta.FechaObjetivo.split('T')[0] : ""),
-      FechaInicio: meta.FechaInicio ? meta.FechaInicio.split('T')[0] : "",
+      MontoGuardado: meta.MontoGuardado || "",
+      FechaObjetivo: meta.FechaMeta
+        ? meta.FechaMeta.split("T")[0]
+        : "",
+      FechaInicio: meta.FechaInicio
+        ? meta.FechaInicio.split("T")[0]
+        : "",
       IdDivisa: parseInt(meta.IdDivisa) || 1
     });
     setModalEditarAbierto(true);
   };
 
+  // =========================
+  // USER
+  // =========================
+
+  const nombre = localStorage.getItem("Nombre") || "Usuario";
+
+  const apellido = localStorage.getItem("Apellido") || "";
+
   return (
     <div className="contenedor-principal-general">
+
       <div className="seccion-encabezado-general">
+
         <div className="titulo-principal-general">
-          <h2>{mostrarSaludo ? `¡Bienvenido, ${nombre} ${apellido}!` : "El Control Total de tu Economía"}</h2>
-          <p style={{ color: "#888888" }}>Ya sea para organizar los gastos del hogar o administrar tu emprendimiento, centralizá toda tu información en un solo lugar. Olvidate de las anotaciones sueltas o planillas complicadas y accedé a métricas en tiempo real desde cualquier dispositivo para tomar las mejores decisiones.</p>
+
+          <h2>
+            {mostrarSaludo
+              ? `¡Bienvenido, ${nombre} ${apellido}!`
+              : "El Control Total de tu Economía"}
+          </h2>
+
+          <p style={{ color: "#888888" }}>
+            Todas las monedas son convertidas automáticamente a ARS.
+          </p>
+
+          <small style={{ color: "#c8b277" }}>
+            USD: ${cotizaciones.USD} | EUR: ${cotizaciones.EUR}
+          </small>
+
         </div>
+
         <div className="botones-functions-comparativas">
           <Link to="/comparativa" className="botonesComparativa">
             Mostrar Balance
@@ -382,66 +654,7 @@ const GastoIngreso = () => {
         </div>
       </div>
 
-      <div className="contenedor-ahorros-general" style={{ marginBottom: "30px" }}>
-        <div className="encabezado-ahorros-flex">
-          <h3 className="titulo-ahorros-general">Cuentas y Tarjetas Conectadas</h3>
-          <div style={{ display: "flex", gap: "10px" }}>
-            <button onClick={() => setModalImportarAbierto(true)} className="boton-secundario">
-              📄 Importar CSV
-            </button>
-            <button onClick={() => setModalConectarAbierto(true)} className="boton-primario">
-              🔌 Vincular Tarjeta / Banco
-            </button>
-          </div>
-        </div>
-
-        {cuentas.length > 0 ? (
-          <div className="grid-ahorros-general" style={{ marginTop: "15px" }}>
-            {cuentas.map((cuenta) => (
-              <div key={cuenta.IdCuenta} className="tarjeta-ahorro-item" style={{ borderLeft: cuenta.EsExterna ? "4px solid #007AFF" : "4px solid #c8b277" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <strong style={{ color: "#ffffff", fontSize: "15px" }}>{cuenta.Nombre}</strong>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    {cuenta.EsExterna && (
-                      <span style={{ fontSize: "11px", backgroundColor: "#007AFF", color: "#fff", padding: "2px 8px", borderRadius: "10px", fontWeight: "600" }}>
-                        Sincronizada
-                      </span>
-                    )}
-                    <button 
-                      onClick={() => manejarDesvincularCuenta(cuenta.IdCuenta)}
-                      style={{ 
-                        background: "none", 
-                        border: "none", 
-                        color: "#FF4B4B", 
-                        cursor: "pointer", 
-                        fontSize: "11px", 
-                        fontWeight: "600",
-                        textDecoration: "underline",
-                        padding: "2px 4px"
-                      }}
-                      title="Eliminar vinculación de esta cuenta"
-                    >
-                      Desvincular
-                    </button>
-                  </div>
-                </div>
-                <h3 style={{ margin: "12px 0 6px 0", color: cuenta.SaldoActual < 0 ? "#FF4B4B" : "#c8b277", fontSize: "20px" }}>
-                  {cuenta.IdDivisa === 2 ? "USD" : "$"} {cuenta.SaldoActual.toLocaleString()}
-                </h3>
-                <small style={{ color: "#666" }}>
-                  {cuenta.EsExterna ? `Token: ${cuenta.TokenSincronizacion}` : "Registro Manual"}
-                </small>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <EstadoVacio
-            icono="💳"
-            mensaje="No posees tarjetas ni cuentas corrientes vinculadas para sincronización automática."
-            sugerencia="Hacé clic en 'Vincular Tarjeta / Banco' o importa tus movimientos con CSV."
-          />
-        )}
-      </div>
+      
 
       <div className="panel-graficos-general">
         {/* GRÁFICO GASTOS */}
@@ -556,96 +769,6 @@ const GastoIngreso = () => {
           />
         )}
       </div>
-
-      {/* MODAL: IMPORTAR CSV */}
-      {modalImportarAbierto && (
-        <div className="capa-modal" onClick={() => !cargandoCsv && setModalImportarAbierto(false)}>
-          <div className="contenido-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "450px" }}>
-            <h3 style={{ textAlign: "center", marginBottom: "10px" }}>Importar Movimientos (CSV)</h3>
-            
-            <div className="formulario-cuerpo">
-              <p style={{ color: "#aaa", marginBottom: "20px", fontSize: "13px", textAlign: "center", lineHeight: "1.5" }}>
-                Sube el archivo <strong>.csv</strong> descargado de tu Home Banking. Asegúrate de que las columnas del archivo sean: <strong>Fecha, Descripcion, Monto</strong>.
-              </p>
-              
-              <div style={{
-                  border: "2px dashed rgba(200, 178, 119, 0.5)",
-                  borderRadius: "12px",
-                  padding: "40px 20px",
-                  backgroundColor: "rgba(0,0,0,0.2)",
-                  marginBottom: "20px",
-                  textAlign: "center"
-              }}>
-                <input 
-                  type="file" 
-                  accept=".csv" 
-                  onChange={manejarSeleccionCsv} 
-                  style={{ display: "block", margin: "0 auto", color: "#fff" }}
-                />
-              </div>
-            </div>
-
-            <div className="formulario-acciones" style={{ marginTop: "20px", justifyContent: "center" }}>
-              <button 
-                className="boton-secundario" 
-                onClick={() => setModalImportarAbierto(false)}
-                disabled={cargandoCsv}
-              >
-                Cancelar
-              </button>
-              <button 
-                className="boton-primario" 
-                onClick={manejarSubidaCsv} 
-                disabled={cargandoCsv || !archivoCsv}
-                style={{ opacity: (cargandoCsv || !archivoCsv) ? 0.5 : 1 }}
-              >
-                {cargandoCsv ? "Procesando Archivo..." : "Subir e Importar"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: CONEXIÓN ENTORNO SEGURO OPEN BANKING */}
-      {modalConectarAbierto && (
-        <div className="capa-modal" onClick={() => !cargandoConexion && setModalConectarAbierto(false)}>
-          <div className="contenido-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "420px" }}>
-            <h3 style={{ textAlign: "center", marginBottom: "10px" }}>Vincular Proveedor Financiero</h3>
-            
-            {cargandoConexion ? (
-              <div style={{ textAlign: "center", padding: "30px 0" }}>
-                <div className="spinner-carga" style={{ margin: "0 auto", border: "4px solid rgba(200,178,119,0.1)", borderTop: "4px solid #c8b277", borderRadius: "50%", width: "40px", height: "40px", animation: "spin 1s linear infinite" }}></div>
-                <p style={{ marginTop: "20px", color: "#c8b277", fontWeight: "600" }}>Estableciendo túnel cifrado...</p>
-                <small style={{ color: "#777" }}>Autorizando Token de lectura con el emisor bancario.</small>
-              </div>
-            ) : (
-              <div className="formulario-cuerpo">
-                <p style={{ color: "#aaa", marginBottom: "20px", fontSize: "13px", textAlign: "center", lineHeight: "1.5" }}>
-                  Seleccioná la tarjeta o billetera virtual que deseas integrar. Al proceder, otorgarás permisos de lectura segura sobre los movimientos históricos.
-                </p>
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  {institucionesSoportadas.map((inst) => (
-                    <button 
-                      key={inst.id}
-                      className="boton-secundario" 
-                      style={{ justifyContent: "flex-start", padding: "14px", border: "1px solid #2d2d2e", display: "flex", gap: "10px", width: "100%", textAlign: "left" }}
-                      onClick={() => simularConexionBancaria(inst)}
-                    >
-                      <span>💳</span> {inst.nombre}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {!cargandoConexion && (
-               <div className="formulario-acciones" style={{ marginTop: "20px", justifyContent: "center" }}>
-                 <button className="boton-secundario" onClick={() => setModalConectarAbierto(false)}>Cancelar Conexión</button>
-               </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* MODAL EDITAR META */}
       {modalEditarAbierto && (

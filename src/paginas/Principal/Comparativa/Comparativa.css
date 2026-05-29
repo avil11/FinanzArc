@@ -14,9 +14,34 @@
     --border-radius-lg: 24px;
     --border-radius-md: 16px;
     --border-radius-sm: 8px;
-    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.grafico-linea-container{
+    width: 100%;
+    padding: 30px;
+    min-height: 550px;
 }
 
+.header-linea{
+    margin-bottom: 30px;
+}
+
+.header-linea h2{
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.header-linea p{
+    color: #999;
+}
+
+.recharts-cartesian-axis-tick-value{
+    fill: #aaa;
+}
+
+.recharts-legend-item-text{
+    color: #fff !important;
+}
 /* ==========================================================================
    ESTRUCTURA Y COMPONENTES GLOBALES
    ========================================================================== */
