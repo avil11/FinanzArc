@@ -97,6 +97,8 @@ function Perfil() {
                     </div>
 
                     <div className="perfil-acciones">
+                        <button className="boton-primario" onClick={() => navigate("/planes")}>Ver Planes</button>
+
                         <button onClick={cerrarSesion} className="BotonLogout">
                             Cerrar Sesión
                         </button>

@@ -4,26 +4,48 @@ import { Link } from "react-router-dom";
 import "./General.css";
 
 const API_BASE_URL = "http://localhost:60496/api";
+
 const API_ENDPOINTS = {
   gastos: "/Gasto",
   ingresos: "/Ingreso",
   usuarios: "/Usuarios",
-  ahorros: "/MetaAhorro"
+  ahorros: "/MetaAhorro",
+  cuentas: "/Cuenta",
+  transacciones: "/Transacciones"
 };
+
+const institucionesSoportadas = [
+  { id: 1, nombre: "Banco Galicia", tipo: "galicia", divisa: 1, saldo: 450000 },
+  { id: 2, nombre: "Mercado Pago", tipo: "mp", divisa: 1, saldo: 125000 },
+  { id: 3, nombre: "BBVA Francés", tipo: "bbva", divisa: 1, saldo: 890000 },
+  { id: 4, nombre: "Brubank (USD)", tipo: "bru-usd", divisa: 2, saldo: 1500 }
+];
 
 const GastoIngreso = () => {
   const [mostrarSaludo, setMostrarSaludo] = useState(true);
+
   const [datosGastos, setDatosGastos] = useState([]);
   const [datosIngresos, setDatosIngresos] = useState([]);
   const [metasAhorro, setMetasAhorro] = useState([]);
+  const [cuentas, setCuentas] = useState([]);
 
-  const COLORES = ["#007AFF", "#c8b277", "#8a733f", "#4a4a4a"];
-  const COLORESgasto = ["#FF4B4B", "#c8b277", "#8a733f", "#4a4a4a"]; // Rojo para gastos
+  const [idUsuarioActual, setIdUsuarioActual] = useState(null);
 
+  const [cotizaciones, setCotizaciones] = useState({
+    USD: 1300,
+    EUR: 1450
+  });
+
+  const [modalConectarAbierto, setModalConectarAbierto] = useState(false);
+  const [modalImportarAbierto, setModalImportarAbierto] = useState(false);
   const [modalAgregarAbierto, setModalAgregarAbierto] = useState(false);
   const [modalEditarAbierto, setModalEditarAbierto] = useState(false);
 
-  // Estado para controlar los valores del formulario
+  const [cargandoConexion, setCargandoConexion] = useState(false);
+  const [cargandoCsv, setCargandoCsv] = useState(false);
+
+  const [archivoCsv, setArchivoCsv] = useState(null);
+
   const [metaForm, setMetaForm] = useState({
     IdMetaAhorro: null,
     Nombre: "",
@@ -31,93 +53,340 @@ const GastoIngreso = () => {
     MontoGuardado: "",
     FechaObjetivo: "",
     FechaInicio: "",
-    Divisa: "ARS"
+    Divisa: "1"
   });
 
+  const COLORES = ["#007AFF", "#c8b277", "#8a733f", "#4a4a4a"];
+  const COLORESgasto = ["#FF4B4B", "#c8b277", "#8a733f", "#4a4a4a"];
+
   useEffect(() => {
-    const temporizador = setTimeout(() => setMostrarSaludo(false), 4000);
+    const temporizador = setTimeout(() => {
+      setMostrarSaludo(false);
+    }, 4000);
+
+    obtenerCotizaciones();
+    obtenerDatos();
+
     return () => clearTimeout(temporizador);
   }, []);
 
-  useEffect(() => {
-    obtenerDatos();
-  }, []);
+  // =========================
+  // COTIZACIONES
+  // =========================
 
-  // --- Lógica de API ---
+  const obtenerCotizaciones = async () => {
+    try {
+      const responseUsd = await fetch("https://dolarapi.com/v1/dolares/oficial");
+      const dataUsd = await responseUsd.json();
+
+      const usd = dataUsd?.venta || 1300;
+
+      const eurEstimado = usd * 1.15;
+
+      setCotizaciones({
+        USD: usd,
+        EUR: eurEstimado
+      });
+
+      console.log("Cotizaciones actualizadas:", {
+        USD: usd,
+        EUR: eurEstimado
+      });
+
+    } catch (error) {
+      console.error("Error obteniendo cotizaciones:", error);
+
+      setCotizaciones({
+        USD: 1300,
+        EUR: 1450
+      });
+    }
+  };
+
+  const convertirAPesos = (monto, divisa) => {
+    const valor = Number(monto) || 0;
+
+    switch (Number(divisa)) {
+      case 2:
+        return valor * cotizaciones.USD;
+
+      case 3:
+        return valor * cotizaciones.EUR;
+
+      default:
+        return valor;
+    }
+  };
+
+  // =========================
+  // DATOS
+  // =========================
+
   const obtenerDatos = () => {
     const token = localStorage.getItem("Token");
+
     if (!token) return;
 
     fetch(`${API_BASE_URL}${API_ENDPOINTS.usuarios}/ByToken`, {
-      method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
+        Authorization: `Bearer ${token}`
+      }
     })
-      .then((response) => {
-        if (!response.ok) throw new Error("Error al validar sesión");
-        return response.json();
-      })
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
+        setIdUsuarioActual(data.IdUsuario);
+
         obtenerGastos(data.IdUsuario);
         obtenerIngresos(data.IdUsuario);
         obtenerAhorros(data.IdUsuario);
-      })
-      .catch((error) => console.error("Error identificando usuario:", error));
+        obtenerCuentas(data.IdUsuario);
+      });
   };
+
+  // =========================
+  // CUENTAS
+  // =========================
+
+  const obtenerCuentas = (idusuario) => {
+    fetch(`${API_BASE_URL}${API_ENDPOINTS.cuentas}/ByUsuario/${idusuario}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
+      }
+    })
+      .then(res => res.json())
+      .then(data => setCuentas(data || []));
+  };
+
+  const manejarDesvincularCuenta = (idCuenta) => {
+    if (!window.confirm("¿Seguro que deseas eliminar esta cuenta?")) return;
+
+    fetch(`${API_BASE_URL}${API_ENDPOINTS.cuentas}/${idCuenta}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
+      }
+    })
+      .then(res => {
+        if (res.ok) {
+          obtenerCuentas(idUsuarioActual);
+        } else {
+          alert("Error al desvincular la cuenta.");
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
+
+  // =========================
+  // GASTOS
+  // =========================
 
   const obtenerGastos = (idusuario) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.gastos}/ByUsuario/${idusuario}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("Token")}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
+      }
     })
-      .then((response) => response.json())
-      .then((data) => {
-        const gastosProcesados = data.map((item) => ({
+      .then(res => res.json())
+      .then(data => {
+
+        const gastosProcesados = data.map(item => ({
           name: item.Descripcion || "Sin descripción",
-          valor: Number(item.MontoGasto) || 0,
+
+          valor: convertirAPesos(
+            item.MontoGasto,
+            item.IdDivisa
+          ),
+
+          monedaOriginal:
+            Number(item.IdDivisa) === 2
+              ? "USD"
+              : Number(item.IdDivisa) === 3
+              ? "EUR"
+              : "ARS"
         }));
+
         setDatosGastos(gastosProcesados);
       })
-      .catch((error) => console.error("Error gastos:", error));
+      .catch(error => console.error(error));
   };
+
+  // =========================
+  // INGRESOS
+  // =========================
 
   const obtenerIngresos = (idusuario) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.ingresos}/ByUsuario/${idusuario}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("Token")}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
+      }
     })
-      .then((response) => response.json())
-      .then((data) => {
-        const ingresosProcesados = data.map((item) => ({
+      .then(res => res.json())
+      .then(data => {
+
+        const ingresosProcesados = data.map(item => ({
           name: item.Descripcion || "Sin Descripción",
-          valor: Number(item.MontoIngreso) || 0,
+
+          valor: convertirAPesos(
+            item.MontoIngreso,
+            item.IdDivisa
+          ),
+
+          monedaOriginal:
+            Number(item.IdDivisa) === 2
+              ? "USD"
+              : Number(item.IdDivisa) === 3
+              ? "EUR"
+              : "ARS"
         }));
+
         setDatosIngresos(ingresosProcesados);
       })
-      .catch((error) => console.error("Error ingresos:", error));
+      .catch(error => console.error(error));
   };
+
+  // =========================
+  // AHORROS
+  // =========================
 
   const obtenerAhorros = (idusuario) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.ahorros}/ByUsuario/${idusuario}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("Token")}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
+      }
     })
-      .then((response) => response.json())
-      .then((data) => {
-        const metasProcesadas = data.map((item) => ({
+      .then(res => res.json())
+      .then(data => {
+
+        const metasProcesadas = data.map(item => ({
           ...item,
+
           etiqueta: item.Nombre || "Meta de ahorro",
-          actual: Number(item.MontoGuardado ?? 0),
-          objetivo: Number(item.MontoObjetivo ?? 0),
+
+          actual: convertirAPesos(
+            item.MontoGuardado,
+            item.IdDivisa
+          ),
+
+          objetivo: convertirAPesos(
+            item.MontoObjetivo,
+            item.IdDivisa
+          )
         }));
+
         setMetasAhorro(metasProcesadas);
       })
-      .catch((error) => console.error("Error ahorros:", error));
+      .catch(error => console.error(error));
   };
 
-  // Función para actualizar el estado cuando se escribe en los inputs
+  // =========================
+  // CSV
+  // =========================
+
+  const manejarSeleccionCsv = (e) => {
+    const file = e.target.files[0];
+
+    if (file && !file.name.endsWith(".csv")) {
+      alert("Selecciona un archivo CSV.");
+      return;
+    }
+
+    setArchivoCsv(file);
+  };
+
+  const manejarSubidaCsv = async () => {
+    if (!archivoCsv) {
+      alert("Selecciona un archivo.");
+      return;
+    }
+
+    setCargandoCsv(true);
+
+    const formData = new FormData();
+
+    formData.append("archivo", archivoCsv);
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}${API_ENDPOINTS.transacciones}/importar-csv`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("Token")}`
+          },
+          body: formData
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(data.message);
+
+        setModalImportarAbierto(false);
+
+        obtenerDatos();
+      } else {
+        alert(data.message);
+      }
+
+    } catch (error) {
+      console.error(error);
+
+    } finally {
+      setCargandoCsv(false);
+    }
+  };
+
+  // =========================
+  // OPEN BANKING
+  // =========================
+
+  const simularConexionBancaria = (institucion) => {
+    if (!idUsuarioActual) return;
+
+    setCargandoConexion(true);
+
+    setTimeout(() => {
+
+      const nuevaCuentaExterna = {
+        IdUsuario: idUsuarioActual,
+        IdDivisa: institucion.divisa,
+        Nombre: institucion.nombre,
+        SaldoActual: institucion.saldo,
+        EsExterna: true,
+        TokenSincronizacion: `${institucion.tipo}-${Math.floor(Math.random() * 10000)}`,
+        FechaCreacion: new Date().toISOString()
+      };
+
+      fetch(`${API_BASE_URL}${API_ENDPOINTS.cuentas}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("Token")}`
+        },
+        body: JSON.stringify(nuevaCuentaExterna)
+      })
+        .then(() => {
+          alert(`${institucion.nombre} vinculada`);
+
+          setModalConectarAbierto(false);
+
+          obtenerCuentas(idUsuarioActual);
+        })
+        .finally(() => setCargandoConexion(false));
+
+    }, 2500);
+  };
+
+  // =========================
+  // METAS
+  // =========================
+
   const manejarCambioInput = (e) => {
     setMetaForm({
       ...metaForm,
@@ -125,16 +394,13 @@ const GastoIngreso = () => {
     });
   };
 
-  // --- Lógica para Crear / Editar Meta ---
   const manejarGuardarMeta = () => {
     const token = localStorage.getItem("Token");
 
     fetch(`${API_BASE_URL}${API_ENDPOINTS.usuarios}/ByToken`, {
-      method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
+        Authorization: `Bearer ${token}`
+      }
     })
       .then(res => res.json())
       .then(userData => {
@@ -148,138 +414,239 @@ const GastoIngreso = () => {
           IdDivisa: metaForm.Divisa,
           IdUsuario: userData.IdUsuario
         };
-        console.log("Meta a guardar:", metaAGuardar);
+
         guardarMetaApi(metaAGuardar);
-      });
+      })
+      .catch(error => console.error("Error obteniendo usuario:", error));
   };
 
-  // MODIFICADO: Ahora maneja POST y PUT dinámicamente
+ 
   const guardarMetaApi = (metaAGuardar) => {
-    const esEdicion = metaAGuardar.IdMetaAhorro !== null && metaAGuardar.IdMetaAhorro !== undefined;
+    const esEdicion =
+      metaAGuardar.IdMetaAhorro !== null &&
+      metaAGuardar.IdMetaAhorro !== undefined;
 
-    // Si es edición, se agrega el ID al endpoint
     const url = esEdicion
       ? `${API_BASE_URL}${API_ENDPOINTS.ahorros}/${metaAGuardar.IdMetaAhorro}`
       : `${API_BASE_URL}${API_ENDPOINTS.ahorros}`;
 
-    // Si es edición usamos PUT, si no, POST
     const metodo = esEdicion ? "PUT" : "POST";
 
     fetch(url, {
       method: metodo,
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("Token")}`
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
       },
       body: JSON.stringify(metaAGuardar)
     })
-      .then((response) => {
-        if (!response.ok) throw new Error(`Error al ${esEdicion ? 'editar' : 'guardar'} la meta`);
-
-        // Validamos por si el PUT devuelve 204 No Content para evitar errores de parseo
-        return response.text().then(text => text ? JSON.parse(text) : {});
-      })
       .then(() => {
+
         setModalAgregarAbierto(false);
         setModalEditarAbierto(false);
-        obtenerDatos(); // Recargamos todo
+
+        obtenerDatos();
       })
-      .catch((error) => console.error("Error guardando meta:", error));
+      .catch(error => console.error(error));
   };
 
-  // --- Funciones de Renderizado ---
-  const calcularTotal = (datos) => datos.reduce((acum, item) => acum + Number(item.valor || 0), 0);
-  const obtenerTopCinco = (items) => [...items].sort((a, b) => b.valor - a.valor).slice(0, 5);
+  const manejarEliminarMeta = () => {
+    fetch(`${API_BASE_URL}${API_ENDPOINTS.ahorros}/${metaForm.IdMetaAhorro}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
+      }
+    })
+      .then(() => {
+
+        setModalEditarAbierto(false);
+
+        obtenerDatos();
+      })
+      .catch(error => console.error(error));
+  };
+
+  // =========================
+  // HELPERS
+  // =========================
+
+  const calcularTotal = (datos) => {
+    return datos.reduce((acum, item) => {
+      return acum + Number(item.valor || 0);
+    }, 0);
+  };
+
+  const obtenerTopCinco = (items) => {
+    return [...items]
+      .sort((a, b) => b.valor - a.valor)
+      .slice(0, 5);
+  };
 
   const renderCenterLabel = ({ cx, cy }, total) => (
     <g>
-      <text x={cx} y={cy - 12} textAnchor="middle" fill="#ffffff" fontSize={13} fontWeight="600">Total</text>
-      <text x={cx} y={cy + 12} textAnchor="middle" fill="#c8b277" fontSize={16} fontWeight="700">
-        ${total.toLocaleString()}
+      <text
+        x={cx}
+        y={cy - 12}
+        textAnchor="middle"
+        fill="#ffffff"
+        fontSize={13}
+        fontWeight="600"
+      >
+        Total
+      </text>
+
+      <text
+        x={cx}
+        y={cy + 12}
+        textAnchor="middle"
+        fill="#c8b277"
+        fontSize={16}
+        fontWeight="700"
+      >
+        ${total.toLocaleString("es-AR")}
       </text>
     </g>
   );
 
-  const EstadoVacio = ({ titulo, mensaje, icono = "📊", sugerencia }) => (
+  const EstadoVacio = ({
+    titulo,
+    mensaje,
+    icono = "📊",
+    sugerencia
+  }) => (
     <div className="tarjeta-general aviso-vacio">
       {titulo && <h3>{titulo}</h3>}
+
       <div className="contenido-aviso-vacio">
         <div className="icono-placeholder">{icono}</div>
+
         <p>{mensaje}</p>
-        <span className="sugerencia">{sugerencia || "Registra movimientos para ver el progreso aquí."}</span>
+
+        <span className="sugerencia">
+          {sugerencia || "Registra movimientos para ver información."}
+        </span>
       </div>
     </div>
   );
 
-  const BarraProgreso = ({ actual, objetivo, etiqueta }) => {
-    const porcentaje = objetivo > 0 ? Math.min(100, (actual / objetivo) * 100) : 0;
+  const BarraProgreso = ({
+    actual,
+    objetivo,
+    etiqueta
+  }) => {
+
+    const porcentaje =
+      objetivo > 0
+        ? Math.min(100, (actual / objetivo) * 100)
+        : 0;
+
     return (
       <div className="item-progreso-general">
+
         <div className="info-progreso-general">
-          <span style={{ fontWeight: "500", color: "#ffffff" }}>{etiqueta}</span>
-          <span style={{ color: "#c8b277", fontWeight: "bold" }}>{porcentaje.toFixed(0)}%</span>
+          <span
+            style={{
+              fontWeight: "500",
+              color: "#ffffff"
+            }}
+          >
+            {etiqueta}
+          </span>
+
+          <span
+            style={{
+              color: "#c8b277",
+              fontWeight: "bold"
+            }}
+          >
+            {porcentaje.toFixed(0)}%
+          </span>
         </div>
+
         <div className="pista-barra-general">
-          <div className="relleno-barra-general" style={{ width: `${porcentaje}%` }} />
+          <div
+            className="relleno-barra-general"
+            style={{
+              width: `${porcentaje}%`
+            }}
+          />
         </div>
+
         <div className="texto-monto-general">
-          ${actual.toLocaleString()} / ${objetivo.toLocaleString()}
+          ${actual.toLocaleString("es-AR")} / $
+          {objetivo.toLocaleString("es-AR")}
         </div>
       </div>
     );
   };
 
-  const manejarEliminarMeta = () => {
-    console.log("Eliminar meta ID:", metaForm.IdMetaAhorro);
-    fetch(`${API_BASE_URL}${API_ENDPOINTS.ahorros}/${metaForm.IdMetaAhorro}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("Token")}`
-      }
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error("Error al eliminar la meta");
-        setModalEditarAbierto(false);
-        obtenerDatos(); // Recargamos todo
-      })
-      .catch((error) => console.error("Error eliminando meta:", error));
+  // =========================
+  // MODALES
+  // =========================
 
-  }
-
-  const nombre = localStorage.getItem("Nombre") || "Usuario";
-  const apellido = localStorage.getItem("Apellido") || "";
-
-  // Helper para resetear el formulario al agregar
   const abrirModalAgregar = () => {
-    setMetaForm({ IdMetaAhorro: null, Nombre: "", MontoObjetivo: "", MontoGuardado: "", FechaObjetivo: "", FechaInicio: "", Divisa: "ARS" });
+    setMetaForm({
+      IdMetaAhorro: null,
+      Nombre: "",
+      MontoObjetivo: "",
+      MontoGuardado: "",
+      FechaObjetivo: "",
+      FechaInicio: "",
+      Divisa: "1"
+    });
+
     setModalAgregarAbierto(true);
   };
 
-  // Helper para cargar los datos de la meta seleccionada
   const abrirModalEditar = (meta) => {
     setMetaForm({
       IdMetaAhorro: meta.IdMetaAhorro,
       Nombre: meta.Nombre || "",
       MontoObjetivo: meta.MontoObjetivo || "",
-      // CAMBIO AQUÍ: Usamos 'actual' que es el nombre que le diste en obtenerAhorros
-      MontoGuardado: meta.actual || meta.MontoGuardado || 0,
-      FechaObjetivo: meta.FechaMeta ? meta.FechaMeta.split('T')[0] : (meta.FechaObjetivo ? meta.FechaObjetivo.split('T')[0] : ""),
-      FechaInicio: meta.FechaInicio ? meta.FechaInicio.split('T')[0] : "",
+      MontoGuardado: meta.MontoGuardado || "",
+      FechaObjetivo: meta.FechaMeta
+        ? meta.FechaMeta.split("T")[0]
+        : "",
+      FechaInicio: meta.FechaInicio
+        ? meta.FechaInicio.split("T")[0]
+        : "",
       IdDivisa: parseInt(meta.IdDivisa) || 1
     });
-
     setModalEditarAbierto(true);
   };
 
+  // =========================
+  // USER
+  // =========================
+
+  const nombre = localStorage.getItem("Nombre") || "Usuario";
+
+  const apellido = localStorage.getItem("Apellido") || "";
+
   return (
     <div className="contenedor-principal-general">
-      {/*Botones de función comparativa*/}
+
       <div className="seccion-encabezado-general">
+
         <div className="titulo-principal-general">
-          <h2>{mostrarSaludo ? `¡Bienvenido, ${nombre} ${apellido}!` : "El Control Total de tu Economía"}</h2>
-          <p style={{ color: "#888888" }}>Ya sea para organizar los gastos del hogar o administrar tu emprendimiento, centralizá toda tu información en un solo lugar. Olvidate de las anotaciones sueltas o planillas complicadas y accedé a métricas en tiempo real desde cualquier dispositivo para tomar las mejores decisiones.</p>
+
+          <h2>
+            {mostrarSaludo
+              ? `¡Bienvenido, ${nombre} ${apellido}!`
+              : "El Control Total de tu Economía"}
+          </h2>
+
+          <p style={{ color: "#888888" }}>
+            Todas las monedas son convertidas automáticamente a ARS.
+          </p>
+
+          <small style={{ color: "#c8b277" }}>
+            USD: ${cotizaciones.USD} | EUR: ${cotizaciones.EUR}
+          </small>
+
         </div>
+
         <div className="botones-functions-comparativas">
           <Link to="/comparativa" className="botonesComparativa">
             Mostrar Balance
@@ -287,8 +654,9 @@ const GastoIngreso = () => {
         </div>
       </div>
 
-      <div className="panel-graficos-general">
+      
 
+      <div className="panel-graficos-general">
         {/* GRÁFICO GASTOS */}
         {datosGastos.length > 0 ? (
           <div className="tarjeta-general">
@@ -372,11 +740,7 @@ const GastoIngreso = () => {
         ) : (
           <EstadoVacio titulo="Fuentes de Ingreso" mensaje="No se encontraron ingresos registrados." />
         )}
-
       </div>
-
-
-       {/* SECCIÓN DE AHORROS */} 
 
       <div className="contenedor-ahorros-general">
         <div className="encabezado-ahorros-flex">
@@ -406,8 +770,8 @@ const GastoIngreso = () => {
         )}
       </div>
 
-      {/* MODAL EDITAR */}
-      {(modalEditarAbierto) && (
+      {/* MODAL EDITAR META */}
+      {modalEditarAbierto && (
         <div className="capa-modal" onClick={() => setModalEditarAbierto(false)}>
           <div className="contenido-modal" onClick={(e) => e.stopPropagation()}>
             <h3>Editar Meta de Ahorro</h3>
@@ -456,8 +820,8 @@ const GastoIngreso = () => {
         </div>
       )}
 
-      {/* MODAL AGREGAR */}
-      {(modalAgregarAbierto) && (
+      {/* MODAL AGREGAR META */}
+      {modalAgregarAbierto && (
         <div className="capa-modal" onClick={() => setModalAgregarAbierto(false)}>
           <div className="contenido-modal" onClick={(e) => e.stopPropagation()}>
             <h3>Nueva Meta de Ahorro</h3>
@@ -482,7 +846,6 @@ const GastoIngreso = () => {
                 <label htmlFor="fechaObjetivo">Fecha Objetivo</label>
                 <input type="date" name="FechaObjetivo" value={metaForm.FechaObjetivo} onChange={manejarCambioInput} id="fechaObjetivo" />
               </div>
-
               <div className="formulario-grupo">
                 <label htmlFor="divisa">Divisa</label>
                 <select name="Divisa" value={metaForm.Divisa} onChange={manejarCambioInput} id="divisa">
