@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
+import Confetti from "react-confetti"; // <-- AGREGADO
 import "./General.css";
 
 const API_BASE_URL = "http://localhost:60496/api";
@@ -45,6 +46,7 @@ const GastoIngreso = () => {
   const [cargandoCsv, setCargandoCsv] = useState(false);
 
   const [archivoCsv, setArchivoCsv] = useState(null);
+  const [mostrarConfeti, setMostrarConfeti] = useState(false); // <-- AGREGADO
 
   const [metaForm, setMetaForm] = useState({
     IdMetaAhorro: null,
@@ -70,6 +72,22 @@ const GastoIngreso = () => {
     return () => clearTimeout(temporizador);
   }, []);
 
+  // <-- EFECTO AGREGADO PARA CONTROLAR EL CONFETI -->
+  useEffect(() => {
+    // Verificamos si alguna meta ya alcanzó o superó el objetivo
+    const metaCumplida = metasAhorro.some(
+      (meta) => meta.actual >= meta.objetivo && meta.objetivo > 0
+    );
+
+    if (metaCumplida) {
+      setMostrarConfeti(true);
+      // Apaga la animación después de 6 segundos
+      const timer = setTimeout(() => setMostrarConfeti(false), 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [metasAhorro]);
+  // <------------------------------------------------>
+
   // =========================
   // COTIZACIONES
   // =========================
@@ -78,17 +96,13 @@ const GastoIngreso = () => {
     const API_KEY = "2ba96ae66f6deb72572261fe";
 
     try {
-      // Llamamos a la API para obtener tasas base USD
       const response = await fetch(`https://v6.exchangerate-api.com/v6/${API_KEY}/latest/USD`);
       const data = await response.json();
 
       if (data.result === "success") {
-        const usdToArs = data.conversion_rates.ARS; // Cuántos pesos vale 1 dólar
-        const eurToUsd = data.conversion_rates.EUR; // Cuántos euros vale 1 dólar
+        const usdToArs = data.conversion_rates.ARS; 
+        const eurToUsd = data.conversion_rates.EUR; 
 
-        // Calculamos EUR a ARS: (1 Euro en USD) * (1 USD en ARS)
-        // Como la API nos da el EUR expresado en USD, dividimos 1 por ese valor 
-        // para obtener el valor del Euro en USD, y luego multiplicamos por pesos.
         const eurToArs = (1 / eurToUsd) * usdToArs;
 
         setCotizaciones({
@@ -625,6 +639,21 @@ const GastoIngreso = () => {
 
   return (
     <div className="contenedor-principal-general">
+
+      {/* <-- COMPONENTE CONFETI AGREGADO --> */}
+      {mostrarConfeti && (
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", zIndex: 9999, pointerEvents: "none" }}>
+          <Confetti
+            width={window.innerWidth}
+            height={window.innerHeight}
+            recycle={false}
+            numberOfPieces={450}
+            gravity={0.15}
+            colors={["#c8b277", "#ffffff", "#007AFF", "#34C759"]} // Colores combinados con tu diseño
+          />
+        </div>
+      )}
+      {/* <---------------------------------> */}
 
       <div className="seccion-encabezado-general">
 
