@@ -183,42 +183,61 @@ function Ingreso() {
     <div className="pagina-ingreso-contenedor">
       <div className="encabezado-simple">
         <h1 className="titulo-seccion">Fuentes de Ingreso</h1>
-        <p className="texto-gris">Administra todas tus entradas de dinero. Cotizaciones: 1 USD = ${tasas.USD} | 1 EUR = ${tasas.EUR}</p>
+        <p className="texto-gris">Administra todos tus ingresos en este apartado. <br /> Cotizaciones: 1 USD = ${tasas.USD} | 1 EUR = ${tasas.EUR}</p>
       </div>
 
       <div className="pagina-ingreso-tarjeta">
         <div className="tarjeta">
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie
-                data={datosGrafico}
-                cx="50%"
-                cy="50%"
-                innerRadius={70}
-                outerRadius={120}
-                paddingAngle={6}
-                dataKey="valor"
-                nameKey="nombre"
-                stroke="none"
-              >
-                {datosGrafico.map((entry, i) => (
-                  <Cell key={`cell-${i}`} fill={entry.valor === 0 ? "#333" : COLORES[i % COLORES.length]} />
-                ))}
-              </Pie>
+          {ingresosFiltrados.length === 0 ? (
+            <div style={{ 
+              display: "flex", 
+              flexDirection: "column", 
+              justifyContent: "center", 
+              alignItems: "center", 
+              height: "280px", 
+              textAlign: "center", 
+              color: "#a0a0a0" 
+            }}>
+              <span style={{ fontSize: "2.5rem", marginBottom: "12px" }}>📊</span>
+              <p style={{ fontSize: "14px", margin: 0, padding: "0 20px", lineHeight: "1.5" }}>
+                {listaIngresos.length === 0 
+                  ? "No hay ingresos registrados para generar el gráfico de distribución." 
+                  : "No hay datos que coincidan para mostrar en el gráfico."}
+              </p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie
+                  data={datosGrafico}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={120}
+                  paddingAngle={6}
+                  dataKey="valor"
+                  nameKey="nombre"
+                  stroke="none"
+                >
+                  {datosGrafico.map((entry, i) => (
+                    <Cell key={`cell-${i}`} fill={entry.valor === 0 ? "#333" : COLORES[i % COLORES.length]} />
+                  ))}
+                </Pie>
 
-              <text x="50%" y="50%" fill="#fff" textAnchor="middle" dominantBaseline="central">
-                <tspan x="50%" dy="-0.5em" fontSize="14" fill="#a0a0a0">Total (ARS)</tspan>
-                <tspan x="50%" dy="1.5em" fontSize="20" fontWeight="bold">
-                  ${totalMonto.toLocaleString()}
-                </tspan>
-              </text>
+                <text x="50%" y="50%" fill="#fff" textAnchor="middle" dominantBaseline="central">
+                  <tspan x="50%" dy="-0.5em" fontSize="14" fill="#a0a0a0">Total (ARS)</tspan>
+                  <tspan x="50%" dy="1.5em" fontSize="20" fontWeight="bold">
+                    ${totalMonto.toLocaleString()}
+                  </tspan>
+                </text>
 
-              <Tooltip
-                contentStyle={{ backgroundColor: "#1e1e1f", border: "1px solid rgba(200, 178, 119, 0.3)", borderRadius: "8px" }}
-                itemStyle={{ color: "#fff" }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+                <Tooltip
+                  contentStyle={{ backgroundColor: "#1e1e1f", border: "1px solid rgba(200, 178, 119, 0.3)", borderRadius: "8px" }}
+                  itemStyle={{ color: "#fff" }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         <div className="contenedor-tabla-filtradaCategoria">
@@ -243,20 +262,30 @@ function Ingreso() {
                 </tr>
               </thead>
               <tbody>
-                {ingresosFiltrados.map((item) => (
-                  <tr key={item.IdIngreso || Math.random()}>
-                    <td>{item.Descripcion}</td>
-                    <td className="monto-destacado" style={{ color: 'rgb(70, 130, 180)' }}>
-                      {FormatearMoneda(Number(item.MontoIngreso), item.IdDivisa)}
-                    </td>
-                    <td className="texto-gris">{new Date(item.FechaIngreso).toLocaleDateString()}</td>
-                    <td>
-                      <button className="btn-icon" onClick={() => prepararEdicion(item)}>✏️</button>
-                      <button className="btn-icon" onClick={() => eliminarIngreso(item.IdIngreso)}>🗑️</button>
-                      <button className="btn-icon" onClick={() => { setItemSeleccionado(item); setVerMas(true); }}>📊</button>
+                {ingresosFiltrados.length === 0 ? (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: "center", padding: "3rem 1rem", color: "#a0a0a0" }}>
+                      {listaIngresos.length === 0 
+                        ? "No tenés registrado ningún ingreso. ¡Registrá tu primer ingreso abajo!" 
+                        : "No se encontraron ingresos que coincidan con tu búsqueda."}
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  ingresosFiltrados.map((item) => (
+                    <tr key={item.IdIngreso || Math.random()}>
+                      <td>{item.Descripcion}</td>
+                      <td className="monto-destacado" style={{ color: 'rgb(70, 130, 180)' }}>
+                        {FormatearMoneda(Number(item.MontoIngreso), item.IdDivisa)}
+                      </td>
+                      <td className="texto-gris">{new Date(item.FechaIngreso).toLocaleDateString()}</td>
+                      <td>
+                        <button className="btn-icon" onClick={() => prepararEdicion(item)}>✏️</button>
+                        <button className="btn-icon" onClick={() => eliminarIngreso(item.IdIngreso)}>🗑️</button>
+                        <button className="btn-icon" onClick={() => { setItemSeleccionado(item); setVerMas(true); }}>📊</button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

@@ -1,31 +1,209 @@
 /* --- Página de Perfil (Dashboard Style - Golden Sinergy) --- */
-.perfil-pagina-contenedor-general, .perfil-pagina-contenedor { width: 100%; display: flex; justify-content: center; align-items: center; }
-.perfil-pagina-contenedor { min-height: 80vh; padding: 20px; background: #0a0a0a; }
-.perfil-tarjeta-premium { width: 100%; max-width: 450px; padding: 40px; background: #141414; border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 28px; box-shadow: 0 30px 60px rgba(0, 0, 0, .8); text-align: center; animation: fadeInPerfil .6s ease-out; position: relative; }
+.perfil-pagina-contenedor-general, .perfil-pagina-contenedor { 
+    width: 100%; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
 
-/* Avatar circular con el Oro del Navbar */
-.perfil-avatar { width: 100px; height: 100px; margin: 0 auto 20px; display: flex; justify-content: center; align-items: center; background: linear-gradient(145deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%); border-radius: 50%; box-shadow: 0 0 25px rgba(212, 175, 55, 0.3); border: 2px solid rgba(255, 255, 255, 0.1); }
-.avatar-inicial { color: #000; font-size: 2.5rem; font-weight: 800; }
+.perfil-pagina-contenedor { 
+    min-height: 80vh; 
+    padding: 20px; 
+}
 
-/* Textos y Status */
-.perfil-nombre { margin-bottom: 5px; color: #fff; font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
-.perfil-status { margin-bottom: 30px; color: #D4AF37; font-size: .85rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
+.perfil-tarjeta-premium { 
+    width: 100%; 
+    max-width: 480px; 
+    padding: 40px; 
+    background: rgba(20, 20, 20, 0.85); /* Un poco de transparencia para el glassmorphism */
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(212, 175, 55, 0.2); 
+    border-radius: 28px; 
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8); 
+    text-align: center; 
+    animation: fadeInPerfil .6s ease-out; 
+    position: relative; 
+}
 
-/* Lista de Información con Estilo Glass */
-.perfil-info-lista { margin-bottom: 40px; padding: 25px; background: rgba(0, 0, 0, .3); border: 1px solid rgba(212, 175, 55, 0.1); border-radius: 18px; text-align: left; }
-.info-item { display: flex; flex-direction: column; margin-bottom: 18px; }
-.info-item:last-child { margin-bottom: 0; }
-.info-item label { margin-bottom: 6px; color: #666; font-size: .7rem; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
-.info-item span { color: #eee; font-size: 1rem; font-weight: 400; }
-.badge-dorado { color: #FFD700 !important; font-weight: 700; text-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+/* --- Avatar Circular Editable --- */
+.perfil-avatar { 
+    width: 110px; 
+    height: 110px; 
+    margin: 0 auto 20px; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    background: linear-gradient(145deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%); 
+    border-radius: 50%; 
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.3); 
+    border: 3px solid rgba(25, 25, 26, 1); 
+    position: relative;
+    overflow: hidden; /* Mantiene la imagen y el hover dentro del círculo */
+}
 
-/* Botón de Logout (Estilo Peligro Elegante) */
-.BotonLogout { width: 100%; padding: 16px; background: rgb(255, 75, 75); color: black; font-size: .9rem; font-weight: 700; border: 1.5px solid rgba(255, 77, 77, .3); border-radius: 14px; cursor: pointer; transition: all .3s cubic-bezier(.4, 0, .2, 1); text-transform: uppercase; letter-spacing: 1px; }
-.BotonLogout:hover { background: rgb(255, 75, 75); border-color: #ff4d4d; box-shadow: 0 8px 20px rgba(255, 77, 77, .2); transform: translateY(-3px); }
-.BotonLogout:active { transform: translateY(0) scale(.97); }
+.avatar-inicial { 
+    color: #000; 
+    font-size: 2.5rem; 
+    font-weight: 800; 
+}
 
+.avatar-imagen-cargada {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
-.perfil-acciones { display: flex; flex-direction: column; gap: 15px; }
-.perfil-acciones .boton-primario { width: 100%; padding: 16px;background-color: transparent; color: #000000; font-size: .9rem; font-weight: 700; cursor: pointer; transition: all .3s cubic-bezier(.4, 0, .2, 1); text-transform: uppercase; letter-spacing: 1px; }
+/* Capa hover para editar foto */
+.capa-subir-foto {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 35%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #c8b277;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.perfil-avatar:hover .capa-subir-foto {
+    opacity: 1;
+}
+
+.capa-subir-foto span {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+
+/* --- Textos Header --- */
+.perfil-nombre { 
+    margin-bottom: 5px; 
+    color: #fff; 
+    font-size: 1.8rem; 
+    font-weight: 700; 
+    letter-spacing: -0.5px; 
+}
+
+.perfil-email-header {
+    color: #b0b0b1;
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+}
+
+/* --- Lista de Información --- */
+.perfil-info-lista { 
+    margin-bottom: 40px; 
+    padding: 25px; 
+    background: rgba(0, 0, 0, 0.4); 
+    border: 1px solid rgba(212, 175, 55, 0.1); 
+    border-radius: 18px; 
+    text-align: left; 
+}
+
+.info-item { 
+    display: flex; 
+    flex-direction: column; 
+    margin-bottom: 20px; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 10px;
+}
+
+.info-item:last-child { 
+    margin-bottom: 0; 
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.info-item label { 
+    margin-bottom: 6px; 
+    color: #888; 
+    font-size: 0.75rem; 
+    letter-spacing: 1px; 
+    text-transform: uppercase; 
+    font-weight: 700; 
+}
+
+.info-item span { 
+    color: #eee; 
+    font-size: 1.05rem; 
+    font-weight: 500; 
+}
+
+.item-destacado {
+    background: rgba(200, 178, 119, 0.05);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px dashed rgba(200, 178, 119, 0.3);
+}
+
+.badge-dorado { 
+    color: #FFD700 !important; 
+    font-weight: 700; 
+    font-size: 1.2rem !important;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.3); 
+}
+
+/* --- Botones --- */
+.perfil-acciones { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
+}
+
+.boton-ver-planes { 
+    width: 100%; 
+    padding: 16px;
+    background: #c8b277; 
+    color: #1e1e1f; 
+    font-size: 1rem; 
+    font-weight: 700; 
+    border: none;
+    border-radius: 14px;
+    cursor: pointer; 
+    transition: all .3s cubic-bezier(.4, 0, .2, 1); 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+}
+
+.boton-ver-planes:hover {
+    background: #d4c08b;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(200, 178, 119, 0.2);
+}
+
+.BotonLogout { 
+    width: 100%; 
+    padding: 16px; 
+    background: transparent; 
+    color: rgb(255, 75, 75); 
+    font-size: 0.9rem; 
+    font-weight: 700; 
+    border: 1.5px solid rgba(255, 77, 77, .3); 
+    border-radius: 14px; 
+    cursor: pointer; 
+    transition: all .3s cubic-bezier(.4, 0, .2, 1); 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+}
+
+.BotonLogout:hover { 
+    background: rgb(255, 75, 75);
+    color: #000;
+    border-color: #ff4d4d; 
+    box-shadow: 0 8px 20px rgba(255, 77, 77, .2); 
+    transform: translateY(-3px); 
+}
+
+.BotonLogout:active { 
+    transform: translateY(0) scale(.97); 
+}
+
 /* Animación de entrada */
-@keyframes fadeInPerfil { from { opacity: 0; transform: scale(.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes fadeInPerfil { 
+    from { opacity: 0; transform: scale(.95) translateY(10px); } 
+    to { opacity: 1; transform: scale(1) translateY(0); } 
+}

@@ -36,7 +36,10 @@ const CrearCuenta = () => {
     }
 
     const inicialApellido = formData.apellido.trim().charAt(0).toUpperCase();
-    const urlCarpetaGenerada = `${formData.nombre.trim()}${inicialApellido}`;
+    
+    // --- NUEVA LÓGICA DE URL ÚNICA ---
+    const sufijoUnico = Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
+    const urlCarpetaGenerada = `${formData.nombre.trim()}${inicialApellido}_${sufijoUnico}`;
 
     const usuarioParaRegistrar = {
       Nombre: formData.nombre,
@@ -48,7 +51,8 @@ const CrearCuenta = () => {
       UrlCarpeta: urlCarpetaGenerada,
       FechaAlta: new Date().toISOString(),
       Activo: true,
-      Token: "" 
+      Token: "" ,
+      IdRol: 1 
     };
 
     try {
@@ -59,10 +63,10 @@ const CrearCuenta = () => {
       });
 
       if (response.ok) {
-        // 1. Obtenemos los datos que devuelve tu controlador C# (Token, NombreUsuario, etc.)
+        // 1. Obtenemos los datos que devuelve tu controlador C#
         const data = await response.json(); 
 
-        // 2. Guardamos la sesión en el localStorage para que la App sepa que estamos logueados
+        // 2. Guardamos la sesión en el localStorage
         localStorage.setItem("Token", data.Token);
         localStorage.setItem("Nombre", formData.nombre);
         localStorage.setItem("Apellido", formData.apellido);

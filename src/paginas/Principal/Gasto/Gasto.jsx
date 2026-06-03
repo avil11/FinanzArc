@@ -112,49 +112,66 @@ function Gasto() {
     <div className="pagina-ingreso-contenedor">
       <div className="encabezado-simple">
         <h1 className="titulo-seccion">Control de Gastos</h1>
-        <p className="texto-gris">Cotizaciones: 1 USD = ${tasas.USD} | 1 EUR = ${tasas.EUR}</p>
+        <p className="texto-gris">Administra todas tus gastos en este apartado. <br /> Cotizaciones: 1 USD = ${tasas.USD} | 1 EUR = ${tasas.EUR}</p>
       </div>
 
       <div className="pagina-ingreso-tarjeta">
         <div className="tarjeta">
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie
-                data={gastosFiltrados.map(i => ({
-                  nombre: i.Descripcion,
-                  valor: calcularMontoEnPesos(Number(i.MontoGasto), i.IdDivisa)
-                }))}
-                paddingAngle={6}
-                dataKey="valor"
-                nameKey="nombre"
-                innerRadius={70}
-                outerRadius={120}
-                stroke="none" /* <--- ESTO ELIMINA EL BORDE BLANCO */
-              >
-                {gastosFiltrados.map((_, i) => (
-                  <Cell key={`cell-${i}`} fill={COLORES[i % COLORES.length]} />
-                ))}
-              </Pie>
+          {gastosFiltrados.length === 0 ? (
+            <div style={{ 
+              display: "flex", 
+              flexDirection: "column", 
+              justifyContent: "center", 
+              alignItems: "center", 
+              height: "280px", 
+              textAlign: "center", 
+              color: "#a0a0a0" 
+            }}>
+              <span style={{ fontSize: "2.5rem", marginBottom: "12px" }}>📊</span>
+              <p style={{ fontSize: "14px", margin: 0, padding: "0 20px", lineHeight: "1.5" }}>
+                {listaGastos.length === 0 
+                  ? "No hay gastos registrados para generar el gráfico de distribución." 
+                  : "No hay datos que coincidan para mostrar en el gráfico."}
+              </p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie
+                  data={gastosFiltrados.map(i => ({
+                    nombre: i.Descripcion,
+                    valor: calcularMontoEnPesos(Number(i.MontoGasto), i.IdDivisa)
+                  }))}
+                  paddingAngle={6}
+                  dataKey="valor"
+                  nameKey="nombre"
+                  innerRadius={70}
+                  outerRadius={120}
+                  stroke="none"
+                >
+                  {gastosFiltrados.map((_, i) => (
+                    <Cell key={`cell-${i}`} fill={COLORES[i % COLORES.length]} />
+                  ))}
+                </Pie>
 
-              {/* AGREGAMOS EL TOOLTIP AQUÍ */}
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#1e1e1f',
-                  borderRadius: '10px',
-                  border: '1px solid rgba(200, 178, 119, 0.3)',
-                  color: '#fff'
-                }}
-                itemStyle={{ color: '#c8b277' }}
-                // 'value' es el monto, 'name' es la descripción (gracias a nameKey="nombre")
-                formatter={(value, name) => [`$${value.toLocaleString()}`, name]}
-              />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#1e1e1f',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(200, 178, 119, 0.3)',
+                    color: '#fff'
+                  }}
+                  itemStyle={{ color: '#c8b277' }}
+                  formatter={(value, name) => [`$${value.toLocaleString()}`, name]}
+                />
 
-              <text x="50%" y="50%" fill="#fff" textAnchor="middle" dominantBaseline="central">
-                <tspan x="50%" dy="-0.5em" fontSize="14" fill="#a0a0a0">Total</tspan>
-                <tspan x="50%" dy="1.5em" fontSize="20" fontWeight="bold">${totalMonto.toLocaleString()}</tspan>
-              </text>
-            </PieChart>
-          </ResponsiveContainer>
+                <text x="50%" y="50%" fill="#fff" textAnchor="middle" dominantBaseline="central">
+                  <tspan x="50%" dy="-0.5em" fontSize="14" fill="#a0a0a0">Total</tspan>
+                  <tspan x="50%" dy="1.5em" fontSize="20" fontWeight="bold">${totalMonto.toLocaleString()}</tspan>
+                </text>
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         <div className="contenedor-tabla-filtradaCategoria">
@@ -166,18 +183,28 @@ function Gasto() {
             <table className="tabla-ingresos">
               <thead><tr><th>Descripción</th><th>Monto</th><th>Fecha</th><th>Acciones</th></tr></thead>
               <tbody>
-                {gastosFiltrados.map((item) => (
-                  <tr key={item.IdGasto}>
-                    <td>{item.Descripcion}</td>
-                    <td className="monto-destacado" style={{ color: '#FF4B4B' }}>{FormatearMoneda(Number(item.MontoGasto), item.IdDivisa)}</td>
-                    <td className="texto-gris">{new Date(item.FechaGasto).toLocaleDateString()}</td>
-                    <td>
-                      <button className="btn-icon" onClick={() => prepararEdicion(item)}>✏️</button>
-                      <button className="btn-icon" onClick={() => eliminarGasto(item.IdGasto)}>🗑️</button>
-                      <button className="btn-icon" onClick={() => { setItemSeleccionado(item); setVerMas(true); }}>📊</button>
+                {gastosFiltrados.length === 0 ? (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: "center", padding: "3rem 1rem", color: "#a0a0a0" }}>
+                      {listaGastos.length === 0 
+                        ? "No tenés registrado ningún gasto. ¡Ingresá tu primer gasto abajo!" 
+                        : "No se encontraron gastos que coincidan con tu búsqueda."}
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  gastosFiltrados.map((item) => (
+                    <tr key={item.IdGasto}>
+                      <td>{item.Descripcion}</td>
+                      <td className="monto-destacado" style={{ color: '#FF4B4B' }}>{FormatearMoneda(Number(item.MontoGasto), item.IdDivisa)}</td>
+                      <td className="texto-gris">{new Date(item.FechaGasto).toLocaleDateString()}</td>
+                      <td>
+                        <button className="btn-icon" onClick={() => prepararEdicion(item)}>✏️</button>
+                        <button className="btn-icon" onClick={() => eliminarGasto(item.IdGasto)}>🗑️</button>
+                        <button className="btn-icon" onClick={() => { setItemSeleccionado(item); setVerMas(true); }}>📊</button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
