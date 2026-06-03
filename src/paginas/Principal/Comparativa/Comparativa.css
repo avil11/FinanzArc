@@ -151,8 +151,9 @@
     .seccion-comparativa-fila{ display: flex; flex-direction: column; gap: 20px; } 
     .seccion-comparativa-fila .subtitulo-seccion{width: 100%; }
 
+    .botonesComparativa .btn-volver { width: 100%; }
     .seccion-encabezado-general{ display: flex;flex-direction: column; align-items: flex-start;align-items: center; width: 100%;}
-     .seccion-encabezado-general a{ width: 150px; text-align: center;} 
+     .seccion-encabezado-general a{ text-align: center;} 
      .seccion-encabezado-general p { text-align: center;}
      .seccion-encabezado-general{text-align: center}
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './Perfil.css';
 import { useEffect, useState } from 'react';
 
@@ -20,32 +20,32 @@ function Perfil() {
         window.location.reload();
     }
     const obtenerDatos = () => {
-    const token = localStorage.getItem("Token");
-    if (!token) return;
+        const token = localStorage.getItem("Token");
+        if (!token) return;
 
-    fetch(`${API_BASE_URL}${API_ENDPOINTS.usuarios}/ByToken`, {
-      method: "GET",
-      headers: { 
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}` 
-      },
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error("Error al validar sesión");
-        return response.json();
-      })
-      .then((data) => { 
+        fetch(`${API_BASE_URL}${API_ENDPOINTS.usuarios}/ByToken`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+        })
+            .then((response) => {
+                if (!response.ok) throw new Error("Error al validar sesión");
+                return response.json();
+            })
+            .then((data) => {
 
-        setUserData(data);
-        localStorage.setItem("Nombre", data.Nombre);
-        localStorage.setItem("Apellido", data.Apellido);
-        localStorage.setItem("PlanActual", data.PlanActual);
-        setEmail(data.Email);
-        setTelefono(data.Telefono);
-        setNombreUsuario(data.NombreUsuario);
-      })
-      .catch((error) => console.error("Error identificando usuario:", error));
-  };
+                setUserData(data);
+                localStorage.setItem("Nombre", data.Nombre);
+                localStorage.setItem("Apellido", data.Apellido);
+                localStorage.setItem("PlanActual", data.PlanActual);
+                setEmail(data.Email);
+                setTelefono(data.Telefono);
+                setNombreUsuario(data.NombreUsuario);
+            })
+            .catch((error) => console.error("Error identificando usuario:", error));
+    };
     let nombre = localStorage.getItem("Nombre");
     let apellido = localStorage.getItem("Apellido");
     let planActual = localStorage.getItem("PlanActual");
@@ -97,9 +97,11 @@ function Perfil() {
                     </div>
 
                     <div className="perfil-acciones">
-                        <button className="boton-primario" onClick={() => navigate("/planes")}>Ver Planes</button>
+                        <button className="btn boton-primario" onClick={() => navigate("/planes")}>
+                            Ver Planes
+                        </button>
 
-                        <button onClick={cerrarSesion} className="BotonLogout">
+                        <button className="btn BotonLogout" onClick={cerrarSesion}>
                             Cerrar Sesión
                         </button>
                     </div>

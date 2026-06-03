@@ -38,7 +38,7 @@
 .tabla-ingresos td, .pagina-ingreso-contenedor .tabla-ingresos td { padding: 15px; border-bottom: 1px solid #2a2a2b; color: #eee; font-size: .95rem; white-space: nowrap; vertical-align: middle; }
 .tabla-ingresos tbody tr:hover, .pagina-ingreso-contenedor .tabla-ingresos tbody tr:hover, .tabla-ingresos tr:hover { background: rgba(200, 178, 119, .05); }
 .pagina-ingreso-contenedor .tabla-ingresos tbody tr:last-child td { border-bottom: none; }
-.texto-gris, .pagina-ingreso-contenedor .texto-gris { color: #888 !important; text-align: center; width: 60%; font-size: .9rem; }
+.texto-gris, .pagina-ingreso-contenedor .texto-gris { color: #888 !important; text-align: center; width: 60%; font-size: 1.2rem; }
 .monto-destacado, .pagina-ingreso-contenedor .monto-destacado { font-weight: bold; color: #007AFF; font-family: 'Courier New', Courier, monospace; }
 
 /* =========================================

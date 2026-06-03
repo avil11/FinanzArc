@@ -2,9 +2,12 @@ import React, { useState, useEffect, useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import "./Ingreso.css";
 
+import { obtenerTasas } from "../../../apiConfig";
+
 const API_BASE_URL = "http://localhost:60496/api";
 
 function Ingreso() {
+
   const [modalAbierto, setModalAbierto] = useState(false);
   const [listaIngresos, setListaIngresos] = useState([]);
   const [busqueda, setBusqueda] = useState("");
@@ -23,7 +26,18 @@ function Ingreso() {
     Descripcion: ""
   });
 
-  const COLORES = ["#007AFF", "#c8b277", "#8a733f", "#4a4a4a"];
+  // --- CARGA DE DATOS ---
+  useEffect(() => {
+    const cargarDatos = async () => {
+      const tasasActuales = await obtenerTasas();
+      setTasas(tasasActuales);
+      obtenerDatosUsuarioYRegistros();
+    };
+    cargarDatos();
+  }, []);
+
+  
+  const COLORES = ["#007AFF", "#FF9500", "#34C759", "#AF52DE"];
 
   useEffect(() => {
     obtenerCotizaciones();
@@ -181,8 +195,8 @@ function Ingreso() {
                 cx="50%"
                 cy="50%"
                 innerRadius={70}
-                outerRadius={100}
-                paddingAngle={5}
+                outerRadius={120}
+                paddingAngle={6}
                 dataKey="valor"
                 nameKey="nombre"
                 stroke="none"
@@ -191,7 +205,7 @@ function Ingreso() {
                   <Cell key={`cell-${i}`} fill={entry.valor === 0 ? "#333" : COLORES[i % COLORES.length]} />
                 ))}
               </Pie>
-              
+
               <text x="50%" y="50%" fill="#fff" textAnchor="middle" dominantBaseline="central">
                 <tspan x="50%" dy="-0.5em" fontSize="14" fill="#a0a0a0">Total (ARS)</tspan>
                 <tspan x="50%" dy="1.5em" fontSize="20" fontWeight="bold">

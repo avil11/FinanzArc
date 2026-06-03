@@ -56,8 +56,8 @@ const GastoIngreso = () => {
     Divisa: "1"
   });
 
-  const COLORES = ["#007AFF", "#c8b277", "#8a733f", "#4a4a4a"];
-  const COLORESgasto = ["#FF4B4B", "#c8b277", "#8a733f", "#4a4a4a"];
+  const COLORES = ["#007AFF", "#FF9500", "#34C759", "#AF52DE"];
+  const COLORESgasto = ["#FF4B4B","#FFD700", "#4B79FF", "#FF7F50"];
 
   useEffect(() => {
     const temporizador = setTimeout(() => {
@@ -75,44 +75,43 @@ const GastoIngreso = () => {
   // =========================
 
   const obtenerCotizaciones = async () => {
+    const API_KEY = "2ba96ae66f6deb72572261fe";
+
     try {
-      const responseUsd = await fetch("https://dolarapi.com/v1/dolares/oficial");
-      const dataUsd = await responseUsd.json();
+      // Llamamos a la API para obtener tasas base USD
+      const response = await fetch(`https://v6.exchangerate-api.com/v6/${API_KEY}/latest/USD`);
+      const data = await response.json();
 
-      const usd = dataUsd?.venta || 1300;
+      if (data.result === "success") {
+        const usdToArs = data.conversion_rates.ARS; // Cuántos pesos vale 1 dólar
+        const eurToUsd = data.conversion_rates.EUR; // Cuántos euros vale 1 dólar
 
-      const eurEstimado = usd * 1.15;
+        // Calculamos EUR a ARS: (1 Euro en USD) * (1 USD en ARS)
+        // Como la API nos da el EUR expresado en USD, dividimos 1 por ese valor 
+        // para obtener el valor del Euro en USD, y luego multiplicamos por pesos.
+        const eurToArs = (1 / eurToUsd) * usdToArs;
 
-      setCotizaciones({
-        USD: usd,
-        EUR: eurEstimado
-      });
-
-      console.log("Cotizaciones actualizadas:", {
-        USD: usd,
-        EUR: eurEstimado
-      });
-
+        setCotizaciones({
+          USD: Number(usdToArs).toFixed(2),
+          EUR: Number(eurToArs).toFixed(2)
+        });
+      }
     } catch (error) {
       console.error("Error obteniendo cotizaciones:", error);
-
-      setCotizaciones({
-        USD: 1300,
-        EUR: 1450
-      });
+      setCotizaciones({ USD: "1300.00", EUR: "1450.00" });
     }
   };
 
   const convertirAPesos = (monto, divisa) => {
     const valor = Number(monto) || 0;
+    const cotUSD = Number(cotizaciones.USD);
+    const cotEUR = Number(cotizaciones.EUR);
 
     switch (Number(divisa)) {
       case 2:
-        return valor * cotizaciones.USD;
-
+        return valor * cotUSD;
       case 3:
-        return valor * cotizaciones.EUR;
-
+        return valor * cotEUR;
       default:
         return valor;
     }
@@ -204,8 +203,8 @@ const GastoIngreso = () => {
             Number(item.IdDivisa) === 2
               ? "USD"
               : Number(item.IdDivisa) === 3
-              ? "EUR"
-              : "ARS"
+                ? "EUR"
+                : "ARS"
         }));
 
         setDatosGastos(gastosProcesados);
@@ -239,8 +238,8 @@ const GastoIngreso = () => {
             Number(item.IdDivisa) === 2
               ? "USD"
               : Number(item.IdDivisa) === 3
-              ? "EUR"
-              : "ARS"
+                ? "EUR"
+                : "ARS"
         }));
 
         setDatosIngresos(ingresosProcesados);
@@ -420,7 +419,7 @@ const GastoIngreso = () => {
       .catch(error => console.error("Error obteniendo usuario:", error));
   };
 
- 
+
   const guardarMetaApi = (metaAGuardar) => {
     const esEdicion =
       metaAGuardar.IdMetaAhorro !== null &&
@@ -637,11 +636,11 @@ const GastoIngreso = () => {
               : "El Control Total de tu Economía"}
           </h2>
 
-          <p style={{ color: "#888888" }}>
+          <p>
             Todas las monedas son convertidas automáticamente a ARS.
           </p>
 
-          <small style={{ color: "#c8b277" }}>
+          <small style={{ color: "#c8b277", fontWeight: "500", fontStyle: "italic", fontSize: "1.1rem" }}>
             USD: ${cotizaciones.USD} | EUR: ${cotizaciones.EUR}
           </small>
 
@@ -654,7 +653,7 @@ const GastoIngreso = () => {
         </div>
       </div>
 
-      
+
 
       <div className="panel-graficos-general">
         {/* GRÁFICO GASTOS */}

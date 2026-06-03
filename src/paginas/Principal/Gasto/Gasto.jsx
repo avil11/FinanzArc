@@ -1,10 +1,19 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import "./Gasto.css";
+import { obtenerTasas } from "../../../apiConfig"; // Importa la función
 
 const API_BASE_URL = "http://localhost:60496/api";
 
 function Gasto() {
+  useEffect(() => {
+    const cargarDatos = async () => {
+      const tasasActuales = await obtenerTasas();
+      setTasas(tasasActuales);
+      obtenerDatosUsuarioYRegistros();
+    };
+    cargarDatos();
+  }, []);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [listaGastos, setListaGastos] = useState([]);
   const [busqueda, setBusqueda] = useState("");
@@ -14,11 +23,13 @@ function Gasto() {
 
   const [form, setForm] = useState({
     IdGasto: null, IdUsuario: null, IdCuenta: 1, IdCategoria: 1,
-    IdModoPago: 1, IdDivisa: 1, MontoGasto: "", 
+    IdModoPago: 1, IdDivisa: 1, MontoGasto: "",
     FechaGasto: new Date().toISOString().split('T')[0], Descripcion: ""
   });
 
-  const COLORES = ["#FF4B4B", "#c8b277", "#8a733f", "#4a4a4a"];
+  const COLORES = ["#FF4B4B","#FFD700", "#4B79FF", "#FF7F50"];
+
+
 
   useEffect(() => {
     obtenerCotizaciones();
@@ -108,9 +119,36 @@ function Gasto() {
         <div className="tarjeta">
           <ResponsiveContainer width="100%" height={280}>
             <PieChart>
-              <Pie data={gastosFiltrados.map(i => ({ nombre: i.Descripcion, valor: calcularMontoEnPesos(Number(i.MontoGasto), i.IdDivisa) }))} dataKey="valor" innerRadius={70} outerRadius={100}>
-                {gastosFiltrados.map((_, i) => <Cell key={i} fill={COLORES[i % COLORES.length]} />)}
+              <Pie
+                data={gastosFiltrados.map(i => ({
+                  nombre: i.Descripcion,
+                  valor: calcularMontoEnPesos(Number(i.MontoGasto), i.IdDivisa)
+                }))}
+                paddingAngle={6}
+                dataKey="valor"
+                nameKey="nombre"
+                innerRadius={70}
+                outerRadius={120}
+                stroke="none" /* <--- ESTO ELIMINA EL BORDE BLANCO */
+              >
+                {gastosFiltrados.map((_, i) => (
+                  <Cell key={`cell-${i}`} fill={COLORES[i % COLORES.length]} />
+                ))}
               </Pie>
+
+              {/* AGREGAMOS EL TOOLTIP AQUÍ */}
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#1e1e1f',
+                  borderRadius: '10px',
+                  border: '1px solid rgba(200, 178, 119, 0.3)',
+                  color: '#fff'
+                }}
+                itemStyle={{ color: '#c8b277' }}
+                // 'value' es el monto, 'name' es la descripción (gracias a nameKey="nombre")
+                formatter={(value, name) => [`$${value.toLocaleString()}`, name]}
+              />
+
               <text x="50%" y="50%" fill="#fff" textAnchor="middle" dominantBaseline="central">
                 <tspan x="50%" dy="-0.5em" fontSize="14" fill="#a0a0a0">Total</tspan>
                 <tspan x="50%" dy="1.5em" fontSize="20" fontWeight="bold">${totalMonto.toLocaleString()}</tspan>
@@ -167,13 +205,13 @@ function Gasto() {
           <div className="contenido-modal">
             <h3 className="modal-titulo">{form.IdGasto ? "Editar Gasto" : "Nuevo Gasto"}</h3>
             <div className="formulario-grid">
-              <div className="formulario-grupo full-width"><label>Descripción</label><input type="text" value={form.Descripcion} onChange={(e) => setForm({...form, Descripcion: e.target.value})} /></div>
-              <div className="formulario-grupo"><label>Monto</label><input type="number" value={form.MontoGasto} onChange={(e) => setForm({...form, MontoGasto: e.target.value})} /></div>
-              <div className="formulario-grupo"><label>Fecha</label><input type="date" value={form.FechaGasto} onChange={(e) => setForm({...form, FechaGasto: e.target.value})} /></div>
-              
+              <div className="formulario-grupo full-width"><label>Descripción</label><input type="text" value={form.Descripcion} onChange={(e) => setForm({ ...form, Descripcion: e.target.value })} /></div>
+              <div className="formulario-grupo"><label>Monto</label><input type="number" value={form.MontoGasto} onChange={(e) => setForm({ ...form, MontoGasto: e.target.value })} /></div>
+              <div className="formulario-grupo"><label>Fecha</label><input type="date" value={form.FechaGasto} onChange={(e) => setForm({ ...form, FechaGasto: e.target.value })} /></div>
+
               <div className="formulario-grupo">
                 <label>Categoría</label>
-                <select value={form.IdCategoria} onChange={(e) => setForm({...form, IdCategoria: parseInt(e.target.value)})}>
+                <select value={form.IdCategoria} onChange={(e) => setForm({ ...form, IdCategoria: parseInt(e.target.value) })}>
                   <option value={1}>Alimentación</option>
                   <option value={2}>Transporte</option>
                   <option value={3}>Servicios</option>
@@ -182,7 +220,7 @@ function Gasto() {
               </div>
               <div className="formulario-grupo">
                 <label>Modo de Pago</label>
-                <select value={form.IdModoPago} onChange={(e) => setForm({...form, IdModoPago: parseInt(e.target.value)})}>
+                <select value={form.IdModoPago} onChange={(e) => setForm({ ...form, IdModoPago: parseInt(e.target.value) })}>
                   <option value={1}>Efectivo</option>
                   <option value={2}>Débito</option>
                   <option value={3}>Crédito</option>
@@ -191,14 +229,14 @@ function Gasto() {
               </div>
               <div className="formulario-grupo">
                 <label>Cuenta</label>
-                <select value={form.IdCuenta} onChange={(e) => setForm({...form, IdCuenta: parseInt(e.target.value)})}>
+                <select value={form.IdCuenta} onChange={(e) => setForm({ ...form, IdCuenta: parseInt(e.target.value) })}>
                   <option value={1}>Caja Principal</option>
                   <option value={2}>Ahorros</option>
                 </select>
               </div>
               <div className="formulario-grupo">
                 <label>Divisa</label>
-                <select value={form.IdDivisa} onChange={(e) => setForm({...form, IdDivisa: parseInt(e.target.value)})}>
+                <select value={form.IdDivisa} onChange={(e) => setForm({ ...form, IdDivisa: parseInt(e.target.value) })}>
                   <option value={1}>ARS</option><option value={2}>USD</option><option value={3}>EUR</option>
                 </select>
               </div>
