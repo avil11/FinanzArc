@@ -43,14 +43,14 @@ function Perfil() {
     }, []);
 
     const obtenerNombrePlan = (rol) => {
-        switch (rol) {
-            case 1: return "Plan Esencial";
-            case 2: return "Plan Gold";
-            case 3: return "Plan Gold";
-            case 4: return "Plan Platino (Admin)";
-            default: return "Cargando plan...";
-        }
-    };
+    switch (rol) {
+        case 1: return "Plan Esencial";
+        case 2: return "Plan Gold";
+        case 3: return "Plan Platino";
+        case 4: return "Plan Developer";
+        default: return "Cargando plan...";
+    }
+};
 
     const cerrarSesion = () => {
 

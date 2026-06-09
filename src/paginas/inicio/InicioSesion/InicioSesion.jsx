@@ -5,10 +5,10 @@ import "./InicioSesion.css";
 const InicioSesion = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const [NombreUsuario, setNombreUsuario] = useState("");
-  const [PasswordHash, setPasswordHash] = useState(""); 
+  const [PasswordHash, setPasswordHash] = useState("");
   const [error, setError] = useState("");
   const [mostrarPasswordHash, setMostrarPasswordHash] = useState(false);
-  const [cargando, setCargando] = useState(false); 
+  const [cargando, setCargando] = useState(false);
 
   if (!isOpen) return null;
 
@@ -20,7 +20,7 @@ const InicioSesion = ({ isOpen, onClose }) => {
   async function iniciarSesion() {
     setCargando(true);
     setError("");
-    
+
     try {
       const response = await fetch("http://localhost:60496/api/Usuarios/Login", {
         method: "POST",
@@ -42,7 +42,8 @@ const InicioSesion = ({ isOpen, onClose }) => {
       localStorage.setItem("Nombre", data.Nombre);
       localStorage.setItem("Apellido", data.Apellido);
       localStorage.setItem("PlanActual", data.PlanActual);
-
+      localStorage.setItem("IdRol", data.IdRol); // <--- Guardamos esto
+      
       // Limpiar estados
       setNombreUsuario("");
       setPasswordHash("");
@@ -50,10 +51,10 @@ const InicioSesion = ({ isOpen, onClose }) => {
 
       // Navegación limpia
       navigate("/Principal");
-      
+
       // En lugar de window.location.reload(), mejor forzar una actualización de estado global 
       // si usas un Contexto de Auth. Si no, recarga una sola vez.
-      window.location.reload(); 
+      window.location.reload();
 
     } catch (err) {
       setError(err.message);
@@ -73,7 +74,7 @@ const InicioSesion = ({ isOpen, onClose }) => {
 
           <form onSubmit={handleSubmit} className="login-form">
             {error && <p className="login-error-msg">{error}</p>}
-            
+
             <div className="formulario-grupo">
               <label>Nombre de Usuario:</label>
               <input
@@ -84,7 +85,7 @@ const InicioSesion = ({ isOpen, onClose }) => {
                 required
               />
             </div>
-            
+
             <div className="formulario-grupo">
               <label>Contraseña</label>
               <div className="input-con-icono">
