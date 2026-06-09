@@ -1,76 +1,65 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Importa useNavigate correctamente
 import "./InicioSesion.css";
 
 const InicioSesion = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const [NombreUsuario, setNombreUsuario] = useState("");
-  const [PasswordHash, setPasswordHash] = useState(""); // Usamos el nombre que espera la API
+  const [PasswordHash, setPasswordHash] = useState(""); 
   const [error, setError] = useState("");
   const [mostrarPasswordHash, setMostrarPasswordHash] = useState(false);
-  const [cargando, setCargando] = useState(false); // Para feedback visual
+  const [cargando, setCargando] = useState(false); 
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    iniciarSesion();
+    await iniciarSesion();
   };
 
-  function handleCerrarModal() {
-    setError("");
-    setNombreUsuario("");
-    setPasswordHash("");
-    onClose();
-  }
-
-  function iniciarSesion() {
+  async function iniciarSesion() {
     setCargando(true);
     setError("");
-
-    // Ajusta la URL a la que use tu proyecto de Visual Studio (ej: localhost:44332)
-    fetch("http://localhost:60496/api/Usuarios/Login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        NombreUsuario: NombreUsuario,
-        PasswordHash: PasswordHash, // Enviamos los nombres exactos de tu objeto Usuario en C#
-      }),
-    })
-      .then((response) => {
-        if (response.status === 401) {
-          throw new Error("Usuario o contraseña incorrectos.");
-        }
-        if (!response.ok) {
-          throw new Error("Error en el servidor. Inténtalo más tarde.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        // Guardamos el JWT real que generó tu API en C#
-        localStorage.setItem("Token", data.Token);
-        localStorage.setItem("Nombre", data.Nombre);
-        localStorage.setItem("Apellido", data.Apellido);
-        localStorage.setItem("PlanActual", data.PlanActual);
-
-        handleCerrarModal();
-        navigate("/Principal");
-
-        // Pequeño delay para asegurar que el token se guardó antes de recargar
-        setTimeout(() => {
-          window.location.reload();
-        }, 100);
-      })
-      .catch((err) => {
-        setError(err.message);
-        console.error("Login Error:", err);
-      })
-      .finally(() => {
-        setCargando(false);
+    
+    try {
+      const response = await fetch("http://localhost:60496/api/Usuarios/Login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ NombreUsuario, PasswordHash }),
       });
+
+      const data = await response.json();
+
+      if (response.status === 401) {
+        throw new Error("Usuario o contraseña incorrectos.");
+      }
+      if (!response.ok) {
+        throw new Error(data.message || "Error en el servidor.");
+      }
+
+      // Guardado seguro del token
+      localStorage.setItem("Token", data.Token);
+      localStorage.setItem("Nombre", data.Nombre);
+      localStorage.setItem("Apellido", data.Apellido);
+      localStorage.setItem("PlanActual", data.PlanActual);
+
+      // Limpiar estados
+      setNombreUsuario("");
+      setPasswordHash("");
+      onClose();
+
+      // Navegación limpia
+      navigate("/Principal");
+      
+      // En lugar de window.location.reload(), mejor forzar una actualización de estado global 
+      // si usas un Contexto de Auth. Si no, recarga una sola vez.
+      window.location.reload(); 
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setCargando(false);
+    }
   }
 
   return (
@@ -84,6 +73,7 @@ const InicioSesion = ({ isOpen, onClose }) => {
 
           <form onSubmit={handleSubmit} className="login-form">
             {error && <p className="login-error-msg">{error}</p>}
+            
             <div className="formulario-grupo">
               <label>Nombre de Usuario:</label>
               <input
@@ -94,6 +84,7 @@ const InicioSesion = ({ isOpen, onClose }) => {
                 required
               />
             </div>
+            
             <div className="formulario-grupo">
               <label>Contraseña</label>
               <div className="input-con-icono">
@@ -104,7 +95,6 @@ const InicioSesion = ({ isOpen, onClose }) => {
                   placeholder="••••••••"
                   required
                 />
-
                 <button
                   type="button"
                   className="btn-ver-password"
@@ -115,14 +105,10 @@ const InicioSesion = ({ isOpen, onClose }) => {
                 </button>
               </div>
             </div>
-            <Link
-              to="/crear-cuenta"
-              className="gold-link"
-              onClick={onClose} // Cerramos el modal antes de irnos a la otra página
-            >
+
+            <Link to="/crear-cuenta" className="gold-link" onClick={onClose}>
               ¿No tienes cuenta todavía?
             </Link>
-
 
             <button
               type="submit"
@@ -131,7 +117,6 @@ const InicioSesion = ({ isOpen, onClose }) => {
             >
               {cargando ? "Verificando..." : "Iniciar Sesión"}
             </button>
-
           </form>
         </div>
       </div>

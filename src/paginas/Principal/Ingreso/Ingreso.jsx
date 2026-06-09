@@ -25,8 +25,6 @@ function Ingreso() {
     FechaIngreso: new Date().toISOString().split('T')[0],
     Descripcion: ""
   });
-
-  // --- CARGA DE DATOS ---
   useEffect(() => {
     const cargarDatos = async () => {
       const tasasActuales = await obtenerTasas();
@@ -36,26 +34,8 @@ function Ingreso() {
     cargarDatos();
   }, []);
 
-  
+
   const COLORES = ["#007AFF", "#FF9500", "#34C759", "#AF52DE"];
-
-  useEffect(() => {
-    obtenerCotizaciones();
-    obtenerDatosUsuarioYRegistros();
-  }, []);
-
-  // --- LÓGICA DE API Y COTIZACIONES ---
-  const obtenerCotizaciones = async () => {
-    try {
-      const [resUsd, resEur] = await Promise.all([
-        fetch("https://dolarapi.com/v1/dolares/oficial"),
-        fetch("https://dolarapi.com/v1/cotizaciones/eur")
-      ]);
-      const usd = await resUsd.json();
-      const eur = await resEur.json();
-      setTasas({ USD: usd.venta, EUR: eur.venta });
-    } catch (err) { setTasas({ USD: 1200, EUR: 1300 }); }
-  };
 
   const obtenerDatosUsuarioYRegistros = async () => {
     const token = localStorage.getItem("Token");
@@ -112,8 +92,6 @@ function Ingreso() {
       headers: { "Authorization": `Bearer ${localStorage.getItem("Token")}` }
     }).then(() => obtenerDatosUsuarioYRegistros());
   };
-
-  // --- LÓGICA DE CONVERSIÓN ---
   const calcularMontoEnPesos = (monto, idDivisa) => {
     if (idDivisa === 2) return monto * tasas.USD;
     if (idDivisa === 3) return monto * tasas.EUR;
@@ -131,8 +109,6 @@ function Ingreso() {
       </div>
     );
   };
-
-  // --- PROCESAMIENTO DE DATOS (Optimizado con useMemo) ---
   const ingresosFiltrados = useMemo(() => {
     return listaIngresos.filter(i =>
       i.Descripcion?.toLowerCase().includes(busqueda.toLowerCase())
@@ -146,12 +122,9 @@ function Ingreso() {
     })).slice(0, 5);
     return data.length > 0 ? data : [{ nombre: "Sin datos", valor: 0 }];
   }, [ingresosFiltrados, tasas]);
-
   const totalMonto = useMemo(() => {
     return ingresosFiltrados.reduce((acc, item) => acc + calcularMontoEnPesos(Number(item.MontoIngreso), item.IdDivisa), 0);
   }, [ingresosFiltrados, tasas]);
-
-  // --- AYUDANTES DE UI ---
   const resetearForm = () => {
     setForm(prev => ({
       ...prev,
@@ -164,7 +137,6 @@ function Ingreso() {
       IdDivisa: 1
     }));
   };
-
   const prepararEdicion = (item) => {
     setForm({
       IdIngreso: item.IdIngreso,
@@ -178,7 +150,6 @@ function Ingreso() {
     });
     setModalAbierto(true);
   };
-
   return (
     <div className="pagina-ingreso-contenedor">
       <div className="encabezado-simple">
@@ -189,19 +160,19 @@ function Ingreso() {
       <div className="pagina-ingreso-tarjeta">
         <div className="tarjeta">
           {ingresosFiltrados.length === 0 ? (
-            <div style={{ 
-              display: "flex", 
-              flexDirection: "column", 
-              justifyContent: "center", 
-              alignItems: "center", 
-              height: "280px", 
-              textAlign: "center", 
-              color: "#a0a0a0" 
+            <div style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "280px",
+              textAlign: "center",
+              color: "#a0a0a0"
             }}>
               <span style={{ fontSize: "2.5rem", marginBottom: "12px" }}>📊</span>
               <p style={{ fontSize: "14px", margin: 0, padding: "0 20px", lineHeight: "1.5" }}>
-                {listaIngresos.length === 0 
-                  ? "No hay ingresos registrados para generar el gráfico de distribución." 
+                {listaIngresos.length === 0
+                  ? "No hay ingresos registrados para generar el gráfico de distribución."
                   : "No hay datos que coincidan para mostrar en el gráfico."}
               </p>
             </div>
@@ -265,8 +236,8 @@ function Ingreso() {
                 {ingresosFiltrados.length === 0 ? (
                   <tr>
                     <td colSpan="4" style={{ textAlign: "center", padding: "3rem 1rem", color: "#a0a0a0" }}>
-                      {listaIngresos.length === 0 
-                        ? "No tenés registrado ningún ingreso. ¡Registrá tu primer ingreso abajo!" 
+                      {listaIngresos.length === 0
+                        ? "No tenés registrado ningún ingreso. ¡Registrá tu primer ingreso abajo!"
                         : "No se encontraron ingresos que coincidan con tu búsqueda."}
                     </td>
                   </tr>
@@ -335,8 +306,6 @@ function Ingreso() {
           </div>
         </div>
       )}
-
-      {/* MODAL DE INGRESOS */}
       {modalAbierto && (
         <div className="capa-modal">
           <div className="contenido-modal">

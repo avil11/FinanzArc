@@ -1,4 +1,5 @@
-// src/apiConfig.js
+
+//API DE DOLAR USD Y EUR
 export const API_KEY = "2ba96ae66f6deb72572261fe";
 
 export const obtenerTasas = async () => {
@@ -13,6 +14,6 @@ export const obtenerTasas = async () => {
     }
   } catch (error) {
     console.error("Error al obtener tasas:", error);
-    return { USD: 1300, EUR: 1450 }; // Valores de respaldo
+    return { USD: 1300, EUR: 1450 };
   }
 };

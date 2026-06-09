@@ -6,7 +6,6 @@ const Inicio = () => {
   return (
     <div className="main-wrapper">
       {/* SECCIÓN HERO */}
-      
       <div className="containerInicio" id="inicio">
         <div className="contenedorBackground">
           <img

@@ -16,7 +16,6 @@ const CrearCuenta = () => {
     password: "",
     confirmarPassword: ""
   });
-  
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -29,14 +28,14 @@ const CrearCuenta = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmarPassword) {
       alert("Las contraseñas no coinciden");
       return;
     }
 
     const inicialApellido = formData.apellido.trim().charAt(0).toUpperCase();
-    
+
     // --- NUEVA LÓGICA DE URL ÚNICA ---
     const sufijoUnico = Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
     const urlCarpetaGenerada = `${formData.nombre.trim()}${inicialApellido}_${sufijoUnico}`;
@@ -47,14 +46,12 @@ const CrearCuenta = () => {
       Email: formData.email,
       Telefono: formData.telefono,
       NombreUsuario: formData.nombreUsuario,
-      PasswordHash: formData.password, 
+      PasswordHash: formData.password,
       UrlCarpeta: urlCarpetaGenerada,
       FechaAlta: new Date().toISOString(),
       Activo: true,
-      Token: "" ,
-      IdRol: 1 
+      IdRol: 1
     };
-
     try {
       const response = await fetch("http://localhost:60496/api/Usuarios", {
         method: "POST",
@@ -64,7 +61,7 @@ const CrearCuenta = () => {
 
       if (response.ok) {
         // 1. Obtenemos los datos que devuelve tu controlador C#
-        const data = await response.json(); 
+        const data = await response.json();
 
         // 2. Guardamos la sesión en el localStorage
         localStorage.setItem("Token", data.Token);
@@ -81,7 +78,7 @@ const CrearCuenta = () => {
         setTimeout(() => {
           window.location.reload();
         }, 100);
-        
+
       } else {
         const errorText = await response.text();
         console.error("Error del servidor:", errorText);

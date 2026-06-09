@@ -9,9 +9,9 @@ function Perfil() {
     const [userData, setUserData] = useState({});
     const [fotoPerfil, setFotoPerfil] = useState(localStorage.getItem("FotoPerfil") || null);
 
-    // Extraemos las iniciales de localStorage por si tarda el fetch
     const nombreLocal = localStorage.getItem("Nombre") || "";
     const apellidoLocal = localStorage.getItem("Apellido") || "";
+    
     const primerletranombre = nombreLocal.charAt(0).toUpperCase();
     const primerletraapellido = apellidoLocal.charAt(0).toUpperCase();
 
@@ -26,16 +26,16 @@ function Perfil() {
                 "Authorization": `Bearer ${token}`
             },
         })
-        .then((response) => {
-            if (!response.ok) throw new Error("Error al validar sesión");
-            return response.json();
-        })
-        .then((data) => {
-            setUserData(data);
-            localStorage.setItem("Nombre", data.Nombre);
-            localStorage.setItem("Apellido", data.Apellido);
-        })
-        .catch((error) => console.error("Error identificando usuario:", error));
+            .then((response) => {
+                if (!response.ok) throw new Error("Error al validar sesión");
+                return response.json();
+            })
+            .then((data) => {
+                setUserData(data);
+                localStorage.setItem("Nombre", data.Nombre);
+                localStorage.setItem("Apellido", data.Apellido);
+            })
+            .catch((error) => console.error("Error identificando usuario:", error));
     };
 
     useEffect(() => {
@@ -45,7 +45,7 @@ function Perfil() {
     const obtenerNombrePlan = (rol) => {
         switch (rol) {
             case 1: return "Plan Esencial";
-            case 2: return "Plan Gold"; 
+            case 2: return "Plan Gold";
             case 3: return "Plan Gold";
             case 4: return "Plan Platino (Admin)";
             default: return "Cargando plan...";
@@ -62,19 +62,15 @@ function Perfil() {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         if (file.size > 2 * 1024 * 1024) {
             alert("La imagen es muy pesada. Por favor, elegí una menor a 2MB.");
             return;
         }
 
         const reader = new FileReader();
-        
         reader.onloadend = () => {
             const base64String = reader.result;
-
             setFotoPerfil(base64String);
-
             try {
                 localStorage.setItem("FotoPerfil", base64String);
             } catch (error) {
@@ -82,8 +78,8 @@ function Perfil() {
                 alert("No se pudo guardar la imagen localmente. Memoria llena.");
             }
         };
-
         reader.readAsDataURL(file);
+
     };
 
     return (
@@ -100,18 +96,16 @@ function Perfil() {
                                     <span className="avatar-inicial">{userData.Nombre ? userData.Nombre.charAt(0).toUpperCase() : primerletranombre}</span>
                                     <span className="avatar-inicial">{userData.Apellido ? userData.Apellido.charAt(0).toUpperCase() : primerletraapellido}</span>
                                 </>
-                            )}                       
+                            )}
                             <label className="capa-subir-foto">
                                 <span>✎</span>
                                 <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
                             </label>
                         </div>
-                        
+
                         <h1 className="perfil-nombre">{userData.Nombre || nombreLocal} {userData.Apellido || apellidoLocal}</h1>
                         <p className="perfil-email-header">{userData.Email || "Cargando..."}</p>
                     </div>
-
-                    {/* LISTA DE DATOS */}
                     <div className="perfil-info-lista">
                         <div className="info-item">
                             <label>Nombre</label>
@@ -134,7 +128,6 @@ function Perfil() {
                             <span className="badge-dorado">{obtenerNombrePlan(userData.IdRol)}</span>
                         </div>
                     </div>
-
                     <div className="perfil-acciones">
                         <button className="btn boton-ver-planes" onClick={() => navigate("/planes")}>
                             Mejorar Plan

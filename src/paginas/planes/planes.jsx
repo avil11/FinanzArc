@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { initMercadoPago } from '@mercadopago/sdk-react';
 import "../Principal/General/general.css";
-import "./planes.css"; // <-- Importamos el nuevo CSS
-
-// Inicializa Mercado Pago con tu PUBLIC KEY
-initMercadoPago('APP_USR-760a1b53-cf60-4fb8-a6e2-0743b89da718', { locale: 'es-AR' });
+import "./planes.css";
 
 const API_BASE_URL = "http://localhost:60496/api";
 
@@ -12,10 +8,8 @@ const PlanesCompra = () => {
   const [planes, setPlanes] = useState([]);
   const [usuario, setUsuario] = useState(null);
   const [cargandoPago, setCargandoPago] = useState(false);
-  
   const [modalAbierto, setModalAbierto] = useState(false);
   const [esEdicion, setEsEdicion] = useState(false);
-  
   const [planForm, setPlanForm] = useState({ id: null, Nombre: "", Precio: "", Detalle: "", IdRol: "" });
 
   useEffect(() => {
@@ -35,7 +29,6 @@ const PlanesCompra = () => {
       .catch(err => console.error("Error cargando planes:", err));
   };
 
-  // --- LÓGICA DE MERCADO PAGO ---
   const comprarPlan = async (plan) => {
     setCargandoPago(true);
     try {
@@ -65,8 +58,6 @@ const PlanesCompra = () => {
       setCargandoPago(false);
     }
   };
-
-  // --- GUARDAR O EDITAR PLAN ---
   const guardarPlan = () => {
     const metodo = esEdicion ? "PUT" : "POST";
     const url = esEdicion ? `${API_BASE_URL}/Planes/${planForm.id}` : `${API_BASE_URL}/Planes`;

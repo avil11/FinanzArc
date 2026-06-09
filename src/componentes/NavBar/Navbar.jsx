@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom"; // Agregamos useLocation
 import "../NavBar/Navbar.css";
-// 1. NUEVO: Importamos el componente del modal
-import InicioSesion from "../../paginas/inicio/InicioSesion/InicioSesion"; 
-
+import InicioSesion from "../../paginas/inicio/InicioSesion/InicioSesion";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { hash } = useLocation(); // Detectamos el hash de la URL (#inicio, #servicio, etc.)
+  const { hash } = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("Token"));
 
-// --- LÓGICA DE SCROLL CALIBRADA ---
   useEffect(() => {
     if (hash) {
       const id = hash.replace("#", "");
@@ -20,7 +17,7 @@ const Navbar = () => {
       if (element) {
         setTimeout(() => {
           // Calculamos la posición del elemento menos el alto del navbar (ej: 80px)
-          const yOffset = -80; 
+          const yOffset = -80;
           const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
 
           window.scrollTo({ top: y, behavior: "smooth" });
@@ -47,7 +44,7 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("Token"); 
+    localStorage.removeItem("Token");
     setIsLoggedIn(false);
     closeMobileMenu();
     navigate("/");
@@ -66,14 +63,11 @@ const Navbar = () => {
   return (
     <header className="navbar-container">
       <nav className="nav-content">
-        {/* Logo */}
         <div className="logo-section">
-          <p className="logo-text" onClick={() => navigate("/")} style={{cursor: 'pointer'}}>
+          <p className="logo-text" onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>
             FinanzARC
           </p>
         </div>
-
-        {/* --- MENÚ DE ESCRITORIO --- */}
         <div className="menu-pill desktop-menu">
           {isLoggedIn ? (
             <>
@@ -84,7 +78,6 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              {/* Rutas con Hash para redirigir a apartados */}
               <Link to="/#inicio" className="nav-link">Inicio</Link>
               <Link to="/#servicio" className="nav-link">Servicios</Link>
               <Link to="/#propuesta" className="nav-link">Propuesta</Link>
@@ -92,12 +85,10 @@ const Navbar = () => {
             </>
           )}
         </div>
-
-        {/* --- SECCION DE ACCESO */}
         <div className="auth-section desktop-menu">
           <div className="">
             {isLoggedIn ? (
-              <button style={{display: 'none'}}>
+              <button style={{ display: 'none' }}>
                 Cerrar Sesión
               </button>
             ) : (
@@ -107,8 +98,6 @@ const Navbar = () => {
             )}
           </div>
         </div>
-
-        {/* --- ICONO HAMBURGUESA --- */}
         <div
           className={`hamburger-icon ${isMobileMenuOpen ? "open" : ""}`}
           onClick={toggleMobileMenu}
@@ -117,8 +106,6 @@ const Navbar = () => {
           <span></span>
           <span></span>
         </div>
-
-        {/* --- MENÚ MÓVIL DESPLEGABLE --- */}
         <div className={`mobile-menu-overlay ${isMobileMenuOpen ? "open" : ""}`}>
           <div className="mobile-menu-content">
             {isLoggedIn ? (
@@ -147,11 +134,11 @@ const Navbar = () => {
         </div>
       </nav>
 
-      <InicioSesion 
-        isOpen={modalAbierto} 
-        onClose={() => setModalAbierto(false)} 
+      <InicioSesion
+        isOpen={modalAbierto}
+        onClose={() => setModalAbierto(false)}
       />
-      
+
     </header>
   );
 };
