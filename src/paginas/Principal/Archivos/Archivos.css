@@ -1,0 +1,362 @@
+/* ==========================================================================
+   Estilos Estructurales y de Animaciones de Transición para Gestión Documental
+   ========================================================================== */
+
+.archivos-cargando, .archivos-error-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 350px;
+    text-align: center;
+}
+
+.spinner-arquitectonico {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #0056b3;
+    border-radius: 50%;
+    animation: spinEfecto 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spinEfecto {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.alerta-error-mensaje {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    max-width: 500px;
+}
+
+.acciones-cabecera-archivos {
+    display: flex;
+    gap: 12px;
+}
+
+/* CONTENEDOR FLEXIBLE: Clave para la interpolación de los Paneles */
+.contenedor-paneles-dinamicos {
+    display: flex;
+    width: 100%;
+    gap: 24px;
+    margin-top: 25px;
+    align-items: flex-start;
+    overflow: hidden;
+}
+
+/* Estado Base del Módulo Documental */
+.panel-documental-base {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+    opacity: 1;
+    transform: scale(1);
+    
+    /* Configuración de transiciones fluidas de alto rendimiento físico */
+    transition: 
+        flex 0.7s cubic-bezier(0.25, 1, 0.5, 1),
+        max-width 0.7s cubic-bezier(0.25, 1, 0.5, 1),
+        opacity 0.5s ease-in-out,
+        transform 0.6s ease;
+}
+
+.encabezado-tarjeta-modulo {
+    background: #f8f9fa;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e9ecef;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+}
+
+.encabezado-tarjeta-modulo h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #333333;
+}
+
+.indicador-interactivo {
+    font-size: 0.85rem;
+    color: #007bff;
+    font-weight: 500;
+}
+
+.cuerpo-interno-documental {
+    padding: 20px;
+    max-height: 650px;
+    overflow-y: auto;
+    transition: opacity 0.4s ease;
+}
+
+/* ==========================================================================
+   Lógica Estilográfica de Absorción y Transiciones (Requerimiento 3)
+   ========================================================================== */
+
+/* El Panel Seleccionado se expande uniformemente "comiéndose" al otro */
+.panel-documental-base.panel-estado-maximizando {
+    flex: 999;
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* El Panel Oculto se contrae progresivamente hasta desaparecer sin parpadeos */
+.panel-documental-base.panel-estado-minimizando {
+    flex: 0;
+    max-width: 0;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+    transform: scale(0.92);
+    pointer-events: none;
+    border: none;
+}
+
+.panel-documental-base.panel-estado-minimizando .cuerpo-interno-documental {
+    opacity: 0;
+}
+
+/* ==========================================================================
+   Elementos Interiores del Repositorio de Archivos
+   ========================================================================== */
+
+.estado-vacio-documentos {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.boton-chico {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    margin-top: 10px;
+}
+
+.grilla-tarjetas-archivos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.tarjeta-archivo-item {
+    background: #fdfdfd;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: box-shadow 0.2s ease;
+}
+
+.tarjeta-archivo-item:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+.contenedor-vista-previa {
+    height: 110px;
+    background: #f1f3f5;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.imagen-preview-render {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.icono-documento-generico {
+    font-weight: bold;
+    color: #495057;
+    font-size: 1.4rem;
+    background: #e2e8f0;
+    padding: 10px 18px;
+    border-radius: 4px;
+    border: 2px dashed #ced4da;
+}
+
+.detalles-archivo-item h4 {
+    margin: 0 0 6px 0;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #212529;
+}
+
+.detalles-archivo-item p {
+    margin: 2px 0;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.acciones-archivo-item {
+    margin-top: 12px;
+}
+
+.enlace-descarga-archivo-btn {
+    display: block;
+    text-align: center;
+    background: #e9ecef;
+    color: #495057;
+    text-decoration: none;
+    padding: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 4px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.enlace-descarga-archivo-btn:hover {
+    background: #007bff;
+    color: #ffffff;
+}
+
+/* Estilos de Control del Modal */
+.capa-modal-documentos {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+
+.contenido-modal-documentos {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+.contenedor-principal-general {
+  padding: 20px;
+  width: 100%;
+}
+
+.contenedor-paneles-dinamicos {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  width: 100%;
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  min-height: 600px;
+}
+
+.panel-documental-base {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #dcdcdc;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Efecto de absorción */
+.panel-expandido {
+  flex: 5;
+  opacity: 1;
+}
+
+.panel-contraido {
+  flex: 0.1;
+  opacity: 0.2;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.panel-ingresos-estilo {
+  border-top: 4px solid #2ecc71;
+}
+
+.panel-gastos-estilo {
+  border-top: 4px solid #e74c3c;
+}
+
+.encabezado-tarjeta-modulo {
+  padding: 15px;
+  background: #f4f4f4;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
+
+.cuerpo-interno-documental {
+  padding: 15px;
+  flex-grow: 1;
+}
+
+.capa-modal-documentos {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.contenido-modal-documentos {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+}
+/* (Agregar al final de tu Archivos.css actual) */
+.contenedor-filtros-documental {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.contenedor-filtros-documental select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+}
+
+.mensaje-vacio {
+  color: #888;
+  font-style: italic;
+  padding: 10px;
+}
+
+/* Responsividad Adaptativa de los Paneles */
+@media (max-width: 868px) {
+    .contenedor-paneles-dinamicos {
+        flex-direction: column;
+    }
+    .panel-documental-base.panel-estado-minimizando {
+        max-height: 0;
+        overflow: hidden;
+    }
+}

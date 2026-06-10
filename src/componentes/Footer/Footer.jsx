@@ -38,7 +38,6 @@ const Footer = () => {
     <div className="layou-display" id="contacto">
       <footer className="footer-principal">
         <div className="footer-contenido">
-          {/* Izquierda: Branding */}
           <div className="footer-col-marca">
             <div className="Titulo">
               <h4>FinanzARC</h4>
@@ -48,8 +47,6 @@ const Footer = () => {
               económico.
             </p>
           </div>
-
-         {/* Centro: El Equipo */}
           <div className="footer-col-equipo">
             <h4>Nuestro Equipo</h4>
             <div className="grid-equipo">
@@ -61,13 +58,10 @@ const Footer = () => {
                   rel="noopener noreferrer" 
                   className="tarjeta-miembro"
                 >
-                  
-                  {/* --- AVATAR (IMAGEN CIRCULAR COMPLETA) --- */}
                   <div 
                     className="avatar-placeholder"
                     style={{ backgroundImage: `url('${persona.texturaFondo}')` }}
                   ></div>
-
                   <div className="info-miembro">
                     <h5>{persona.nombre}</h5>
                     <p>{persona.rol}</p>
@@ -76,8 +70,6 @@ const Footer = () => {
               ))}
             </div>
           </div>
-
-          {/* Derecha: Navegación/Links corregidos */}
           <div className="footer-col-links">
             <h4>Navegación</h4>
             <nav style={{ display: "flex", flexDirection: "column" }}>

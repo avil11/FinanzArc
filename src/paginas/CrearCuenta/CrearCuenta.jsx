@@ -16,7 +16,6 @@ const CrearCuenta = () => {
     password: "",
     confirmarPassword: ""
   });
-  
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -29,14 +28,17 @@ const CrearCuenta = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmarPassword) {
       alert("Las contraseñas no coinciden");
       return;
     }
 
     const inicialApellido = formData.apellido.trim().charAt(0).toUpperCase();
-    const urlCarpetaGenerada = `${formData.nombre.trim()}${inicialApellido}`;
+
+    // Lógica de URL única para almacenamiento en servidor
+    const sufijoUnico = Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
+    const urlCarpetaGenerada = `${formData.nombre.trim()}${inicialApellido}_${sufijoUnico}`;
 
     const usuarioParaRegistrar = {
       Nombre: formData.nombre,
@@ -44,11 +46,11 @@ const CrearCuenta = () => {
       Email: formData.email,
       Telefono: formData.telefono,
       NombreUsuario: formData.nombreUsuario,
-      PasswordHash: formData.password, 
+      PasswordHash: formData.password,
       UrlCarpeta: urlCarpetaGenerada,
       FechaAlta: new Date().toISOString(),
       Activo: true,
-      Token: "" 
+      IdRol: 1 // Rol inicial: Usuario Esencial
     };
 
     try {
@@ -59,25 +61,25 @@ const CrearCuenta = () => {
       });
 
       if (response.ok) {
-        // 1. Obtenemos los datos que devuelve tu controlador C# (Token, NombreUsuario, etc.)
-        const data = await response.json(); 
+        const data = await response.json();
 
-        // 2. Guardamos la sesión en el localStorage para que la App sepa que estamos logueados
+        // Guardamos los datos de sesión básicos
         localStorage.setItem("Token", data.Token);
         localStorage.setItem("Nombre", formData.nombre);
         localStorage.setItem("Apellido", formData.apellido);
         localStorage.setItem("Usuario", data.NombreUsuario);
+        
+        // Asignamos el plan inicial por defecto (Plan Esencial)
+        localStorage.setItem("PlanActual", "Plan Esencial");
 
         alert(`¡Bienvenido a FinanzARC, ${formData.nombre}!`);
 
-        // 3. Redirigimos directamente al dashboard principal
         navigate("/principal");
 
-        // 4. Recarga pequeña para actualizar el estado del Navbar/App
         setTimeout(() => {
           window.location.reload();
         }, 100);
-        
+
       } else {
         const errorText = await response.text();
         console.error("Error del servidor:", errorText);

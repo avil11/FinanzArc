@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';  
+
 import Navbar from './componentes/NavBar/Navbar';
 import Footer from './componentes/Footer/Footer';
 
@@ -12,7 +13,7 @@ import Gasto from './paginas/Principal/Gasto/Gasto';
 import Perfil from './paginas/perfil/Perfil';
 import InicioSesion from './paginas/inicio/InicioSesion/InicioSesion';
 import PlanesCompra from './paginas/planes/planes';
-
+import Archivos from './paginas/Principal/Archivos/Archivos';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/inicio-sesion" element={<InicioSesion />} />
         <Route path="/crear-cuenta" element={<CrearCuenta />} />
         <Route path="/planes" element={<PlanesCompra />} />
+        <Route path="/archivos" element={<Archivos />} />
       </Routes>
       <Footer />
     </BrowserRouter>

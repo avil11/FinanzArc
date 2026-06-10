@@ -14,12 +14,6 @@ const API_ENDPOINTS = {
   transacciones: "/Transacciones"
 };
 
-const institucionesSoportadas = [
-  { id: 1, nombre: "Banco Galicia", tipo: "galicia", divisa: 1, saldo: 450000 },
-  { id: 2, nombre: "Mercado Pago", tipo: "mp", divisa: 1, saldo: 125000 },
-  { id: 3, nombre: "BBVA Francés", tipo: "bbva", divisa: 1, saldo: 890000 },
-  { id: 4, nombre: "Brubank (USD)", tipo: "bru-usd", divisa: 2, saldo: 1500 }
-];
 
 const GastoIngreso = () => {
   const [mostrarSaludo, setMostrarSaludo] = useState(true);
@@ -35,6 +29,29 @@ const GastoIngreso = () => {
     USD: 1300,
     EUR: 1450
   });
+  const obtenerCotizaciones = async () => {
+    const API_KEY = "2ba96ae66f6deb72572261fe";
+
+    try {
+      const response = await fetch(`https://v6.exchangerate-api.com/v6/${API_KEY}/latest/USD`);
+      const data = await response.json();
+
+      if (data.result === "success") {
+        const usdToArs = data.conversion_rates.ARS;
+        const eurToUsd = data.conversion_rates.EUR;
+
+        const eurToArs = (1 / eurToUsd) * usdToArs;
+
+        setCotizaciones({
+          USD: Number(usdToArs).toFixed(2),
+          EUR: Number(eurToArs).toFixed(2)
+        });
+      }
+    } catch (error) {
+      console.error("Error obteniendo cotizaciones:", error);
+      setCotizaciones({ USD: "1300.00", EUR: "1450.00" });
+    }
+  };
 
   const [modalConectarAbierto, setModalConectarAbierto] = useState(false);
   const [modalImportarAbierto, setModalImportarAbierto] = useState(false);
@@ -56,8 +73,8 @@ const GastoIngreso = () => {
     Divisa: "1"
   });
 
-  const COLORES = ["#007AFF", "#c8b277", "#8a733f", "#4a4a4a"];
-  const COLORESgasto = ["#FF4B4B", "#c8b277", "#8a733f", "#4a4a4a"];
+  const COLORES = ["#007AFF", "#FF9500", "#34C759", "#AF52DE"];
+  const COLORESgasto = ["#FF4B4B", "#FFD700", "#4B79FF", "#FF7F50"];
 
   useEffect(() => {
     const temporizador = setTimeout(() => {
@@ -70,57 +87,22 @@ const GastoIngreso = () => {
     return () => clearTimeout(temporizador);
   }, []);
 
-  // =========================
-  // COTIZACIONES
-  // =========================
 
-  const obtenerCotizaciones = async () => {
-    try {
-      const responseUsd = await fetch("https://dolarapi.com/v1/dolares/oficial");
-      const dataUsd = await responseUsd.json();
-
-      const usd = dataUsd?.venta || 1300;
-
-      const eurEstimado = usd * 1.15;
-
-      setCotizaciones({
-        USD: usd,
-        EUR: eurEstimado
-      });
-
-      console.log("Cotizaciones actualizadas:", {
-        USD: usd,
-        EUR: eurEstimado
-      });
-
-    } catch (error) {
-      console.error("Error obteniendo cotizaciones:", error);
-
-      setCotizaciones({
-        USD: 1300,
-        EUR: 1450
-      });
-    }
-  };
 
   const convertirAPesos = (monto, divisa) => {
     const valor = Number(monto) || 0;
+    const cotUSD = Number(cotizaciones.USD);
+    const cotEUR = Number(cotizaciones.EUR);
 
     switch (Number(divisa)) {
       case 2:
-        return valor * cotizaciones.USD;
-
+        return valor * cotUSD;
       case 3:
-        return valor * cotizaciones.EUR;
-
+        return valor * cotEUR;
       default:
         return valor;
     }
   };
-
-  // =========================
-  // DATOS
-  // =========================
 
   const obtenerDatos = () => {
     const token = localStorage.getItem("Token");
@@ -142,10 +124,6 @@ const GastoIngreso = () => {
         obtenerCuentas(data.IdUsuario);
       });
   };
-
-  // =========================
-  // CUENTAS
-  // =========================
 
   const obtenerCuentas = (idusuario) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.cuentas}/ByUsuario/${idusuario}`, {
@@ -178,10 +156,6 @@ const GastoIngreso = () => {
       });
   };
 
-  // =========================
-  // GASTOS
-  // =========================
-
   const obtenerGastos = (idusuario) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.gastos}/ByUsuario/${idusuario}`, {
       headers: {
@@ -191,31 +165,24 @@ const GastoIngreso = () => {
     })
       .then(res => res.json())
       .then(data => {
-
         const gastosProcesados = data.map(item => ({
           name: item.Descripcion || "Sin descripción",
-
           valor: convertirAPesos(
             item.MontoGasto,
             item.IdDivisa
           ),
-
           monedaOriginal:
             Number(item.IdDivisa) === 2
               ? "USD"
               : Number(item.IdDivisa) === 3
-              ? "EUR"
-              : "ARS"
+                ? "EUR"
+                : "ARS"
         }));
 
         setDatosGastos(gastosProcesados);
       })
       .catch(error => console.error(error));
   };
-
-  // =========================
-  // INGRESOS
-  // =========================
 
   const obtenerIngresos = (idusuario) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.ingresos}/ByUsuario/${idusuario}`, {
@@ -226,31 +193,24 @@ const GastoIngreso = () => {
     })
       .then(res => res.json())
       .then(data => {
-
         const ingresosProcesados = data.map(item => ({
           name: item.Descripcion || "Sin Descripción",
-
           valor: convertirAPesos(
             item.MontoIngreso,
             item.IdDivisa
           ),
-
           monedaOriginal:
             Number(item.IdDivisa) === 2
               ? "USD"
               : Number(item.IdDivisa) === 3
-              ? "EUR"
-              : "ARS"
+                ? "EUR"
+                : "ARS"
         }));
 
         setDatosIngresos(ingresosProcesados);
       })
       .catch(error => console.error(error));
   };
-
-  // =========================
-  // AHORROS
-  // =========================
 
   const obtenerAhorros = (idusuario) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.ahorros}/ByUsuario/${idusuario}`, {
@@ -261,17 +221,13 @@ const GastoIngreso = () => {
     })
       .then(res => res.json())
       .then(data => {
-
         const metasProcesadas = data.map(item => ({
           ...item,
-
           etiqueta: item.Nombre || "Meta de ahorro",
-
           actual: convertirAPesos(
             item.MontoGuardado,
             item.IdDivisa
           ),
-
           objetivo: convertirAPesos(
             item.MontoObjetivo,
             item.IdDivisa
@@ -282,10 +238,6 @@ const GastoIngreso = () => {
       })
       .catch(error => console.error(error));
   };
-
-  // =========================
-  // CSV
-  // =========================
 
   const manejarSeleccionCsv = (e) => {
     const file = e.target.files[0];
@@ -305,9 +257,7 @@ const GastoIngreso = () => {
     }
 
     setCargandoCsv(true);
-
     const formData = new FormData();
-
     formData.append("archivo", archivoCsv);
 
     try {
@@ -326,66 +276,17 @@ const GastoIngreso = () => {
 
       if (response.ok) {
         alert(data.message);
-
         setModalImportarAbierto(false);
-
         obtenerDatos();
       } else {
         alert(data.message);
       }
-
     } catch (error) {
       console.error(error);
-
     } finally {
       setCargandoCsv(false);
     }
   };
-
-  // =========================
-  // OPEN BANKING
-  // =========================
-
-  const simularConexionBancaria = (institucion) => {
-    if (!idUsuarioActual) return;
-
-    setCargandoConexion(true);
-
-    setTimeout(() => {
-
-      const nuevaCuentaExterna = {
-        IdUsuario: idUsuarioActual,
-        IdDivisa: institucion.divisa,
-        Nombre: institucion.nombre,
-        SaldoActual: institucion.saldo,
-        EsExterna: true,
-        TokenSincronizacion: `${institucion.tipo}-${Math.floor(Math.random() * 10000)}`,
-        FechaCreacion: new Date().toISOString()
-      };
-
-      fetch(`${API_BASE_URL}${API_ENDPOINTS.cuentas}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("Token")}`
-        },
-        body: JSON.stringify(nuevaCuentaExterna)
-      })
-        .then(() => {
-          alert(`${institucion.nombre} vinculada`);
-
-          setModalConectarAbierto(false);
-
-          obtenerCuentas(idUsuarioActual);
-        })
-        .finally(() => setCargandoConexion(false));
-
-    }, 2500);
-  };
-
-  // =========================
-  // METAS
-  // =========================
 
   const manejarCambioInput = (e) => {
     setMetaForm({
@@ -420,7 +321,6 @@ const GastoIngreso = () => {
       .catch(error => console.error("Error obteniendo usuario:", error));
   };
 
- 
   const guardarMetaApi = (metaAGuardar) => {
     const esEdicion =
       metaAGuardar.IdMetaAhorro !== null &&
@@ -441,17 +341,23 @@ const GastoIngreso = () => {
       body: JSON.stringify(metaAGuardar)
     })
       .then(() => {
-
         setModalAgregarAbierto(false);
         setModalEditarAbierto(false);
-
         obtenerDatos();
       })
       .catch(error => console.error(error));
   };
 
-  const manejarEliminarMeta = () => {
-    fetch(`${API_BASE_URL}${API_ENDPOINTS.ahorros}/${metaForm.IdMetaAhorro}`, {
+  const manejarEliminarMeta = (metaDesdeLista = null) => {
+    // Busca el ID: si viene por parámetro (botón de la lista) usa ese, sino usa el del modal
+    const idAEliminar = metaDesdeLista?.IdMetaAhorro || metaForm.IdMetaAhorro;
+
+    if (!idAEliminar) return;
+
+    const confirmacion = window.confirm("¿Estás seguro de que querés eliminar este logro de tu historial?");
+    if (!confirmacion) return;
+
+    fetch(`${API_BASE_URL}${API_ENDPOINTS.ahorros}/${idAEliminar}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -459,17 +365,11 @@ const GastoIngreso = () => {
       }
     })
       .then(() => {
-
-        setModalEditarAbierto(false);
-
-        obtenerDatos();
+        setModalEditarAbierto(false); // Cierra el modal si se llamó desde ahí
+        obtenerDatos(); // Recarga la vista para que desaparezca la tarjeta
       })
       .catch(error => console.error(error));
   };
-
-  // =========================
-  // HELPERS
-  // =========================
 
   const calcularTotal = (datos) => {
     return datos.reduce((acum, item) => {
@@ -535,7 +435,6 @@ const GastoIngreso = () => {
     objetivo,
     etiqueta
   }) => {
-
     const porcentaje =
       objetivo > 0
         ? Math.min(100, (actual / objetivo) * 100)
@@ -543,7 +442,6 @@ const GastoIngreso = () => {
 
     return (
       <div className="item-progreso-general">
-
         <div className="info-progreso-general">
           <span
             style={{
@@ -581,10 +479,6 @@ const GastoIngreso = () => {
     );
   };
 
-  // =========================
-  // MODALES
-  // =========================
-
   const abrirModalAgregar = () => {
     setMetaForm({
       IdMetaAhorro: null,
@@ -616,48 +510,41 @@ const GastoIngreso = () => {
     setModalEditarAbierto(true);
   };
 
-  // =========================
-  // USER
-  // =========================
-
   const nombre = localStorage.getItem("Nombre") || "Usuario";
-
   const apellido = localStorage.getItem("Apellido") || "";
+
+  // Asumimos que 2 es el estado "Completado" en tu base de datos
+  const metasActivas = metasAhorro.filter(meta => meta.IdEstadoMetaAhorro !== 2);
+  const metasCompletadas = metasAhorro.filter(meta => meta.IdEstadoMetaAhorro === 2);
 
   return (
     <div className="contenedor-principal-general">
-
       <div className="seccion-encabezado-general">
-
         <div className="titulo-principal-general">
-
           <h2>
             {mostrarSaludo
               ? `¡Bienvenido, ${nombre} ${apellido}!`
               : "El Control Total de tu Economía"}
           </h2>
-
-          <p style={{ color: "#888888" }}>
+          <p>
             Todas las monedas son convertidas automáticamente a ARS.
           </p>
-
-          <small style={{ color: "#c8b277" }}>
+          <small style={{ color: "#c8b277", fontWeight: "500", fontStyle: "italic", fontSize: "1.1rem" }}>
             USD: ${cotizaciones.USD} | EUR: ${cotizaciones.EUR}
           </small>
-
         </div>
 
         <div className="botones-functions-comparativas">
           <Link to="/comparativa" className="botonesComparativa">
             Mostrar Balance
           </Link>
+          <Link to="/archivos" className="botonesComparativa">
+            Archivos
+          </Link>
         </div>
       </div>
 
-      
-
       <div className="panel-graficos-general">
-        {/* GRÁFICO GASTOS */}
         {datosGastos.length > 0 ? (
           <div className="tarjeta-general">
             <h3>Gastos por Categoría</h3>
@@ -699,7 +586,6 @@ const GastoIngreso = () => {
           <EstadoVacio titulo="Gastos por Categoría" mensaje="No se encontraron gastos registrados." />
         )}
 
-        {/* GRÁFICO INGRESOS */}
         {datosIngresos.length > 0 ? (
           <div className="tarjeta-general">
             <h3>Fuentes de Ingreso</h3>
@@ -744,15 +630,16 @@ const GastoIngreso = () => {
 
       <div className="contenedor-ahorros-general">
         <div className="encabezado-ahorros-flex">
-          <h3 className="titulo-ahorros-general">Objetivos de Ahorro</h3>
+          <h3 className="titulo-ahorros-general">Objetivos en Curso</h3>
           <button onClick={abrirModalAgregar} className="boton-primario">
             Agregar Meta
           </button>
         </div>
 
-        {metasAhorro.length > 0 ? (
+        {/* METAS ACTIVAS */}
+        {metasActivas.length > 0 ? (
           <div className="grid-ahorros-general">
-            {metasAhorro.map((meta, indice) => (
+            {metasActivas.map((meta, indice) => (
               <div key={indice} className="tarjeta-ahorro-item">
                 <BarraProgreso actual={meta.actual} objetivo={meta.objetivo} etiqueta={meta.etiqueta} />
                 <button className="boton-editar-ahorro" onClick={() => abrirModalEditar(meta)}>
@@ -764,9 +651,55 @@ const GastoIngreso = () => {
         ) : (
           <EstadoVacio
             icono="🎯"
-            mensaje="Aún no tienes metas de ahorro configuradas."
-            sugerencia="Haz clic en 'Agregar Meta' para empezar a planificar tus objetivos financieros."
+            mensaje="No hay objetivos de ahorro en curso."
+            sugerencia="Haz clic en 'Agregar Meta' para empezar."
           />
+        )}
+
+        {/* METAS COMPLETADAS (Logros) */}
+        {metasCompletadas.length > 0 && (
+          <div className="seccion-logros-alcanzados" style={{ marginTop: '2rem' }}>
+            <h3 className="titulo-ahorros-general" style={{ color: '#c8b277', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>🏆</span> Logros Alcanzados
+            </h3>
+
+            <div className="grid-ahorros-general">
+              {metasCompletadas.map((meta, indice) => (
+                <div key={indice} className="tarjeta-logro" style={{
+                  backgroundColor: '#1e1e1f',
+                  border: '1px solid rgba(200, 178, 119, 0.4)',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <span style={{ fontWeight: '600', color: '#ffffff', fontSize: '1.1rem' }}>
+                      {meta.etiqueta}
+                    </span>
+                    <span style={{ color: '#c8b277', fontWeight: 'bold' }}>
+                      ¡Completado!
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.9rem', color: '#8e8e93' }}>
+                    <div>
+                      <span>Total guardado: </span>
+                      <span style={{ color: '#fff', fontWeight: 'bold' }}>${meta.actual.toLocaleString("es-AR")}</span>
+                    </div>
+
+                    {/* OJO ACÁ: Ajusté el estilo del botón para que encaje mejor en tu diseño oscuro */}
+                    <button
+                      className="boton-secundario"
+                      style={{ backgroundColor: '#dc3545', color: '#fff', padding: '4px 10px', fontSize: '0.8rem', borderRadius: '6px', border: 'none', cursor: 'pointer' }}
+                      onClick={() => manejarEliminarMeta(meta)}
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
 

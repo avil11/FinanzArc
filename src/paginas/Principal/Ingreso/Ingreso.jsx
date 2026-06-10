@@ -2,9 +2,12 @@ import React, { useState, useEffect, useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import "./Ingreso.css";
 
+import { obtenerTasas } from "../../../apiConfig";
+
 const API_BASE_URL = "http://localhost:60496/api";
 
 function Ingreso() {
+
   const [modalAbierto, setModalAbierto] = useState(false);
   const [listaIngresos, setListaIngresos] = useState([]);
   const [busqueda, setBusqueda] = useState("");
@@ -22,26 +25,17 @@ function Ingreso() {
     FechaIngreso: new Date().toISOString().split('T')[0],
     Descripcion: ""
   });
-
-  const COLORES = ["#007AFF", "#c8b277", "#8a733f", "#4a4a4a"];
-
   useEffect(() => {
-    obtenerCotizaciones();
-    obtenerDatosUsuarioYRegistros();
+    const cargarDatos = async () => {
+      const tasasActuales = await obtenerTasas();
+      setTasas(tasasActuales);
+      obtenerDatosUsuarioYRegistros();
+    };
+    cargarDatos();
   }, []);
 
-  // --- LÓGICA DE API Y COTIZACIONES ---
-  const obtenerCotizaciones = async () => {
-    try {
-      const [resUsd, resEur] = await Promise.all([
-        fetch("https://dolarapi.com/v1/dolares/oficial"),
-        fetch("https://dolarapi.com/v1/cotizaciones/eur")
-      ]);
-      const usd = await resUsd.json();
-      const eur = await resEur.json();
-      setTasas({ USD: usd.venta, EUR: eur.venta });
-    } catch (err) { setTasas({ USD: 1200, EUR: 1300 }); }
-  };
+
+  const COLORES = ["#007AFF", "#FF9500", "#34C759", "#AF52DE"];
 
   const obtenerDatosUsuarioYRegistros = async () => {
     const token = localStorage.getItem("Token");
@@ -98,8 +92,6 @@ function Ingreso() {
       headers: { "Authorization": `Bearer ${localStorage.getItem("Token")}` }
     }).then(() => obtenerDatosUsuarioYRegistros());
   };
-
-  // --- LÓGICA DE CONVERSIÓN ---
   const calcularMontoEnPesos = (monto, idDivisa) => {
     if (idDivisa === 2) return monto * tasas.USD;
     if (idDivisa === 3) return monto * tasas.EUR;
@@ -117,8 +109,6 @@ function Ingreso() {
       </div>
     );
   };
-
-  // --- PROCESAMIENTO DE DATOS (Optimizado con useMemo) ---
   const ingresosFiltrados = useMemo(() => {
     return listaIngresos.filter(i =>
       i.Descripcion?.toLowerCase().includes(busqueda.toLowerCase())
@@ -132,12 +122,9 @@ function Ingreso() {
     })).slice(0, 5);
     return data.length > 0 ? data : [{ nombre: "Sin datos", valor: 0 }];
   }, [ingresosFiltrados, tasas]);
-
   const totalMonto = useMemo(() => {
     return ingresosFiltrados.reduce((acc, item) => acc + calcularMontoEnPesos(Number(item.MontoIngreso), item.IdDivisa), 0);
   }, [ingresosFiltrados, tasas]);
-
-  // --- AYUDANTES DE UI ---
   const resetearForm = () => {
     setForm(prev => ({
       ...prev,
@@ -150,7 +137,6 @@ function Ingreso() {
       IdDivisa: 1
     }));
   };
-
   const prepararEdicion = (item) => {
     setForm({
       IdIngreso: item.IdIngreso,
@@ -164,47 +150,65 @@ function Ingreso() {
     });
     setModalAbierto(true);
   };
-
   return (
     <div className="pagina-ingreso-contenedor">
       <div className="encabezado-simple">
         <h1 className="titulo-seccion">Fuentes de Ingreso</h1>
-        <p className="texto-gris">Administra todas tus entradas de dinero. Cotizaciones: 1 USD = ${tasas.USD} | 1 EUR = ${tasas.EUR}</p>
+        <p className="texto-gris">Administra todos tus ingresos en este apartado. <br /> Cotizaciones: 1 USD = ${tasas.USD} | 1 EUR = ${tasas.EUR}</p>
       </div>
 
       <div className="pagina-ingreso-tarjeta">
         <div className="tarjeta">
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie
-                data={datosGrafico}
-                cx="50%"
-                cy="50%"
-                innerRadius={70}
-                outerRadius={100}
-                paddingAngle={5}
-                dataKey="valor"
-                nameKey="nombre"
-                stroke="none"
-              >
-                {datosGrafico.map((entry, i) => (
-                  <Cell key={`cell-${i}`} fill={entry.valor === 0 ? "#333" : COLORES[i % COLORES.length]} />
-                ))}
-              </Pie>
-              
-              <text x="50%" y="50%" fill="#fff" textAnchor="middle" dominantBaseline="central">
-                <tspan x="50%" dy="-0.5em" fontSize="14" fill="#a0a0a0">Total (ARS)</tspan>
-                <tspan x="50%" dy="1.5em" fontSize="20" fontWeight="bold">
-                  ${totalMonto.toLocaleString()}
-                </tspan>
-              </text>
+          {ingresosFiltrados.length === 0 ? (
+            <div style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "280px",
+              textAlign: "center",
+              color: "#a0a0a0"
+            }}>
+              <span style={{ fontSize: "2.5rem", marginBottom: "12px" }}>📊</span>
+              <p style={{ fontSize: "14px", margin: 0, padding: "0 20px", lineHeight: "1.5" }}>
+                {listaIngresos.length === 0
+                  ? "No hay ingresos registrados para generar el gráfico de distribución."
+                  : "No hay datos que coincidan para mostrar en el gráfico."}
+              </p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie
+                  data={datosGrafico}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={120}
+                  paddingAngle={6}
+                  dataKey="valor"
+                  nameKey="nombre"
+                  stroke="none"
+                >
+                  {datosGrafico.map((entry, i) => (
+                    <Cell key={`cell-${i}`} fill={entry.valor === 0 ? "#333" : COLORES[i % COLORES.length]} />
+                  ))}
+                </Pie>
 
-              <Tooltip
-                contentStyle={{ backgroundColor: "#1e1e1f", border: "1px solid rgba(200, 178, 119, 0.3)", borderRadius: "8px" }}
-                itemStyle={{ color: "#fff" }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+                <text x="50%" y="50%" fill="#fff" textAnchor="middle" dominantBaseline="central">
+                  <tspan x="50%" dy="-0.5em" fontSize="14" fill="#a0a0a0">Total (ARS)</tspan>
+                  <tspan x="50%" dy="1.5em" fontSize="20" fontWeight="bold">
+                    ${totalMonto.toLocaleString()}
+                  </tspan>
+                </text>
+
+                <Tooltip
+                  contentStyle={{ backgroundColor: "#1e1e1f", border: "1px solid rgba(200, 178, 119, 0.3)", borderRadius: "8px" }}
+                  itemStyle={{ color: "#fff" }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         <div className="contenedor-tabla-filtradaCategoria">
@@ -229,20 +233,30 @@ function Ingreso() {
                 </tr>
               </thead>
               <tbody>
-                {ingresosFiltrados.map((item) => (
-                  <tr key={item.IdIngreso || Math.random()}>
-                    <td>{item.Descripcion}</td>
-                    <td className="monto-destacado" style={{ color: 'rgb(70, 130, 180)' }}>
-                      {FormatearMoneda(Number(item.MontoIngreso), item.IdDivisa)}
-                    </td>
-                    <td className="texto-gris">{new Date(item.FechaIngreso).toLocaleDateString()}</td>
-                    <td>
-                      <button className="btn-icon" onClick={() => prepararEdicion(item)}>✏️</button>
-                      <button className="btn-icon" onClick={() => eliminarIngreso(item.IdIngreso)}>🗑️</button>
-                      <button className="btn-icon" onClick={() => { setItemSeleccionado(item); setVerMas(true); }}>📊</button>
+                {ingresosFiltrados.length === 0 ? (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: "center", padding: "3rem 1rem", color: "#a0a0a0" }}>
+                      {listaIngresos.length === 0
+                        ? "No tenés registrado ningún ingreso. ¡Registrá tu primer ingreso abajo!"
+                        : "No se encontraron ingresos que coincidan con tu búsqueda."}
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  ingresosFiltrados.map((item) => (
+                    <tr key={item.IdIngreso || Math.random()}>
+                      <td>{item.Descripcion}</td>
+                      <td className="monto-destacado" style={{ color: 'rgb(70, 130, 180)' }}>
+                        {FormatearMoneda(Number(item.MontoIngreso), item.IdDivisa)}
+                      </td>
+                      <td className="texto-gris">{new Date(item.FechaIngreso).toLocaleDateString()}</td>
+                      <td>
+                        <button className="btn-icon" onClick={() => prepararEdicion(item)}>✏️</button>
+                        <button className="btn-icon" onClick={() => eliminarIngreso(item.IdIngreso)}>🗑️</button>
+                        <button className="btn-icon" onClick={() => { setItemSeleccionado(item); setVerMas(true); }}>📊</button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -292,8 +306,6 @@ function Ingreso() {
           </div>
         </div>
       )}
-
-      {/* MODAL DE INGRESOS */}
       {modalAbierto && (
         <div className="capa-modal">
           <div className="contenido-modal">

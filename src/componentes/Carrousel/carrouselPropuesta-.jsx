@@ -1,19 +1,14 @@
 import React from "react";
-// Importamos Swiper y sus módulos
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
-
-// Estilos obligatorios de Swiper
 import "swiper/css";
 import "swiper/css/pagination";
-
-// Tu hoja de estilos
 import "./CarrouselPropuesta.css";
 
 const CarrouselPropuesta = () => {
   const itemsPropuesta = [
     {
-      logo: "/Imagenes/LogoDesordenAdmin.webp", 
+      logo: "/Imagenes/LogoDesordenAdmin.webp",
       title: "Desorden administrativo",
       texto: "Centralizá todos tus registros financieros vinculándolos a sus comprobantes digitales.",
       tilde: "✓ Trazabilidad completa y orden automático",
@@ -55,12 +50,10 @@ const CarrouselPropuesta = () => {
         pagination={{ clickable: true }}
         autoplay={{ delay: 4000, disableOnInteraction: false }}
         breakpoints={{
-          // CELULAR
           0: {
             slidesPerView: 1,
             spaceBetween: 20,
           },
-          // TABLET
           720: {
             slidesPerView: 2.3,
             spaceBetween: 30,
@@ -70,18 +63,17 @@ const CarrouselPropuesta = () => {
       >
         {itemsPropuesta.map((item, index) => (
           <SwiperSlide key={index}>
-            <div className="tarjeta-propuesta">  
-              {/* Contenedor del Logo */}
+            <div className="tarjeta-propuesta">
               <div className="logo-container">
-                <img 
-                  src={item.logo} 
-                  alt={item.title} 
-                  className="logo-img" 
-                  style={{ 
-                    width: '110px', 
-                    height: '110px', 
-                    maxWidth: '150px', 
-                    objectFit: 'contain' 
+                <img
+                  src={item.logo}
+                  alt={item.title}
+                  className="logo-img"
+                  style={{
+                    width: '110px',
+                    height: '110px',
+                    maxWidth: '150px',
+                    objectFit: 'contain'
                   }}
                 />
               </div>
