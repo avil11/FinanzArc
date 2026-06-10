@@ -21,15 +21,62 @@ function Gasto() {
   const [itemSeleccionado, setItemSeleccionado] = useState(null);
   const [tasas, setTasas] = useState({ USD: 1, EUR: 1 });
 
+  //PARA SELECT DINAMICO.
+  const [categorias, setCategorias] = useState([]);
+  const [modosPago, setModosPago] = useState([]);
+  const [divisa, setDivisa] = useState([]);
+
   const [form, setForm] = useState({
     IdGasto: null, IdUsuario: null, IdCuenta: 1, IdCategoria: 1,
     IdModoPago: 1, IdDivisa: 1, MontoGasto: "",
     FechaGasto: new Date().toISOString().split('T')[0], Descripcion: ""
   });
 
-  const COLORES = ["#FF4B4B","#FFD700", "#4B79FF", "#FF7F50"];
+  // Agrega este nuevo useEffect para cargar los modos de pago
+  useEffect(() => {
+    const fetchModosPago = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/ModoPago`); // Asegúrate de que la ruta sea esta
+        const data = await response.json();
+        setModosPago(data);
+      } catch (error) {
+        console.error("Error al cargar modos de pago:", error);
+      }
+    };
 
+    fetchModosPago();
+  }, []);
+    // Agrega este nuevo useEffect para cargar los modos de pago
+  useEffect(() => {
+    const fetchDivisa = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/Divisa`); // Asegúrate de que la ruta sea esta
+        const data = await response.json();
+        setDivisa(data);
+      } catch (error) {
+        console.error("Error al cargar las divisas:", error);
+      }
+    };
 
+    fetchDivisa();
+  }, []);
+
+  const COLORES = ["#FF4B4B", "#FFD700", "#4B79FF", "#FF7F50"];
+
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        // Asegúrate de usar la URL correcta donde corre tu API
+        const response = await fetch(`${API_BASE_URL}/Categoria`);
+        const data = await response.json();
+        setCategorias(data);
+      } catch (error) {
+        console.error("Error al cargar categorías:", error);
+      }
+    };
+
+    fetchCategorias();
+  }, []);
 
   useEffect(() => {
     obtenerCotizaciones();
@@ -118,19 +165,19 @@ function Gasto() {
       <div className="pagina-ingreso-tarjeta">
         <div className="tarjeta">
           {gastosFiltrados.length === 0 ? (
-            <div style={{ 
-              display: "flex", 
-              flexDirection: "column", 
-              justifyContent: "center", 
-              alignItems: "center", 
-              height: "280px", 
-              textAlign: "center", 
-              color: "#a0a0a0" 
+            <div style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "280px",
+              textAlign: "center",
+              color: "#a0a0a0"
             }}>
               <span style={{ fontSize: "2.5rem", marginBottom: "12px" }}>📊</span>
               <p style={{ fontSize: "14px", margin: 0, padding: "0 20px", lineHeight: "1.5" }}>
-                {listaGastos.length === 0 
-                  ? "No hay gastos registrados para generar el gráfico de distribución." 
+                {listaGastos.length === 0
+                  ? "No hay gastos registrados para generar el gráfico de distribución."
                   : "No hay datos que coincidan para mostrar en el gráfico."}
               </p>
             </div>
@@ -186,8 +233,8 @@ function Gasto() {
                 {gastosFiltrados.length === 0 ? (
                   <tr>
                     <td colSpan="4" style={{ textAlign: "center", padding: "3rem 1rem", color: "#a0a0a0" }}>
-                      {listaGastos.length === 0 
-                        ? "No tenés registrado ningún gasto. ¡Ingresá tu primer gasto abajo!" 
+                      {listaGastos.length === 0
+                        ? "No tenés registrado ningún gasto. ¡Ingresá tu primer gasto abajo!"
                         : "No se encontraron gastos que coincidan con tu búsqueda."}
                     </td>
                   </tr>
@@ -219,10 +266,24 @@ function Gasto() {
             <h2>Detalle: {itemSeleccionado.Descripcion}</h2>
             <button onClick={() => setVerMas(false)} className="btn-link">Cerrar ✕</button>
           </div>
+
           <div className="formulario-grid">
-            <div className="formulario-grupo"><label>Categoría</label><p>{["Alimentación", "Transporte", "Servicios", "Ocio"][itemSeleccionado.IdCategoria - 1]}</p></div>
-            <div className="formulario-grupo"><label>Modo Pago</label><p>{["Efectivo", "Débito", "Crédito", "Transferencia"][itemSeleccionado.IdModoPago - 1]}</p></div>
-            <div className="formulario-grupo"><label>Cuenta</label><p>{itemSeleccionado.IdCuenta === 1 ? "Caja Principal" : "Ahorros"}</p></div>
+            <div className="formulario-grupo">
+              <label>Categoría</label>
+              <p>
+                {categorias.find(cat => cat.IdCategoria === itemSeleccionado.IdCategoria)?.Nombre || "Cargando..."}
+              </p>
+            </div>
+
+            <div className="formulario-grupo">
+              <label>Modo Pago</label>
+              <p>{["Efectivo", "Débito", "Crédito", "Transferencia"][itemSeleccionado.IdModoPago - 1]}</p>
+            </div>
+
+            <div className="formulario-grupo">
+              <label>Cuenta</label>
+              <p>{itemSeleccionado.IdCuenta === 1 ? "Caja Principal" : "Ahorros"}</p>
+            </div>
           </div>
         </div>
       )}
@@ -232,41 +293,55 @@ function Gasto() {
           <div className="contenido-modal">
             <h3 className="modal-titulo">{form.IdGasto ? "Editar Gasto" : "Nuevo Gasto"}</h3>
             <div className="formulario-grid">
-              <div className="formulario-grupo full-width"><label>Descripción</label><input type="text" value={form.Descripcion} onChange={(e) => setForm({ ...form, Descripcion: e.target.value })} /></div>
-              <div className="formulario-grupo"><label>Monto</label><input type="number" value={form.MontoGasto} onChange={(e) => setForm({ ...form, MontoGasto: e.target.value })} /></div>
+              <div className="formulario-grupo full-width"><label>Descripción</label><input placeholder='"Gasto realizado en colegio para merienda..."' type="text" value={form.Descripcion} onChange={(e) => setForm({ ...form, Descripcion: e.target.value })} /></div>
+              <div className="formulario-grupo"><label>Monto</label><input placeholder='"7.000..."' type="number" value={form.MontoGasto} onChange={(e) => setForm({ ...form, MontoGasto: e.target.value })} /></div>
               <div className="formulario-grupo"><label>Fecha</label><input type="date" value={form.FechaGasto} onChange={(e) => setForm({ ...form, FechaGasto: e.target.value })} /></div>
 
+              {/* SELECCIONADOR DE CATEGORÍA DINÁMICO */}
               <div className="formulario-grupo">
                 <label>Categoría</label>
-                <select value={form.IdCategoria} onChange={(e) => setForm({ ...form, IdCategoria: parseInt(e.target.value) })}>
-                  <option value={1}>Alimentación</option>
-                  <option value={2}>Transporte</option>
-                  <option value={3}>Servicios</option>
-                  <option value={4}>Ocio</option>
+                <select
+                  value={form.IdCategoria}
+                  onChange={(e) => setForm({ ...form, IdCategoria: parseInt(e.target.value) })}
+                >
+                  {categorias.map(cat => (
+                    <option key={cat.IdCategoria} value={cat.IdCategoria}>
+                      {cat.Nombre}
+                    </option>
+                  ))}
                 </select>
               </div>
+
+              {/* SELECCIONADOR DE MODO PAGO DINÁMICO */}
               <div className="formulario-grupo">
-                <label>Modo de Pago</label>
-                <select value={form.IdModoPago} onChange={(e) => setForm({ ...form, IdModoPago: parseInt(e.target.value) })}>
-                  <option value={1}>Efectivo</option>
-                  <option value={2}>Débito</option>
-                  <option value={3}>Crédito</option>
-                  <option value={4}>Transferencia</option>
+                <label>Modo de pago</label>
+                <select
+                  value={form.IdModoPago}
+                  onChange={(e) => setForm({ ...form, IdModoPago: parseInt(e.target.value) })}
+                >
+                  {modosPago.map(modo => (
+                    <option key={modo.IdModoPago} value={modo.IdModoPago}>
+                      {modo.Nombre}
+                    </option>
+                  ))}
                 </select>
               </div>
+
+              {/* SELECCIONADOR DE DIVISA DINAMICO */}
               <div className="formulario-grupo">
-                <label>Cuenta</label>
-                <select value={form.IdCuenta} onChange={(e) => setForm({ ...form, IdCuenta: parseInt(e.target.value) })}>
-                  <option value={1}>Caja Principal</option>
-                  <option value={2}>Ahorros</option>
+                <label>TIPO DIVISA</label>
+                <select
+                  value={form.IdDivisa}
+                  onChange={(e) => setForm({ ...form, IdDivisa: parseInt(e.target.value) })}
+                >
+                  {divisa.map(modo => (
+                    <option key={modo.IdDivisa} value={modo.IdDivisa}>
+                      {modo.CodigoISO}
+                    </option>
+                  ))}
                 </select>
               </div>
-              <div className="formulario-grupo">
-                <label>Divisa</label>
-                <select value={form.IdDivisa} onChange={(e) => setForm({ ...form, IdDivisa: parseInt(e.target.value) })}>
-                  <option value={1}>ARS</option><option value={2}>USD</option><option value={3}>EUR</option>
-                </select>
-              </div>
+
             </div>
             <div className="formulario-acciones">
               <button className="boton-secundario" onClick={() => setModalAbierto(false)}>Cancelar</button>

@@ -73,6 +73,10 @@
 /* =========================================
    MEDIA QUERIES (RESPONSIVE)
    ========================================= */
-@media (max-width: 810px) { .contenedor-principal-general { padding: 100px 20px 40px; } .seccion-encabezado-general h2 { font-size: 1.8rem; } .panel-graficos-general { grid-template-columns: 1fr; } .grafico-con-leyenda { flex-direction: column; text-align: center; } .grafico-pie { width: 100%; max-width: 300px; } .leyenda-grafico { width: 100%; } }
+@media (max-width: 810px)  { .contenedor-principal-general { padding: 100px 20px 40px; } .seccion-encabezado-general h2 { font-size: 1.8rem; } .panel-graficos-general { grid-template-columns: 1fr; } .grafico-con-leyenda { flex-direction: column; text-align: center; } .grafico-pie { width: 100%; max-width: 300px; } .leyenda-grafico { width: 100%; } }
 @media (max-width: 480px) { .seccion-encabezado-general h2 { font-size: 1.5rem; } .encabezado-ahorros-flex { flex-direction: column; gap: 15px; text-align: center; } .formulario-acciones { flex-direction: column; } .boton-primario, .boton-secundario { width: 100%; } }
 @media (max-width: 435px) { .botones-funciones-comparativas { flex-direction: column; width: 100%; } }
+
+@media (max-width:1060px) {
+   .grafico-con-leyenda{display: flex; align-items: center; justify-content: center!important;} 
+}

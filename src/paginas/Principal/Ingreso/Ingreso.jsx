@@ -14,13 +14,15 @@ function Ingreso() {
   const [vermas, setVerMas] = useState(false);
   const [itemSeleccionado, setItemSeleccionado] = useState(null);
   const [tasas, setTasas] = useState({ USD: 1, EUR: 1 });
+  
+  const [tipoIngreso, setTipoIngreso] = useState([]);
+  const [divisa, setDivisa] = useState([]);
 
   const [form, setForm] = useState({
     IdIngreso: null,
     IdUsuario: null,
-    IdCuenta: 1,
-    IdTipoIngreso: 1,
-    IdDivisa: 1,
+    IdTipoIngreso: "",
+    IdDivisa: "",
     MontoIngreso: "",
     FechaIngreso: new Date().toISOString().split('T')[0],
     Descripcion: ""
@@ -34,6 +36,34 @@ function Ingreso() {
     cargarDatos();
   }, []);
 
+   // USE EFFECT PARA TRAER INFORMACION DE LA TABLA TipoIngreso
+   useEffect(() => {
+     const fetchTipoIngreso = async () => {
+       try {
+         const response = await fetch(`${API_BASE_URL}/TipoIngreso`); // Asegúrate de que la ruta sea esta
+         const data = await response.json();
+         setTipoIngreso(data);
+       } catch (error) {
+         console.error("Error al cargar tipo de ingresos:", error);
+       }
+     };
+ 
+     fetchTipoIngreso();
+   }, []);
+   // USE EFFECT PARA TRAER INFORMACION DE LA TABLA Divisa
+   useEffect(() => {
+     const fetchDivisa = async () => {
+       try {
+         const response = await fetch(`${API_BASE_URL}/Divisa`); // Asegúrate de que la ruta sea esta
+         const data = await response.json();
+         setDivisa(data);
+       } catch (error) {
+         console.error("Error al cargar los tipos de divisas:", error);
+       }
+     };
+ 
+     fetchDivisa();
+   }, []);
 
   const COLORES = ["#007AFF", "#FF9500", "#34C759", "#AF52DE"];
 
@@ -150,6 +180,8 @@ function Ingreso() {
     });
     setModalAbierto(true);
   };
+
+
   return (
     <div className="pagina-ingreso-contenedor">
       <div className="encabezado-simple">
@@ -276,13 +308,14 @@ function Ingreso() {
           </div>
 
           <div className="grid-detalles" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px" }}>
+            {/*DINAMICO TIPO INGRESO: */}
             <div className="tarjeta-dato">
               <label style={{ display: "block", color: "#888", fontSize: "12px" }}>Tipo de Ingreso</label>
               <p style={{ margin: "5px 0 0 0", fontWeight: "600" }}>
                 {["Sueldo", "Inversiones", "Ventas", "Otros"][itemSeleccionado.IdTipoIngreso - 1] || "No definido"}
               </p>
             </div>
-
+          
             <div className="tarjeta-dato">
               <label style={{ display: "block", color: "#888", fontSize: "12px" }}>Cuenta Destino</label>
               <p style={{ margin: "5px 0 0 0", fontWeight: "600" }}>
@@ -317,6 +350,7 @@ function Ingreso() {
                   type="text"
                   value={form.Descripcion}
                   onChange={(e) => setForm({ ...form, Descripcion: e.target.value })}
+                  placeholder='"Ingreso de aguinaldo..."' 
                 />
               </div>
               <div className="formulario-grupo">
@@ -325,6 +359,7 @@ function Ingreso() {
                   type="number"
                   value={form.MontoIngreso}
                   onChange={(e) => setForm({ ...form, MontoIngreso: e.target.value })}
+                  placeholder='"850.000..."' 
                 />
               </div>
               <div className="formulario-grupo">
@@ -335,28 +370,33 @@ function Ingreso() {
                   onChange={(e) => setForm({ ...form, FechaIngreso: e.target.value })}
                 />
               </div>
+
+              {/*DINAMICO CON TABLA TipoIngreso*/}
               <div className="formulario-grupo">
-                <label>Tipo de Ingreso</label>
-                <select value={form.IdTipoIngreso} onChange={(e) => setForm({ ...form, IdTipoIngreso: parseInt(e.target.value) })}>
-                  <option value={1}>Sueldo</option>
-                  <option value={2}>Inversiones</option>
-                  <option value={3}>Ventas</option>
-                  <option value={4}>Otros</option>
+                <label>Tipo ingreso</label>
+                <select
+                  value={form.IdTipoIngreso}
+                  onChange={(e) => setForm({ ...form, IdTipoIngreso: parseInt(e.target.value) })}
+                >
+                  {tipoIngreso.map(cat => (
+                    <option key={cat.IdTipoIngreso} value={cat.IdTipoIngreso}>
+                      {cat.Nombre}
+                    </option>
+                  ))}
                 </select>
               </div>
+              {/* SELECCIONADOR DE DIVISA DINAMICO */}
               <div className="formulario-grupo">
-                <label>Cuenta de Destino</label>
-                <select value={form.IdCuenta} onChange={(e) => setForm({ ...form, IdCuenta: parseInt(e.target.value) })}>
-                  <option value={1}>Caja Principal</option>
-                  <option value={2}>Ahorros</option>
-                </select>
-              </div>
-              <div className="formulario-grupo">
-                <label>Divisa</label>
-                <select value={form.IdDivisa} onChange={(e) => setForm({ ...form, IdDivisa: parseInt(e.target.value) })}>
-                  <option value={1}>ARS</option>
-                  <option value={2}>USD</option>
-                  <option value={3}>EUR</option>
+                <label>TIPO DIVISA</label>
+                <select
+                  value={form.IdDivisa}
+                  onChange={(e) => setForm({ ...form, IdDivisa: parseInt(e.target.value) })}
+                >
+                  {divisa.map(modo => (
+                    <option key={modo.IdDivisa} value={modo.IdDivisa}>
+                      {modo.CodigoISO}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
