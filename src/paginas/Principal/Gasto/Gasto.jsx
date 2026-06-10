@@ -1,99 +1,63 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import "./Gasto.css";
-import { obtenerTasas } from "../../../apiConfig"; // Importa la función
+import { obtenerTasas } from "../../../apiConfig";
 
 const API_BASE_URL = "http://localhost:60496/api";
 
 function Gasto() {
-  useEffect(() => {
-    const cargarDatos = async () => {
-      const tasasActuales = await obtenerTasas();
-      setTasas(tasasActuales);
-      obtenerDatosUsuarioYRegistros();
-    };
-    cargarDatos();
-  }, []);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [listaGastos, setListaGastos] = useState([]);
   const [busqueda, setBusqueda] = useState("");
   const [vermas, setVerMas] = useState(false);
   const [itemSeleccionado, setItemSeleccionado] = useState(null);
-  const [tasas, setTasas] = useState({ USD: 1, EUR: 1 });
 
-  //PARA SELECT DINAMICO.
+  // Estado inicial con valores por defecto para evitar errores
+  const [tasas, setTasas] = useState({ USD: 1450, EUR: 1650 });
+
+  // PARA SELECT DINAMICO.
   const [categorias, setCategorias] = useState([]);
   const [modosPago, setModosPago] = useState([]);
   const [divisa, setDivisa] = useState([]);
 
   const [form, setForm] = useState({
-    IdGasto: null, IdUsuario: null, IdCuenta: 1, IdCategoria: 1,
-    IdModoPago: 1, IdDivisa: 1, MontoGasto: "",
+    IdGasto: null, IdUsuario: null, MontoGasto: "",
     FechaGasto: new Date().toISOString().split('T')[0], Descripcion: ""
   });
-
-  // Agrega este nuevo useEffect para cargar los modos de pago
+  console.log(form)
+  // CORRECCIÓN: Carga inicial consolidada para evitar redundancia y errores
   useEffect(() => {
-    const fetchModosPago = async () => {
+    const cargarDatosIniciales = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/ModoPago`); // Asegúrate de que la ruta sea esta
-        const data = await response.json();
-        setModosPago(data);
+        const tasasActuales = await obtenerTasas();
+        // Si la API falla, mantenemos valores por defecto 1 para no romper cálculos
+        setTasas(tasasActuales || { USD: 1450, EUR: 1650 });
+        await obtenerDatosUsuarioYRegistros();
       } catch (error) {
-        console.error("Error al cargar modos de pago:", error);
+        console.error("Error al cargar datos iniciales:", error);
       }
     };
-
-    fetchModosPago();
+    cargarDatosIniciales();
   }, []);
-    // Agrega este nuevo useEffect para cargar los modos de pago
+
+  // Carga de catálogos
   useEffect(() => {
-    const fetchDivisa = async () => {
+    const fetchCatalogos = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/Divisa`); // Asegúrate de que la ruta sea esta
-        const data = await response.json();
-        setDivisa(data);
+        const [resCat, resPago, resDiv] = await Promise.all([
+          fetch(`${API_BASE_URL}/Categoria`).then(r => r.json()),
+          fetch(`${API_BASE_URL}/ModoPago`).then(r => r.json()),
+          fetch(`${API_BASE_URL}/Divisa`).then(r => r.json())
+        ]);
+        setCategorias(resCat);
+        setModosPago(resPago);
+        setDivisa(resDiv);
       } catch (error) {
-        console.error("Error al cargar las divisas:", error);
+        console.error("Error al cargar catálogos:", error);
       }
     };
-
-    fetchDivisa();
+    fetchCatalogos();
   }, []);
-
-  const COLORES = ["#FF4B4B", "#FFD700", "#4B79FF", "#FF7F50"];
-
-  useEffect(() => {
-    const fetchCategorias = async () => {
-      try {
-        // Asegúrate de usar la URL correcta donde corre tu API
-        const response = await fetch(`${API_BASE_URL}/Categoria`);
-        const data = await response.json();
-        setCategorias(data);
-      } catch (error) {
-        console.error("Error al cargar categorías:", error);
-      }
-    };
-
-    fetchCategorias();
-  }, []);
-
-  useEffect(() => {
-    obtenerCotizaciones();
-    obtenerDatosUsuarioYRegistros();
-  }, []);
-
-  const obtenerCotizaciones = async () => {
-    try {
-      const [resUsd, resEur] = await Promise.all([
-        fetch("https://dolarapi.com/v1/dolares/oficial"),
-        fetch("https://dolarapi.com/v1/cotizaciones/eur")
-      ]);
-      const usd = await resUsd.json();
-      const eur = await resEur.json();
-      setTasas({ USD: usd.venta, EUR: eur.venta });
-    } catch (err) { setTasas({ USD: 1200, EUR: 1300 }); }
-  };
 
   const obtenerDatosUsuarioYRegistros = async () => {
     const token = localStorage.getItem("Token");
@@ -132,8 +96,9 @@ function Gasto() {
   };
 
   const calcularMontoEnPesos = (monto, idDivisa) => {
-    if (idDivisa === 2) return monto * tasas.USD;
-    if (idDivisa === 3) return monto * tasas.EUR;
+    // CORRECCIÓN: Uso de Optional Chaining y valores por defecto para seguridad
+    if (idDivisa === 2) return monto * (tasas?.USD || 1450);
+    if (idDivisa === 3) return monto * (tasas?.EUR || 1650);
     return monto;
   };
 
@@ -155,11 +120,13 @@ function Gasto() {
   const resetearForm = () => setForm({ ...form, IdGasto: null, MontoGasto: "", Descripcion: "", FechaGasto: new Date().toISOString().split('T')[0], IdCategoria: 1, IdModoPago: 1, IdCuenta: 1, IdDivisa: 1 });
   const prepararEdicion = (item) => { setForm({ ...item, FechaGasto: item.FechaGasto.split('T')[0] }); setModalAbierto(true); };
 
+  const COLORES = ["#FF4B4B", "#FFD700", "#4B79FF", "#FF7F50"];
+
   return (
     <div className="pagina-ingreso-contenedor">
       <div className="encabezado-simple">
         <h1 className="titulo-seccion">Control de Gastos</h1>
-        <p className="texto-gris">Administra todas tus gastos en este apartado. <br /> Cotizaciones: 1 USD = ${tasas.USD} | 1 EUR = ${tasas.EUR}</p>
+        <p className="texto-gris">Administra todas tus gastos en este apartado. <br /> Cotizaciones: 1 USD = ${tasas?.USD || 0} | 1 EUR = ${tasas?.EUR || 0}</p>
       </div>
 
       <div className="pagina-ingreso-tarjeta">
@@ -259,34 +226,61 @@ function Gasto() {
       </div>
 
       <button className="boton-primario" onClick={() => { resetearForm(); setModalAbierto(true); }}>Registrar Gasto</button>
+{vermas && itemSeleccionado && (
+  <div className="seccion-detalle-inferior" style={{ marginTop: "20px", padding: "20px", backgroundColor: "#1e1e1f", borderRadius: "12px", border: "1px solid #333", width: "80%" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
+      <h2>Detalle: {itemSeleccionado.Descripcion}</h2>
+      <button onClick={() => setVerMas(false)} className="btn-link">Cerrar ✕</button>
+    </div>
 
-      {vermas && itemSeleccionado && (
-        <div className="seccion-detalle-inferior" style={{ marginTop: "20px", padding: "20px", backgroundColor: "#1e1e1f", borderRadius: "12px", border: "1px solid #333" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
-            <h2>Detalle: {itemSeleccionado.Descripcion}</h2>
-            <button onClick={() => setVerMas(false)} className="btn-link">Cerrar ✕</button>
-          </div>
+    <div className="formulario-grid">
+      {/* Categoría */}
+      <div className="formulario-grupo">
+        <label>Categoría</label>
+        <p>
+          {categorias.find(c => c.IdCategoria === itemSeleccionado.IdCategoria)?.Nombre || "Cargando..."}
+        </p>
+      </div>
 
-          <div className="formulario-grid">
-            <div className="formulario-grupo">
-              <label>Categoría</label>
-              <p>
-                {categorias.find(cat => cat.IdCategoria === itemSeleccionado.IdCategoria)?.Nombre || "Cargando..."}
-              </p>
-            </div>
+      {/* Divisa */}
+      <div className="formulario-grupo">
+        <label>Divisa</label>
+        <p>
+          {divisa.find(d => d.IdDivisa === itemSeleccionado.IdDivisa)?.CodigoISO || "Cargando..."}
+        </p>
+      </div>
 
-            <div className="formulario-grupo">
-              <label>Modo Pago</label>
-              <p>{["Efectivo", "Débito", "Crédito", "Transferencia"][itemSeleccionado.IdModoPago - 1]}</p>
-            </div>
+      {/* Modo de Pago */}
+      <div className="formulario-grupo">
+        <label>Modo de Pago</label>
+        <p>
+          {modosPago.find(m => m.IdModoPago === itemSeleccionado.IdModoPago)?.Nombre || "Cargando..."}
+        </p>
+      </div>
 
-            <div className="formulario-grupo">
-              <label>Cuenta</label>
-              <p>{itemSeleccionado.IdCuenta === 1 ? "Caja Principal" : "Ahorros"}</p>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Monto (Gasto) */}
+      <div className="formulario-grupo">
+        <label>Monto</label>
+        <p className="monto-destacado" style={{ color: '#ff4b4b', fontWeight: 'bold' }}>
+          {/* Asegúrate de usar la propiedad correcta: MontoGasto */}
+          {FormatearMoneda(Number(itemSeleccionado.MontoGasto), itemSeleccionado.IdDivisa)}
+        </p>
+      </div>
+
+      {/* Fecha Gasto */}
+      <div className="formulario-grupo">
+        <label>Fecha del Gasto</label>
+        <p>{new Date(itemSeleccionado.FechaGasto).toLocaleDateString()}</p>
+      </div>
+
+      {/* Fecha Creación */}
+      <div className="formulario-grupo">
+        <label>Fecha de Creación</label>
+        <p>{new Date(itemSeleccionado.FechaCreacion).toLocaleDateString()}</p>
+      </div>
+    </div>
+  </div>
+)}
 
       {modalAbierto && (
         <div className="capa-modal">
@@ -297,7 +291,6 @@ function Gasto() {
               <div className="formulario-grupo"><label>Monto</label><input placeholder='"7.000..."' type="number" value={form.MontoGasto} onChange={(e) => setForm({ ...form, MontoGasto: e.target.value })} /></div>
               <div className="formulario-grupo"><label>Fecha</label><input type="date" value={form.FechaGasto} onChange={(e) => setForm({ ...form, FechaGasto: e.target.value })} /></div>
 
-              {/* SELECCIONADOR DE CATEGORÍA DINÁMICO */}
               <div className="formulario-grupo">
                 <label>Categoría</label>
                 <select
@@ -312,7 +305,6 @@ function Gasto() {
                 </select>
               </div>
 
-              {/* SELECCIONADOR DE MODO PAGO DINÁMICO */}
               <div className="formulario-grupo">
                 <label>Modo de pago</label>
                 <select
@@ -327,7 +319,6 @@ function Gasto() {
                 </select>
               </div>
 
-              {/* SELECCIONADOR DE DIVISA DINAMICO */}
               <div className="formulario-grupo">
                 <label>TIPO DIVISA</label>
                 <select

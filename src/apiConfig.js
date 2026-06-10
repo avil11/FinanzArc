@@ -1,19 +1,32 @@
-
-//API DE DOLAR USD Y EUR
-export const API_KEY = "2ba96ae66f6deb72572261fe";
+// API DE DOLAR API (No requiere API_KEY)
+// Documentación: https://dolarapi.com/
 
 export const obtenerTasas = async () => {
   try {
-    const response = await fetch(`https://v6.exchangerate-api.com/v6/${API_KEY}/latest/USD`);
-    const data = await response.json();
-    if (data.result === "success") {
-      const usdToArs = data.conversion_rates.ARS;
-      const eurToUsd = data.conversion_rates.EUR;
-      const eurToArs = (1 / eurToUsd) * usdToArs;
-      return { USD: Number(usdToArs).toFixed(2), EUR: Number(eurToArs).toFixed(2) };
+    // Realizamos ambas peticiones al mismo tiempo para mejorar la velocidad
+    const [resUsd, resEur] = await Promise.all([
+      fetch("https://dolarapi.com/v1/dolares/blue"),
+      fetch("https://dolarapi.com/v1/cotizaciones/eur")
+    ]);
+
+    // Verificamos si ambas peticiones fueron exitosas
+    if (!resUsd.ok || !resEur.ok) {
+      throw new Error("Error en la conexión con DolarAPI");
     }
+
+    const dataUsd = await resUsd.json();
+    const dataEur = await resEur.json();
+
+    // DolarAPI nos devuelve un objeto que contiene 'venta'
+    // 'venta' es el valor que realmente pagarías en el mercado
+    return {
+      USD: Number(dataUsd.venta),
+      EUR: Number(dataEur.venta)
+    };
+
   } catch (error) {
-    console.error("Error al obtener tasas:", error);
-    return { USD: 1300, EUR: 1450 };
+    console.error("Error al obtener tasas de DolarAPI, usando respaldo:", error);
+    // Mantenemos tus valores predefinidos por si la API falla
+    return { USD: 1450, EUR: 1650 };
   }
 };

@@ -15,23 +15,33 @@ import InicioSesion from './paginas/inicio/InicioSesion/InicioSesion';
 import PlanesCompra from './paginas/planes/planes';
 import Archivos from './paginas/Principal/Archivos/Archivos';
 
+// Este es el componente limpio que acabamos de corregir arriba
+import RutaProtegida from './RutaProtegida'; 
+
 function App() {
   return (
     <BrowserRouter>
       <Navbar />
       <Routes>
+        {/* --- RUTAS PÚBLICAS --- */}
         <Route path="/" element={<Inicio />} />
         <Route path="/registro" element={<Registro />} />
-        <Route path="/dashboard" element={<div style={{ padding: '50px' }}><h1>Bienvenido a tu Panel</h1></div>} />
-        <Route path="/principal" element={<Principal />} />
-        <Route path="/comparativa" element={<Comparativa />} />
-        <Route path="/ingreso" element={<Ingreso />} />
-        <Route path="/gasto" element={<Gasto />} />
-        <Route path="/perfil" element={<Perfil />} />
         <Route path="/inicio-sesion" element={<InicioSesion />} />
         <Route path="/crear-cuenta" element={<CrearCuenta />} />
         <Route path="/planes" element={<PlanesCompra />} />
-        <Route path="/archivos" element={<Archivos />} />
+
+        {/* --- RUTAS PRIVADAS --- */}
+        {/* Todo lo que esté acá adentro va a pasar primero por el filtro de RutaProtegida */}
+        <Route element={<RutaProtegida />}>
+          <Route path="/dashboard" element={<div style={{ padding: '50px' }}><h1>Bienvenido a tu Panel</h1></div>} />
+          <Route path="/principal" element={<Principal />} />
+          <Route path="/comparativa" element={<Comparativa />} />
+          <Route path="/ingreso" element={<Ingreso />} />
+          <Route path="/gasto" element={<Gasto />} />
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/archivos" element={<Archivos />} />
+        </Route>
+
       </Routes>
       <Footer />
     </BrowserRouter>

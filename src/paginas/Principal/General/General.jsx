@@ -29,27 +29,35 @@ const GastoIngreso = () => {
     USD: 1300,
     EUR: 1450
   });
+  const [rolUsuario, setRolUsuario] = useState(null); // Nuevo estado
+
   const obtenerCotizaciones = async () => {
-    const API_KEY = "2ba96ae66f6deb72572261fe";
-
     try {
-      const response = await fetch(`https://v6.exchangerate-api.com/v6/${API_KEY}/latest/USD`);
-      const data = await response.json();
+      // Usamos Promise.all para hacer ambas peticiones de forma simultánea
+      const [resUsd, resEur] = await Promise.all([
+        fetch("https://dolarapi.com/v1/dolares/blue"),
+        fetch("https://dolarapi.com/v1/cotizaciones/eur")
+      ]);
 
-      if (data.result === "success") {
-        const usdToArs = data.conversion_rates.ARS;
-        const eurToUsd = data.conversion_rates.EUR;
-
-        const eurToArs = (1 / eurToUsd) * usdToArs;
-
-        setCotizaciones({
-          USD: Number(usdToArs).toFixed(2),
-          EUR: Number(eurToArs).toFixed(2)
-        });
+      if (!resUsd.ok || !resEur.ok) {
+        throw new Error("Error en la conexión con DolarAPI");
       }
+
+      const dataUsd = await resUsd.json();
+      const dataEur = await resEur.json();
+
+      // Actualizamos el estado con los datos obtenidos
+      setCotizaciones({
+        USD: Number(dataUsd.venta).toFixed(2),
+        EUR: Number(dataEur.venta).toFixed(2)
+      });
     } catch (error) {
-      console.error("Error obteniendo cotizaciones:", error);
-      setCotizaciones({ USD: "1300.00", EUR: "1450.00" });
+      console.error("Error obteniendo cotizaciones de DolarAPI, usando respaldo:", error);
+      // Valores de respaldo en caso de que la API falle
+      setCotizaciones({
+        USD: "1300.00",
+        EUR: "1450.00"
+      });
     }
   };
 
@@ -106,17 +114,15 @@ const GastoIngreso = () => {
 
   const obtenerDatos = () => {
     const token = localStorage.getItem("Token");
-
     if (!token) return;
 
     fetch(`${API_BASE_URL}${API_ENDPOINTS.usuarios}/ByToken`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
       .then(data => {
         setIdUsuarioActual(data.IdUsuario);
+        setRolUsuario(data.IdRol); // <--- Guarda el rol aquí
 
         obtenerGastos(data.IdUsuario);
         obtenerIngresos(data.IdUsuario);
@@ -534,6 +540,7 @@ const GastoIngreso = () => {
           </small>
         </div>
 
+        {/* Dentro de tu return, en la sección de encabezado */}
         <div className="botones-functions-comparativas">
           <Link to="/comparativa" className="botonesComparativa">
             Mostrar Balance
@@ -541,6 +548,7 @@ const GastoIngreso = () => {
           <Link to="/archivos" className="botonesComparativa">
             Archivos
           </Link>
+
         </div>
       </div>
 

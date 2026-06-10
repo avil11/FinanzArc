@@ -691,3 +691,16 @@
         padding: 12px;
     }
 }
+
+
+/*Modal de - aparatado no habilitado*/
+
+.tarjeta-general {
+        background: #1e1e1f;
+    border: 1px solid rgba(255, 255, 255, .05);
+    border-radius: 20px;
+    padding: 30px;
+    box-sizing: border-box;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+    transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+}

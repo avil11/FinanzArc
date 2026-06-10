@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 import '../General/General.css';
 import './Comparativa.css';
-import { obtenerTasas } from '../../../apiConfig'; 
+import { obtenerTasas } from '../../../apiConfig';
 
 const API_BASE_URL = "http://localhost:60496/api";
 
@@ -47,13 +47,13 @@ const Comparativa = () => {
             if (res.ok) {
                 const user = await res.json();
                 const rolUsuario = user.IdRol || user.idRol;
-                
+
                 // Permitimos acceso general a Roles 2 (Gold), 3 (Platinum) y 4 (Dev)
-                if (rolUsuario >= 2) { 
+                if (rolUsuario >= 2) {
                     setIdUsuario(user.IdUsuario);
                     setRolHabilitado(true);
                     // Solo 3 y 4 tienen acceso Premium
-                    setEsPremium(rolUsuario === 3 || rolUsuario === 4); 
+                    setEsPremium(rolUsuario === 3 || rolUsuario === 4);
                 } else {
                     setRolHabilitado(false);
                     setCargando(false);
@@ -132,21 +132,25 @@ const Comparativa = () => {
         if (!idUsuario || !esPremium) return;
         try {
             setCargandoLinea(true);
+
             const [resIngresos, resHistIngresos, resGastos, resHistGastos] = await Promise.all([
                 fetch(`${API_BASE_URL}/Ingreso/ByUsuario/${idUsuario}`),
                 fetch(`${API_BASE_URL}/HistorialIngreso/ByUsuario/${idUsuario}`),
                 fetch(`${API_BASE_URL}/Gasto/ByUsuario/${idUsuario}`),
                 fetch(`${API_BASE_URL}/HistorialGasto/ByUsuario/${idUsuario}`)
             ]);
+
             const ingresos = resIngresos.ok ? await resIngresos.json() : [];
             const histIngresos = resHistIngresos.ok ? await resHistIngresos.json() : [];
             const gastos = resGastos.ok ? await resGastos.json() : [];
             const histGastos = resHistGastos.ok ? await resHistGastos.json() : [];
+
             const todosIngresos = [...ingresos, ...histIngresos];
             const todosGastos = [...gastos, ...histGastos];
             const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
             const añoActual = new Date().getFullYear();
 
+            // Procesamos todos los datos primero
             const datosPorMes = meses.map((mes, index) => {
                 const totalIngresos = todosIngresos.reduce((acc, item) => {
                     const fecha = new Date(item.FechaIngreso || item.Fecha);
@@ -155,6 +159,7 @@ const Comparativa = () => {
                     }
                     return acc;
                 }, 0);
+
                 const totalGastos = todosGastos.reduce((acc, item) => {
                     const fecha = new Date(item.FechaGasto || item.Fecha);
                     if (fecha.getMonth() === index && fecha.getFullYear() === añoActual) {
@@ -162,23 +167,49 @@ const Comparativa = () => {
                     }
                     return acc;
                 }, 0);
+
                 return { mes, ingresos: totalIngresos, gastos: totalGastos };
             });
 
+            // Calculamos máximo
             let maximo = 0;
-            datosPorMes.forEach(item => { const mayor = Math.max(item.ingresos, item.gastos); if (mayor > maximo) maximo = mayor; });
-            setMaximoGrafico(maximo + 1000);
+            datosPorMes.forEach(item => {
+                const mayor = Math.max(item.ingresos, item.gastos);
+                if (mayor > maximo) maximo = mayor;
+            });
 
-            setDatosLinea([]);
-            for (let i = 0; i < datosPorMes.length; i++) {
-                await new Promise(resolve => setTimeout(resolve, 120));
-                setDatosLinea(prev => [...prev, datosPorMes[i]]);
-            }
-        } catch (error) { console.error(error); } finally { setCargandoLinea(false); }
+            // --- CAMBIO CLAVE AQUÍ ---
+            // Actualizamos los estados una sola vez, sin bucles ni delays
+            setMaximoGrafico(maximo + 1000);
+            setDatosLinea(datosPorMes);
+
+        } catch (error) {
+            console.error("Error al cargar datos línea:", error);
+        } finally {
+            setCargandoLinea(false);
+        }
     }, [idUsuario, calcularMontoEnPesos, esPremium]);
 
     // --- EFECTOS ---
-    useEffect(() => { const cargarTasas = async () => { const valores = await obtenerTasas(); setTasas(valores); }; cargarTasas(); }, []);
+    useEffect(() => {
+        const cargarTasas = async () => {
+            try {
+                const valores = await obtenerTasas();
+                // Validamos que los valores existan y tengan el formato esperado
+                if (valores && valores.USD !== undefined && valores.EUR !== undefined) {
+                    setTasas(valores);
+                } else {
+                    // Si la API responde pero el formato es incorrecto, usamos los defaults
+                    throw new Error("Formato de tasas inválido");
+                }
+            } catch (error) {
+                console.warn("Error al obtener tasas, usando valores de respaldo:", error);
+                // Valores predefinidos en caso de error o fallo de conexión
+                setTasas({ USD: 1450, EUR: 1650 });
+            }
+        };
+        cargarTasas();
+    }, []);
     useEffect(() => { validarUsuario(); }, [validarUsuario]);
     useEffect(() => { if (idUsuario && rolHabilitado) { cargarTodosLosDatos(); } }, [idUsuario, rolHabilitado, cargarTodosLosDatos]);
     useEffect(() => { if (tipoPresentacion === 3 && idUsuario && esPremium) { cargarDatosLinea(); } }, [tipoPresentacion, idUsuario, esPremium, cargarDatosLinea]);
@@ -350,9 +381,9 @@ const Comparativa = () => {
                 <div className="tarjeta-general" style={{ textAlign: 'center', padding: '40px', maxWidth: '500px' }}>
                     <div style={{ fontSize: '50px', marginBottom: '20px' }}>🔒</div>
                     <h2 style={{ color: '#FF4B4B', marginBottom: '15px' }}>Apartado No Habilitado</h2>
-                    <p style={{ color: '#888', marginBottom: '25px', lineHeight: '1.6' }}>Para acceder a las métricas avanzadas de comparativas y balances mensuales, necesitas mejorar tu suscripción actual.</p>
+                    <p style={{ color: '#888', marginBottom: '25px', lineHeight: '1.6' }}>Para acceder a este apartado, necesitas mejorar tu suscripción actual. En este apartado de comparativas y balances mensuales podrás analizar tu rendimiento financiero de manera detallada.</p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                        <button className="botonesComparativa btn-principal" onClick={() => alert("Redirigiendo a planes...")}>Mejorar mi Plan🚀</button>
+                        <Link to="/planes" className="botonesComparativa btn-principal" onClick={() => alert("Redirigiendo a planes...")}>Mejorar mi Plan🚀</Link>
                         <Link to="/Principal" className="botonesComparativa btn-volver" style={{ textDecoration: 'none', display: 'block', textAlign: 'center' }}>Volver al Inicio</Link>
                     </div>
                 </div>
@@ -366,9 +397,9 @@ const Comparativa = () => {
                 <div className="titulo-principal-general">
                     <h2>{tipoPresentacion === 1 ? "Comparativa Mensual Detallada" : tipoPresentacion === 2 ? "Balance de Ingresos y Gastos" : "Gráfico de Desempeño Económico"}</h2>
                     <p className="descripcion-encabezado">
-                        {tipoPresentacion === 1 ? "Seleccione dos meses para contrastar registros y porcentaje de crecimiento." : 
-                         tipoPresentacion === 2 ? "Cruza datos de ingresos y gastos de un mismo periodo para mostrar resultado neto." : 
-                         "Analice visualmente el comportamiento anual de sus finanzas."}
+                        {tipoPresentacion === 1 ? "Seleccione dos meses para contrastar registros y porcentaje de crecimiento." :
+                            tipoPresentacion === 2 ? "Cruza datos de ingresos y gastos de un mismo periodo para mostrar resultado neto." :
+                                "Analice visualmente el comportamiento anual de sus finanzas."}
                     </p>
                 </div>
 

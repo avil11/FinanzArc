@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Sacamos Link de acá
 import PhoneInputPkg from "react-phone-input-2";
 const PhoneInput = PhoneInputPkg.default ? PhoneInputPkg.default : PhoneInputPkg;
 
 import "react-phone-input-2/lib/style.css";
 import "./CrearCuenta.css";
+
+// IMPORTANTE: Asegurate de que la ruta de importación coincida con la ubicación de tu archivo
+import InicioSesion from "../inicio/InicioSesion/InicioSesion"; 
 
 const CrearCuenta = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +19,10 @@ const CrearCuenta = () => {
     password: "",
     confirmarPassword: ""
   });
+  
+  // NUEVO ESTADO: Controla si el modal de login está abierto o cerrado
+  const [modalLoginAbierto, setModalLoginAbierto] = useState(false);
+  
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -151,9 +158,31 @@ const CrearCuenta = () => {
         </form>
 
         <p className="footer-text">
-          ¿Ya tienes cuenta? <Link to="/inicio-sesion" className="gold-link">Inicia Sesión</Link>
+          ¿Ya tienes cuenta?{" "}
+          {/* CAMBIO ACÁ: Reemplazamos el Link por un botón que abre el modal */}
+          <button 
+            type="button" 
+            className="gold-link" 
+            onClick={() => setModalLoginAbierto(true)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              font: 'inherit',
+              cursor: 'pointer',
+              textDecoration: 'none'
+            }}
+          >
+            Inicia Sesión
+          </button>
         </p>
       </div>
+
+      {/* RENDERIZAMOS EL MODAL FUERA DE LA TARJETA */}
+      <InicioSesion 
+        isOpen={modalLoginAbierto} 
+        onClose={() => setModalLoginAbierto(false)} 
+      />
     </div>
   );
 };

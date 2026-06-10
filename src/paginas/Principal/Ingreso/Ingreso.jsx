@@ -13,8 +13,10 @@ function Ingreso() {
   const [busqueda, setBusqueda] = useState("");
   const [vermas, setVerMas] = useState(false);
   const [itemSeleccionado, setItemSeleccionado] = useState(null);
-  const [tasas, setTasas] = useState({ USD: 1, EUR: 1 });
-  
+
+  // Estado inicial con valores por defecto para evitar undefined
+  const [tasas, setTasas] = useState({ USD: 1450, EUR: 1650 });
+
   const [tipoIngreso, setTipoIngreso] = useState([]);
   const [divisa, setDivisa] = useState([]);
 
@@ -27,43 +29,50 @@ function Ingreso() {
     FechaIngreso: new Date().toISOString().split('T')[0],
     Descripcion: ""
   });
+
   useEffect(() => {
     const cargarDatos = async () => {
-      const tasasActuales = await obtenerTasas();
-      setTasas(tasasActuales);
+      try {
+        const tasasActuales = await obtenerTasas();
+        // Solo actualizamos si recibimos un objeto válido
+        if (tasasActuales && typeof tasasActuales === 'object') {
+          setTasas(tasasActuales);
+        }
+      } catch (error) {
+        console.error("Error al cargar tasas, usando valores por defecto:", error);
+      }
       obtenerDatosUsuarioYRegistros();
     };
     cargarDatos();
   }, []);
 
-   // USE EFFECT PARA TRAER INFORMACION DE LA TABLA TipoIngreso
-   useEffect(() => {
-     const fetchTipoIngreso = async () => {
-       try {
-         const response = await fetch(`${API_BASE_URL}/TipoIngreso`); // Asegúrate de que la ruta sea esta
-         const data = await response.json();
-         setTipoIngreso(data);
-       } catch (error) {
-         console.error("Error al cargar tipo de ingresos:", error);
-       }
-     };
- 
-     fetchTipoIngreso();
-   }, []);
-   // USE EFFECT PARA TRAER INFORMACION DE LA TABLA Divisa
-   useEffect(() => {
-     const fetchDivisa = async () => {
-       try {
-         const response = await fetch(`${API_BASE_URL}/Divisa`); // Asegúrate de que la ruta sea esta
-         const data = await response.json();
-         setDivisa(data);
-       } catch (error) {
-         console.error("Error al cargar los tipos de divisas:", error);
-       }
-     };
- 
-     fetchDivisa();
-   }, []);
+  // USE EFFECT PARA TRAER INFORMACION DE LA TABLA TipoIngreso
+  useEffect(() => {
+    const fetchTipoIngreso = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/TipoIngreso`);
+        const data = await response.json();
+        setTipoIngreso(data);
+      } catch (error) {
+        console.error("Error al cargar tipo de ingresos:", error);
+      }
+    };
+    fetchTipoIngreso();
+  }, []);
+
+  // USE EFFECT PARA TRAER INFORMACION DE LA TABLA Divisa
+  useEffect(() => {
+    const fetchDivisa = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/Divisa`);
+        const data = await response.json();
+        setDivisa(data);
+      } catch (error) {
+        console.error("Error al cargar los tipos de divisas:", error);
+      }
+    };
+    fetchDivisa();
+  }, []);
 
   const COLORES = ["#007AFF", "#FF9500", "#34C759", "#AF52DE"];
 
@@ -122,9 +131,14 @@ function Ingreso() {
       headers: { "Authorization": `Bearer ${localStorage.getItem("Token")}` }
     }).then(() => obtenerDatosUsuarioYRegistros());
   };
+
   const calcularMontoEnPesos = (monto, idDivisa) => {
-    if (idDivisa === 2) return monto * tasas.USD;
-    if (idDivisa === 3) return monto * tasas.EUR;
+    // Uso de || 1 como fallback de seguridad
+    const tasaUSD = tasas?.USD || 1450;
+    const tasaEUR = tasas?.EUR || 1650;
+
+    if (idDivisa === 2) return monto * tasaUSD;
+    if (idDivisa === 3) return monto * tasaEUR;
     return monto;
   };
 
@@ -139,6 +153,7 @@ function Ingreso() {
       </div>
     );
   };
+
   const ingresosFiltrados = useMemo(() => {
     return listaIngresos.filter(i =>
       i.Descripcion?.toLowerCase().includes(busqueda.toLowerCase())
@@ -152,9 +167,11 @@ function Ingreso() {
     })).slice(0, 5);
     return data.length > 0 ? data : [{ nombre: "Sin datos", valor: 0 }];
   }, [ingresosFiltrados, tasas]);
+
   const totalMonto = useMemo(() => {
     return ingresosFiltrados.reduce((acc, item) => acc + calcularMontoEnPesos(Number(item.MontoIngreso), item.IdDivisa), 0);
   }, [ingresosFiltrados, tasas]);
+
   const resetearForm = () => {
     setForm(prev => ({
       ...prev,
@@ -167,6 +184,7 @@ function Ingreso() {
       IdDivisa: 1
     }));
   };
+
   const prepararEdicion = (item) => {
     setForm({
       IdIngreso: item.IdIngreso,
@@ -181,26 +199,20 @@ function Ingreso() {
     setModalAbierto(true);
   };
 
-
   return (
     <div className="pagina-ingreso-contenedor">
       <div className="encabezado-simple">
         <h1 className="titulo-seccion">Fuentes de Ingreso</h1>
-        <p className="texto-gris">Administra todos tus ingresos en este apartado. <br /> Cotizaciones: 1 USD = ${tasas.USD} | 1 EUR = ${tasas.EUR}</p>
+        <p className="texto-gris">
+          Administra todos tus ingresos en este apartado. <br />
+          Cotizaciones: 1 USD = ${tasas?.USD || "..."} | 1 EUR = ${tasas?.EUR || "..."}
+        </p>
       </div>
 
       <div className="pagina-ingreso-tarjeta">
         <div className="tarjeta">
           {ingresosFiltrados.length === 0 ? (
-            <div style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "280px",
-              textAlign: "center",
-              color: "#a0a0a0"
-            }}>
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "280px", textAlign: "center", color: "#a0a0a0" }}>
               <span style={{ fontSize: "2.5rem", marginBottom: "12px" }}>📊</span>
               <p style={{ fontSize: "14px", margin: 0, padding: "0 20px", lineHeight: "1.5" }}>
                 {listaIngresos.length === 0
@@ -299,46 +311,46 @@ function Ingreso() {
         Registrar Ingreso
       </button>
 
-      {/* SECCIÓN DE DETALLES */}
-      {vermas && itemSeleccionado && (
-        <div className="seccion-detalle-inferior" style={{ marginTop: "20px", padding: "20px", backgroundColor: "#1e1e1f", borderRadius: "12px", border: "1px solid #333" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-            <h2 style={{ margin: 0, color: "#c8b277" }}>Detalle de: {itemSeleccionado.Descripcion}</h2>
-            <button onClick={() => setVerMas(false)} className="btn-link" style={{ background: "none", border: "none", color: "#888", cursor: "pointer" }}>Cerrar ✕</button>
-          </div>
+     {vermas && itemSeleccionado && (
+  <div className="seccion-detalle-inferior" style={{ marginTop: "20px", padding: "20px", backgroundColor: "#1e1e1f", borderRadius: "12px", border: "1px solid #333", width: "80%" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
+      <h2>Detalle: {itemSeleccionado.Descripcion}</h2>
+      <button onClick={() => setVerMas(false)} className="btn-link">Cerrar ✕</button>
+    </div>
 
-          <div className="grid-detalles" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px" }}>
-            {/*DINAMICO TIPO INGRESO: */}
-            <div className="tarjeta-dato">
-              <label style={{ display: "block", color: "#888", fontSize: "12px" }}>Tipo de Ingreso</label>
-              <p style={{ margin: "5px 0 0 0", fontWeight: "600" }}>
-                {["Sueldo", "Inversiones", "Ventas", "Otros"][itemSeleccionado.IdTipoIngreso - 1] || "No definido"}
-              </p>
-            </div>
-          
-            <div className="tarjeta-dato">
-              <label style={{ display: "block", color: "#888", fontSize: "12px" }}>Cuenta Destino</label>
-              <p style={{ margin: "5px 0 0 0", fontWeight: "600" }}>
-                {itemSeleccionado.IdCuenta === 1 ? "Caja Principal" : "Ahorros"}
-              </p>
-            </div>
+    <div className="formulario-grid">
+      {/* Campos existentes */}
+      <div className="formulario-grupo">
+        <label>Tipo de Ingreso</label>
+        <p>{tipoIngreso.find(t => t.IdTipoIngreso === itemSeleccionado.IdTipoIngreso)?.Nombre || "Cargando..."}</p>
+      </div>
 
-            <div className="tarjeta-dato">
-              <label style={{ display: "block", color: "#888", fontSize: "12px" }}>Divisa</label>
-              <p style={{ margin: "5px 0 0 0", fontWeight: "600" }}>
-                {itemSeleccionado.IdDivisa === 1 ? "Peso Argentino (ARS)" : itemSeleccionado.IdDivisa === 2 ? "Dólar (USD)" : "Euro (EUR)"}
-              </p>
-            </div>
+      <div className="formulario-grupo">
+        <label>Divisa</label>
+        <p>{divisa.find(d => d.IdDivisa === itemSeleccionado.IdDivisa)?.CodigoISO || "Cargando..."}</p>
+      </div>
 
-            <div className="tarjeta-dato">
-              <label style={{ display: "block", color: "#888", fontSize: "12px" }}>ID de Registro</label>
-              <p style={{ margin: "5px 0 0 0", fontWeight: "600", fontFamily: "monospace", color: "#c8b277" }}>
-                #{itemSeleccionado.IdIngreso}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Nuevos campos traídos de la base de datos */}
+      <div className="formulario-grupo">
+        <label>Monto</label>
+        <p className="monto-destacado" style={{ color: 'rgb(70, 130, 180)', fontWeight: 'bold' }}>
+          {FormatearMoneda(Number(itemSeleccionado.MontoIngreso), itemSeleccionado.IdDivisa)}
+        </p>
+      </div>
+
+      <div className="formulario-grupo">
+        <label>Fecha de Ingreso</label>
+        <p>{new Date(itemSeleccionado.FechaIngreso).toLocaleDateString()}</p>
+      </div>
+
+      <div className="formulario-grupo">
+        <label>Fecha de Creación</label>
+        <p>{new Date(itemSeleccionado.FechaCreacion).toLocaleDateString()}</p>
+      </div>
+    </div>
+  </div>
+)}
+
       {modalAbierto && (
         <div className="capa-modal">
           <div className="contenido-modal">
@@ -350,7 +362,7 @@ function Ingreso() {
                   type="text"
                   value={form.Descripcion}
                   onChange={(e) => setForm({ ...form, Descripcion: e.target.value })}
-                  placeholder='"Ingreso de aguinaldo..."' 
+                  placeholder='"Ingreso de aguinaldo..."'
                 />
               </div>
               <div className="formulario-grupo">
@@ -359,7 +371,7 @@ function Ingreso() {
                   type="number"
                   value={form.MontoIngreso}
                   onChange={(e) => setForm({ ...form, MontoIngreso: e.target.value })}
-                  placeholder='"850.000..."' 
+                  placeholder='"850.000..."'
                 />
               </div>
               <div className="formulario-grupo">
@@ -371,7 +383,6 @@ function Ingreso() {
                 />
               </div>
 
-              {/*DINAMICO CON TABLA TipoIngreso*/}
               <div className="formulario-grupo">
                 <label>Tipo ingreso</label>
                 <select
@@ -385,7 +396,6 @@ function Ingreso() {
                   ))}
                 </select>
               </div>
-              {/* SELECCIONADOR DE DIVISA DINAMICO */}
               <div className="formulario-grupo">
                 <label>TIPO DIVISA</label>
                 <select
