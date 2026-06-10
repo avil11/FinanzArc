@@ -8,6 +8,9 @@ import './Comparativa.css';
 import { obtenerTasas } from '../../../apiConfig'; 
 
 
+
+
+
 const API_BASE_URL = "http://localhost:60496/api";
 
 const Comparativa = () => {
