@@ -65,7 +65,8 @@
 .boton-primario:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(200, 178, 119, .4); }
 .boton-secundario { background: rgba(255, 255, 255, .05); color: #fff; border: 1px solid rgba(255, 255, 255, .1); }
 .boton-secundario:hover { background: rgba(255, 255, 255, .1); }
-.botones-functions-comparativas{ margin-top: 20px; }
+.botones-functions-comparativas{ margin-top: 20px; display: flex; gap: 15px; justify-content: center; }
+.botones-functions-comparativas .botonesComparativa { width : 150px; padding: 5px }
 /* --- ANIMACIONES --- */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 

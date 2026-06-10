@@ -204,9 +204,38 @@ const Archivos = () => {
     <div className="contenedor-principal-general">
       <div className="seccion-encabezado-general">
         <div className="titulo-principal-general">
-          <h2>Repositorio de Comprobantes Digitales</h2>
-          <p>Gestión completa de documentación financiera para el usuario: <strong>{usuario?.Email || usuario?.Nombre}</strong></p>
+  <h2 className="h2Archivos">Repositorio de Comprobantes Digitales</h2>
+  
+  <div className="perfil-usuario-header-badge">
+    <p className="perfil-usuario-subtitulo">
+      Gestión completa de documentación financiera para el usuario:
+    </p>
+    
+    <div className="perfil-usuario-metadatos">
+      <div className="perfil-usuario-item titular">
+        <span className="perfil-meta-tag">Titular</span>
+        <strong>{usuario?.Nombre} {usuario?.Apellido}</strong>
+      </div>
+      
+      <div className="perfil-usuario-item">
+        <span className="perfil-meta-tag">Nombre de Usuario</span>
+        <span>{usuario?.NombreUsuario}</span>
+      </div>
+      
+      <div className="perfil-usuario-item">
+        <span className="perfil-meta-tag">Email</span>
+        <span>{usuario?.Email || usuario?.Nombre}</span>
+      </div>
+      
+      {usuario?.Telefono && (
+        <div className="perfil-usuario-item">
+          <span className="perfil-meta-tag">Contacto</span>
+          <span>+ {usuario?.Telefono}</span>
         </div>
+      )}
+    </div>
+  </div>
+</div>
 
         {/* Sección de Filtros integrada */}
         <div className="contenedor-filtros-documental">
@@ -222,21 +251,22 @@ const Archivos = () => {
         </div>
 
         <div className="acciones-cabecera-archivos">
+
+          <button className="boton-primario" onClick={() => abrirModalCarga("ingreso")}>
+            + Cargar Nuevo Comprobante
+          </button>
           {panelActivo !== "ambos" && (
             <button className="boton-secundario" onClick={() => setPanelActivo("ambos")}>
               ← Ver Ambos Paneles
             </button>
           )}
-          <button className="boton-primario" onClick={() => abrirModalCarga("ingreso")}>
-            + Cargar Nuevo Comprobante
-          </button>
         </div>
       </div>
 
       <div className="contenedor-paneles-dinamicos">
-        
+
         {/* PANEL DE COMPROBANTES DE INGRESO */}
-        <div 
+        <div
           className={`panel-documental-base panel-ingresos-estilo 
             ${panelActivo === "ingreso" ? "panel-estado-maximizando" : ""} 
             ${panelActivo === "gasto" ? "panel-estado-minimizando" : ""}`}
@@ -282,7 +312,7 @@ const Archivos = () => {
         </div>
 
         {/* PANEL DE COMPROBANTES DE GASTO */}
-        <div 
+        <div
           className={`panel-documental-base panel-gastos-estilo 
             ${panelActivo === "gasto" ? "panel-estado-maximizando" : ""} 
             ${panelActivo === "ingreso" ? "panel-estado-minimizando" : ""}`}
@@ -336,8 +366,8 @@ const Archivos = () => {
             <form onSubmit={ejecutarSubidaArchivo}>
               <div className="formulario-grupo">
                 <label>Tipo de Comprobante</label>
-                <select 
-                  value={tipoSubida} 
+                <select
+                  value={tipoSubida}
                   onChange={(e) => setTipoSubida(e.target.value)}
                   disabled={subiendo}
                 >
@@ -347,18 +377,18 @@ const Archivos = () => {
               </div>
               <div className="formulario-grupo">
                 <label>ID de la Transacción en FinanZARC</label>
-                <input 
-                  type="number" 
-                  value={idTransaccion} 
-                  onChange={(e) => setIdTransaccion(e.target.value)} 
+                <input
+                  type="number"
+                  value={idTransaccion}
+                  onChange={(e) => setIdTransaccion(e.target.value)}
                   placeholder="Ej: 1045"
                   disabled={subiendo}
                 />
               </div>
               <div className="formulario-grupo">
                 <label>Archivo de Respaldo (Imágenes o PDF)</label>
-                <input 
-                  type="file" 
+                <input
+                  type="file"
                   accept=".pdf,.png,.jpg,.jpeg,.gif"
                   onChange={(e) => setArchivoSeleccionado(e.target.files[0])}
                   required

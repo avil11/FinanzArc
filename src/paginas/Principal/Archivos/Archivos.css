@@ -150,7 +150,7 @@
 /* Encabezado con efecto de desplazamiento suave */
 .encabezado-tarjeta-modulo {
     background: rgba(30, 30, 30, 0.8);
-    padding: 18px 24px;
+    padding: 18px 10px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     cursor: pointer;
     display: flex;
@@ -163,6 +163,10 @@
 .encabezado-tarjeta-modulo:hover {
     background: rgba(50, 50, 50, 0.9);
     padding-left: 30px;
+}
+
+.h2Archivos {
+    font-size: 2rem !important;
 }
 
 .encabezado-tarjeta-modulo h3 {
@@ -214,6 +218,78 @@
 }
 
 /* ==========================================================================
+   Bloque Semántico de Información de Usuario (Premium Header Badge)
+   ========================================================================== */
+
+.perfil-usuario-header-badge {
+    margin-top: 14px;
+    padding: 16px 20px;
+    background: rgba(26, 26, 26, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: inline-block;
+    max-width: 100%;
+}
+
+.perfil-usuario-subtitulo {
+    margin: 0 0 12px 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.3px;
+}
+
+.perfil-usuario-metadatos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: center;
+}
+
+.perfil-usuario-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px;
+}
+
+.perfil-meta-tag {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #D4AF37;
+    font-weight: 600;
+    opacity: 0.85;
+}
+
+.perfil-usuario-item span:not(.perfil-meta-tag) {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.perfil-usuario-item.titular strong {
+    font-size: 0.95rem;
+    color: #ffffff;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.perfil-usuario-item:not(:last-child) {
+    position: relative;
+}
+
+.perfil-usuario-item:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: -12px;
+    top: 20%;
+    height: 60%;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
    Elementos Interiores del Repositorio de Archivos
    ========================================================================== */
 
@@ -231,6 +307,7 @@
 }
 
 .tarjeta-archivo-item {
+    width: 100%;
     background: rgba(26, 26, 26, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 10px;
@@ -331,8 +408,8 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -341,43 +418,44 @@
 
 .contenido-modal-documentos {
     background: #121212;
-    padding: 40px;
-    border-radius: 16px;
+    padding: 35px 40px;
+    border-radius: 12px;
     width: 100%;
-    max-width: 480px;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(212, 175, 55, 0.2);
+    max-width: 460px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    box-sizing: border-box;
 }
 
 .contenido-modal-documentos h3 {
     margin-top: 0;
     color: #D4AF37;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     font-weight: 500;
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     letter-spacing: 0.5px;
 }
 
 .formulario-grupo {
-    margin-bottom: 24px;
+    margin-bottom: 22px;
 }
 
 .formulario-grupo label {
     display: block;
-    margin-bottom: 10px;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.75rem;
+    margin-bottom: 8px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.7rem;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 1.2px;
     font-weight: 600;
 }
 
-.formulario-grupo input, 
+.formulario-grupo input:not([type="file"]), 
 .formulario-grupo select {
     width: 100%;
-    padding: 14px 16px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.03);
+    padding: 12px 16px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #ffffff;
     font-size: 0.95rem;
@@ -391,34 +469,38 @@
     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23D4AF37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
     background-repeat: no-repeat;
     background-position: right 16px top 50%;
-    background-size: 12px auto;
+    background-size: 10px auto;
     cursor: pointer;
 }
 
 .formulario-grupo select option {
-    background-color: #121212;
+    background-color: #1a1a1a;
     color: #ffffff;
+    padding: 10px;
 }
 
 .formulario-grupo input:focus, 
 .formulario-grupo select:focus {
     outline: none;
     border-color: #D4AF37;
-    background: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .formulario-grupo input[type="file"] {
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px dashed rgba(255, 255, 255, 0.15);
-    color: rgba(255, 255, 255, 0.6);
+    padding: 8px;
+    background: transparent;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
     cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
 }
 
 .formulario-grupo input[type="file"]:hover {
-    border-color: #D4AF37;
-    background: rgba(212, 175, 55, 0.02);
+    border-color: rgba(212, 175, 55, 0.6);
 }
 
 .formulario-grupo input[type="file"]::file-selector-button {
@@ -426,25 +508,24 @@
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 8px 16px;
-    border-radius: 6px;
+    border-radius: 4px;
     margin-right: 16px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     font-weight: 500;
     font-family: inherit;
 }
 
 .formulario-grupo input[type="file"]::file-selector-button:hover {
-    background: #D4AF37;
-    color: #121212;
-    border-color: #D4AF37;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 .formulario-acciones {
     display: flex;
     justify-content: flex-end;
-    gap: 16px;
-    margin-top: 35px;
+    gap: 12px;
+    margin-top: 30px;
     padding-top: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -453,32 +534,35 @@
     background: transparent;
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 12px 24px;
-    border-radius: 8px;
+    padding: 10px 20px;
+    border-radius: 6px;
     font-weight: 500;
+    font-family: inherit;
+    font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .formulario-acciones .boton-secundario:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .formulario-acciones .boton-primario {
-    background: linear-gradient(135deg, #D4AF37 0%, #AA8A2E 100%);
+    background: linear-gradient(135deg, #D4AF37 0%, #B5952F 100%);
     color: #121212;
     border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
+    padding: 10px 20px;
+    border-radius: 6px;
     font-weight: 600;
+    font-family: inherit;
+    font-size: 0.95rem;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .formulario-acciones .boton-primario:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(212, 175, 55, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
 }
 
 .formulario-acciones button:disabled {
@@ -488,19 +572,122 @@
 }
 
 /* ==========================================================================
-   Responsividad Adaptativa de los Paneles
+   Responsividad Adaptativa de los Paneles (Optimizado a partir de 810px)
    ========================================================================== */
 
-@media (max-width: 868px) {
+@media (max-width: 810px) {
+    .perfil-usuario-metadatos {
+        margin-top: 12px;
+    }
+    
+    .perfil-usuario-header-badge {
+        display: block; 
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* ENCABEZADO */
+    .seccion-encabezado-general {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .contenedor-filtros-documental {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .contenedor-filtros-documental select {
+        width: 80%;
+        padding: 10px !important;
+    }
+
+    /* Acciones combinadas y optimizadas */
+    .acciones-cabecera-archivos {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .acciones-cabecera-archivos button, 
+    .acciones-cabecera-archivos .boton-primario, 
+    .acciones-cabecera-archivos .boton-secundario {
+        width: 100%;
+        max-width: 280px; /* Evita que los botones sean excesivamente anchos en tablets */
+    }
+
     .contenedor-paneles-dinamicos {
         flex-direction: column;
+        align-items: stretch;
+        gap: 20px;
+        min-height: auto;
     }
-    .panel-documental-base.panel-estado-minimizando {
-        max-height: 0;
-        overflow: hidden;
-    }
-    .acciones-cabecera-archivos {
-        flex-direction: column;
+
+    .panel-documental-base {
         width: 100%;
+        max-height: 1200px;
+        transition: 
+            max-height 0.6s cubic-bezier(0.25, 1, 0.5, 1),
+            opacity 0.4s ease-in-out,
+            transform 0.5s ease;
+    }
+
+    .panel-documental-base.panel-estado-maximizando {
+        flex: initial;
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .panel-documental-base.panel-estado-minimizando {
+        flex: initial;
+        max-width: none;
+        max-height: 0;
+        padding: 0;
+        margin: 0;
+        opacity: 0;
+        transform: scale(0.96);
+        pointer-events: none;
+        border: none;
+    }
+}
+
+/* ==========================================================================
+   Quiebre Móvil (480px)
+   ========================================================================== */
+@media (max-width: 480px) {
+    .perfil-usuario-metadatos {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .perfil-usuario-item {
+        text-align: center;
+        width: 100%;
+    }
+    
+    .perfil-usuario-item:not(:last-child)::after {
+        display: none;
+    }
+
+    .contenido-modal-documentos {
+        width: 90%;
+        padding: 25px 20px;
+    }
+
+    .formulario-acciones {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+
+    .formulario-acciones button {
+        width: 100%;
+        padding: 12px;
     }
 }
