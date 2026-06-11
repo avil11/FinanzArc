@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 
 import '../General/General.css';
@@ -220,8 +221,14 @@ const Comparativa = () => {
         try {
             setCargando(true); setModalArchivarAbierto(false);
             const response = await fetch(`${API_BASE_URL}/Cierre/FinalizarMes`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ IdUsuario: idUsuario }) });
-            if (response.ok) { alert("¡Mes archivado correctamente!"); await cargarTodosLosDatos(); }
-        } catch (error) { console.error(error); } finally { setCargando(false); }
+            if (response.ok) {
+                toast.success("¡Mes archivado correctamente!");
+                await cargarTodosLosDatos();
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al archivar el mes actual");
+        }
     };
 
     const abrirDetalleMes = async (tipo, offset, titulo) => {
@@ -383,8 +390,12 @@ const Comparativa = () => {
                     <h2 style={{ color: '#FF4B4B', marginBottom: '15px' }}>Apartado No Habilitado</h2>
                     <p style={{ color: '#888', marginBottom: '25px', lineHeight: '1.6' }}>Para acceder a este apartado, necesitas mejorar tu suscripción actual. En este apartado de comparativas y balances mensuales podrás analizar tu rendimiento financiero de manera detallada.</p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                        <Link to="/planes" className="botonesComparativa btn-principal" onClick={() => alert("Redirigiendo a planes...")}>Mejorar mi Plan🚀</Link>
-                        <Link to="/Principal" className="botonesComparativa btn-volver" style={{ textDecoration: 'none', display: 'block', textAlign: 'center' }}>Volver al Inicio</Link>
+                        <Link
+                            to="/planes"
+                            className="botonesComparativa btn-principal"
+                            onClick={() => toast.info("Redirigiendo a planes...")}
+                        >   Explorar Planes</Link>
+                            <Link to="/Principal" className="botonesComparativa btn-volver" style={{ textDecoration: 'none', display: 'block', textAlign: 'center' }}>Volver al Inicio</Link>
                     </div>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import "../General/general.css";
 import "./Archivos.css";
 
@@ -144,7 +145,11 @@ const Archivos = () => {
 
   const ejecutarSubidaArchivo = async (e) => {
     e.preventDefault();
-    if (!archivoSeleccionado) return alert("Por favor, seleccione un archivo.");
+   if (!archivoSeleccionado) {
+  toast.warning("Por favor, seleccione un archivo.");
+  return;
+}
+
 
     setSubiendo(true);
     const token = localStorage.getItem("Token");
@@ -167,11 +172,11 @@ const Archivos = () => {
         body: formData
       });
       if (!respuesta.ok) throw new Error("Error al subir el archivo.");
-      alert("Documento vinculado exitosamente.");
+      toast.success("Documento vinculado exitosamente.");
       setModalAbierto(false);
       await inicializarComponente();
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     } finally {
       setSubiendo(false);
     }
@@ -203,7 +208,7 @@ const Archivos = () => {
           <h2 style={{ color: '#FF4B4B', marginBottom: '15px' }}>Apartado No Habilitado</h2>
           <p style={{ color: '#888', marginBottom: '25px', lineHeight: '1.6' }}>Para acceder a este apartado, necesitas mejorar tu suscripción actual.</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <Link to="/planes" className="botonesComparativa btn-principal" onClick={() => alert("Redirigiendo a planes...")}>Mejorar mi Plan🚀</Link>
+            <Link to="/planes" className="botonesComparativa btn-principal" onClick={() => toast.info("Redirigiendo a planes...")}>Mejorar mi Plan🚀</Link>
             <Link to="/Principal" className="botonesComparativa btn-volver" style={{ textDecoration: 'none', display: 'block', textAlign: 'center' }}>Volver al Inicio</Link>
           </div>
         </div>

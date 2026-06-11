@@ -5,7 +5,11 @@
     justify-content: center; 
     align-items: center; 
 }
-
+.boton-primario-plan, .boton-secundario-plan { border: none; border-radius: 12px; padding: 14px 24px; cursor: pointer; font-weight: 600; font-size: .95rem; transition: all .3s ease; }
+.boton-primario-plan { background: linear-gradient(90deg, #8a733f 0%, #c8b277 100%); color: #111; box-shadow: 0 4px 15px rgba(200, 178, 119, .2); }
+.boton-primario-plan:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(200, 178, 119, .4); }
+.boton-secundario-plan { background: rgba(255, 255, 255, .05); color: #fff; border: 1px solid rgba(255, 255, 255, .1); }
+.boton-secundario-plan:hover { background: rgba(255, 255, 255, .1); }
 .perfil-pagina-contenedor { 
     min-height: 80vh; 
     padding: 20px; 

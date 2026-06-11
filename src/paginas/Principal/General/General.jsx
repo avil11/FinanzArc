@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import "./General.css";
 
 const API_BASE_URL = "http://localhost:60496/api";
@@ -10,7 +11,6 @@ const API_ENDPOINTS = {
   ingresos: "/Ingreso",
   usuarios: "/Usuarios",
   ahorros: "/MetaAhorro",
-  cuentas: "/Cuenta",
   transacciones: "/Transacciones"
 };
 
@@ -21,7 +21,6 @@ const GastoIngreso = () => {
   const [datosGastos, setDatosGastos] = useState([]);
   const [datosIngresos, setDatosIngresos] = useState([]);
   const [metasAhorro, setMetasAhorro] = useState([]);
-  const [cuentas, setCuentas] = useState([]);
 
   const [idUsuarioActual, setIdUsuarioActual] = useState(null);
 
@@ -29,11 +28,10 @@ const GastoIngreso = () => {
     USD: 1300,
     EUR: 1450
   });
-  const [rolUsuario, setRolUsuario] = useState(null); // Nuevo estado
+  const [rolUsuario, setRolUsuario] = useState(null);
 
   const obtenerCotizaciones = async () => {
     try {
-      // Usamos Promise.all para hacer ambas peticiones de forma simultánea
       const [resUsd, resEur] = await Promise.all([
         fetch("https://dolarapi.com/v1/dolares/blue"),
         fetch("https://dolarapi.com/v1/cotizaciones/eur")
@@ -46,14 +44,12 @@ const GastoIngreso = () => {
       const dataUsd = await resUsd.json();
       const dataEur = await resEur.json();
 
-      // Actualizamos el estado con los datos obtenidos
       setCotizaciones({
         USD: Number(dataUsd.venta).toFixed(2),
         EUR: Number(dataEur.venta).toFixed(2)
       });
     } catch (error) {
       console.error("Error obteniendo cotizaciones de DolarAPI, usando respaldo:", error);
-      // Valores de respaldo en caso de que la API falle
       setCotizaciones({
         USD: "1300.00",
         EUR: "1450.00"
@@ -95,8 +91,6 @@ const GastoIngreso = () => {
     return () => clearTimeout(temporizador);
   }, []);
 
-
-
   const convertirAPesos = (monto, divisa) => {
     const valor = Number(monto) || 0;
     const cotUSD = Number(cotizaciones.USD);
@@ -122,43 +116,11 @@ const GastoIngreso = () => {
       .then(res => res.json())
       .then(data => {
         setIdUsuarioActual(data.IdUsuario);
-        setRolUsuario(data.IdRol); // <--- Guarda el rol aquí
+        setRolUsuario(data.IdRol);
 
         obtenerGastos(data.IdUsuario);
         obtenerIngresos(data.IdUsuario);
         obtenerAhorros(data.IdUsuario);
-        obtenerCuentas(data.IdUsuario);
-      });
-  };
-
-  const obtenerCuentas = (idusuario) => {
-    fetch(`${API_BASE_URL}${API_ENDPOINTS.cuentas}/ByUsuario/${idusuario}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("Token")}`
-      }
-    })
-      .then(res => res.json())
-      .then(data => setCuentas(data || []));
-  };
-
-  const manejarDesvincularCuenta = (idCuenta) => {
-    if (!window.confirm("¿Seguro que deseas eliminar esta cuenta?")) return;
-
-    fetch(`${API_BASE_URL}${API_ENDPOINTS.cuentas}/${idCuenta}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("Token")}`
-      }
-    })
-      .then(res => {
-        if (res.ok) {
-          obtenerCuentas(idUsuarioActual);
-        } else {
-          alert("Error al desvincular la cuenta.");
-        }
-      })
-      .catch(error => {
-        console.error(error);
       });
   };
 
@@ -245,54 +207,28 @@ const GastoIngreso = () => {
       .catch(error => console.error(error));
   };
 
-  const manejarSeleccionCsv = (e) => {
-    const file = e.target.files[0];
-
-    if (file && !file.name.endsWith(".csv")) {
-      alert("Selecciona un archivo CSV.");
-      return;
-    }
-
-    setArchivoCsv(file);
-  };
-
-  const manejarSubidaCsv = async () => {
-    if (!archivoCsv) {
-      alert("Selecciona un archivo.");
-      return;
-    }
-
-    setCargandoCsv(true);
-    const formData = new FormData();
-    formData.append("archivo", archivoCsv);
-
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}${API_ENDPOINTS.transacciones}/importar-csv`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("Token")}`
-          },
-          body: formData
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert(data.message);
-        setModalImportarAbierto(false);
-        obtenerDatos();
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setCargandoCsv(false);
+  // --- LÓGICA DE LÍMITES POR ROL ---
+  const obtenerLimiteMetas = (idRol) => {
+    switch (idRol) {
+      case 1:
+        return 1;
+      case 2:
+        return 3;
+      case 3:
+        return 5;
+      case 4:
+        return Infinity;
+      default:
+        return 1;
     }
   };
+
+  const metasActivas = metasAhorro.filter(meta => meta.IdEstadoMetaAhorro !== 2);
+  const metasCompletadas = metasAhorro.filter(meta => meta.IdEstadoMetaAhorro === 2);
+  const limiteMetas = obtenerLimiteMetas(rolUsuario);
+  const cantidadMetasActivas = metasActivas.length;
+  const metasDisponibles = limiteMetas - cantidadMetasActivas;
+  const limiteAlcanzado = cantidadMetasActivas >= limiteMetas;
 
   const manejarCambioInput = (e) => {
     setMetaForm({
@@ -303,6 +239,43 @@ const GastoIngreso = () => {
 
   const manejarGuardarMeta = () => {
     const token = localStorage.getItem("Token");
+    
+    // Validación de límites (Solo si es creación)
+    const esEdicion = metaForm.IdMetaAhorro !== null && metaForm.IdMetaAhorro !== undefined;
+    if (!esEdicion && limiteAlcanzado) {
+      toast.warning(`Has alcanzado el máximo de ${limiteMetas} meta${limiteMetas !== 1 ? 's' : ''} activa${limiteMetas !== 1 ? 's' : ''} permitido por tu plan.`);
+      return;
+    }
+
+    if (!metaForm.Nombre.trim()) {
+      toast.warning("Debes ingresar un nombre para la meta");
+      return;
+    }
+
+    if (!metaForm.MontoObjetivo || Number(metaForm.MontoObjetivo) <= 0) {
+      toast.warning("Debes ingresar un monto objetivo válido");
+      return;
+    }
+
+    if (!metaForm.FechaInicio) {
+      toast.warning("Debes seleccionar una fecha de inicio");
+      return;
+    }
+
+    if (!metaForm.FechaObjetivo) {
+      toast.warning("Debes seleccionar una fecha objetivo");
+      return;
+    }
+
+    if (
+      new Date(metaForm.FechaObjetivo) <
+      new Date(metaForm.FechaInicio)
+    ) {
+      toast.error(
+        "La fecha objetivo no puede ser menor a la fecha de inicio"
+      );
+      return;
+    }
 
     fetch(`${API_BASE_URL}${API_ENDPOINTS.usuarios}/ByToken`, {
       headers: {
@@ -324,7 +297,10 @@ const GastoIngreso = () => {
 
         guardarMetaApi(metaAGuardar);
       })
-      .catch(error => console.error("Error obteniendo usuario:", error));
+      .catch(error => {
+        console.error("Error obteniendo usuario:", error);
+        toast.error("No se pudo obtener la información del usuario");
+      });
   };
 
   const guardarMetaApi = (metaAGuardar) => {
@@ -346,16 +322,34 @@ const GastoIngreso = () => {
       },
       body: JSON.stringify(metaAGuardar)
     })
-      .then(() => {
+      .then(response => {
+        if (!response.ok) {
+          throw new Error();
+        }
+
+        toast.success(
+          esEdicion
+            ? "Meta actualizada correctamente"
+            : "Meta creada correctamente"
+        );
+
         setModalAgregarAbierto(false);
         setModalEditarAbierto(false);
+
         obtenerDatos();
       })
-      .catch(error => console.error(error));
+      .catch(error => {
+        console.error(error);
+
+        toast.error(
+          esEdicion
+            ? "Error al actualizar la meta"
+            : "Error al crear la meta"
+        );
+      });
   };
 
   const manejarEliminarMeta = (metaDesdeLista = null) => {
-    // Busca el ID: si viene por parámetro (botón de la lista) usa ese, sino usa el del modal
     const idAEliminar = metaDesdeLista?.IdMetaAhorro || metaForm.IdMetaAhorro;
 
     if (!idAEliminar) return;
@@ -370,11 +364,20 @@ const GastoIngreso = () => {
         Authorization: `Bearer ${localStorage.getItem("Token")}`
       }
     })
-      .then(() => {
-        setModalEditarAbierto(false); // Cierra el modal si se llamó desde ahí
-        obtenerDatos(); // Recarga la vista para que desaparezca la tarjeta
+      .then(response => {
+        if (!response.ok) {
+          throw new Error();
+        }
+
+        toast.success("Meta eliminada correctamente");
+
+        setModalEditarAbierto(false);
+        obtenerDatos();
       })
-      .catch(error => console.error(error));
+      .catch(error => {
+        console.error(error);
+        toast.error("Error al eliminar la meta");
+      });
   };
 
   const calcularTotal = (datos) => {
@@ -486,6 +489,8 @@ const GastoIngreso = () => {
   };
 
   const abrirModalAgregar = () => {
+    if (limiteAlcanzado) return;
+
     setMetaForm({
       IdMetaAhorro: null,
       Nombre: "",
@@ -519,10 +524,6 @@ const GastoIngreso = () => {
   const nombre = localStorage.getItem("Nombre") || "Usuario";
   const apellido = localStorage.getItem("Apellido") || "";
 
-  // Asumimos que 2 es el estado "Completado" en tu base de datos
-  const metasActivas = metasAhorro.filter(meta => meta.IdEstadoMetaAhorro !== 2);
-  const metasCompletadas = metasAhorro.filter(meta => meta.IdEstadoMetaAhorro === 2);
-
   return (
     <div className="contenedor-principal-general">
       <div className="seccion-encabezado-general">
@@ -540,7 +541,6 @@ const GastoIngreso = () => {
           </small>
         </div>
 
-        {/* Dentro de tu return, en la sección de encabezado */}
         <div className="botones-functions-comparativas">
           <Link to="/comparativa" className="botonesComparativa">
             Mostrar Balance
@@ -548,7 +548,6 @@ const GastoIngreso = () => {
           <Link to="/archivos" className="botonesComparativa">
             Archivos
           </Link>
-
         </div>
       </div>
 
@@ -637,11 +636,48 @@ const GastoIngreso = () => {
       </div>
 
       <div className="contenedor-ahorros-general">
-        <div className="encabezado-ahorros-flex">
-          <h3 className="titulo-ahorros-general">Objetivos en Curso</h3>
-          <button onClick={abrirModalAgregar} className="boton-primario">
-            Agregar Meta
-          </button>
+        
+        {/* ENCABEZADO CON CONTADOR DE LÍMITES */}
+        <div style={{ marginBottom: "1.5rem" }}>
+          <div className="encabezado-ahorros-flex" style={{ marginBottom: "12px" }}>
+            <h3 className="titulo-ahorros-general">Objetivos en Curso</h3>
+            <button 
+              onClick={abrirModalAgregar} 
+              className="boton-primario"
+              disabled={limiteAlcanzado}
+              style={{
+                opacity: limiteAlcanzado ? 0.5 : 1,
+                cursor: limiteAlcanzado ? 'not-allowed' : 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              Agregar Meta
+            </button>
+          </div>
+
+          <div className="info-limites-plan" style={{ backgroundColor: "rgba(0,0,0,0.2)", padding: "12px 16px", borderRadius: "8px", border: "1px solid rgba(200,178,119,0.2)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
+              <strong style={{ color: "#ffffff", fontSize: "0.95rem" }}>Metas activas:</strong>
+              <span style={{ color: "#c8b277", fontWeight: "bold", fontSize: "1rem" }}>
+                {cantidadMetasActivas} / {limiteMetas === Infinity ? "∞" : limiteMetas}
+              </span>
+            </div>
+            
+            {rolUsuario === 4 ? (
+              <span style={{ fontSize: "0.85rem", color: "#8e8e93" }}>Administrador - sin restricciones.</span>
+            ) : limiteAlcanzado ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                <span style={{ fontSize: "0.85rem", color: "#ff4b4b" }}>Has alcanzado el límite de tu plan.</span>
+                <Link to="/planes" style={{ fontSize: "0.85rem", color: "#c8b277", textDecoration: "none", fontWeight: "500", marginTop: "2px" }}>
+                  Mejorar mi plan para crear más metas 🚀
+                </Link>
+              </div>
+            ) : (
+              <span style={{ fontSize: "0.85rem", color: "#8e8e93" }}>
+                Te queda{metasDisponibles !== 1 ? 'n' : ''} {metasDisponibles} meta{metasDisponibles !== 1 ? 's' : ''} disponible{metasDisponibles !== 1 ? 's' : ''}.
+              </span>
+            )}
+          </div>
         </div>
 
         {/* METAS ACTIVAS */}
@@ -695,7 +731,6 @@ const GastoIngreso = () => {
                       <span style={{ color: '#fff', fontWeight: 'bold' }}>${meta.actual.toLocaleString("es-AR")}</span>
                     </div>
 
-                    {/* OJO ACÁ: Ajusté el estilo del botón para que encaje mejor en tu diseño oscuro */}
                     <button
                       className="boton-secundario"
                       style={{ backgroundColor: '#dc3545', color: '#fff', padding: '4px 10px', fontSize: '0.8rem', borderRadius: '6px', border: 'none', cursor: 'pointer' }}
@@ -773,7 +808,7 @@ const GastoIngreso = () => {
               </div>
               <div className="formulario-grupo" style={{ display: "none" }}>
                 <label htmlFor="montoGuardado">Monto Actual ($)</label>
-                <input type="number" name="MontoGuardado" value={metaForm.MontoGuardado} onChange={manejarCambioInput} id="montoGuardado" placeholder="0.00"  />
+                <input type="number" name="MontoGuardado" value={metaForm.MontoGuardado} onChange={manejarCambioInput} id="montoGuardado" placeholder="0.00" />
               </div>
               <div className="formulario-grupo">
                 <label htmlFor="montoObjetivo">Monto Objetivo ($)</label>
