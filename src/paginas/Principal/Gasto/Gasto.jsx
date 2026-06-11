@@ -24,7 +24,7 @@ function Gasto() {
     IdGasto: null, IdUsuario: null, MontoGasto: "",
     FechaGasto: new Date().toISOString().split('T')[0], Descripcion: ""
   });
-  console.log(form)
+  
   // CORRECCIÓN: Carga inicial consolidada para evitar redundancia y errores
   useEffect(() => {
     const cargarDatosIniciales = async () => {

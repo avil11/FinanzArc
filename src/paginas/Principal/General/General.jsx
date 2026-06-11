@@ -771,9 +771,9 @@ const GastoIngreso = () => {
                 <label htmlFor="nombreMeta">Nombre de la Meta</label>
                 <input type="text" name="Nombre" value={metaForm.Nombre} onChange={manejarCambioInput} id="nombreMeta" placeholder="Ej: Fondo de Emergencia" />
               </div>
-              <div className="formulario-grupo">
+              <div className="formulario-grupo" style={{ display: "none" }}>
                 <label htmlFor="montoGuardado">Monto Actual ($)</label>
-                <input type="number" name="MontoGuardado" value={metaForm.MontoGuardado} onChange={manejarCambioInput} id="montoGuardado" placeholder="0.00" />
+                <input type="number" name="MontoGuardado" value={metaForm.MontoGuardado} onChange={manejarCambioInput} id="montoGuardado" placeholder="0.00"  />
               </div>
               <div className="formulario-grupo">
                 <label htmlFor="montoObjetivo">Monto Objetivo ($)</label>

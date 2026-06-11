@@ -11,6 +11,73 @@
     align-items: stretch;
 }
 
+/* =========================================
+   ESTILOS PARA LA LISTA DE DETALLES DE PLANES
+   Diseño: Cuaderno Tesis - Desarrollo Web
+   ========================================= */
+
+.lista-detalles {
+  list-style-type: none;
+  padding: 10px 15px; /* Espaciado interno simulando los márgenes de una hoja */
+  margin: 15px 0 25px 0;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  
+  /* Fondo tenue simulando papel de cuaderno y línea de margen izquierdo */
+  
+  box-shadow: inset 3px 0 0 #c8b277; /* Línea de encuadernación / margen */
+}
+
+.lista-detalles li {
+  display: flex;
+  align-items: flex-start;
+  font-size: 14.5px;
+  line-height: 1.6;
+  word-break: break-word;
+  
+  /* Separación y líneas simulando renglones */
+  padding: 8px 0 8px 10px; 
+  border-bottom: 1px solid #c8b277; 
+  font-family: inherit; 
+}
+
+/* Evita que el último elemento tenga una línea extra abajo */
+.lista-detalles li:last-child {
+  border-bottom: none;
+}
+
+.detalle-incluido {
+  color: #27672a; /* Verde oscuro (simulando tinta de corrección aprobada) */
+  font-weight: 600;
+}
+
+.detalle-excluido {
+  color: #c62828; /* Rojo sobrio (simulando tinta roja) */
+  opacity: 0.85;
+  /* Tachado sutil para dar la sensación de un ítem descartado en los apuntes */
+  text-decoration: line-through; 
+  text-decoration-color: rgba(198, 40, 40, 0.4);
+}
+
+.detalle-normal {
+  color: #37474f; /* Gris azulado muy oscuro, similar a la tinta de lapicera */
+  font-weight: 500;
+}
+
+.detalle-vacio {
+  font-style: italic;
+  color: #78909c;
+  font-size: 14px;
+  margin: 15px 0;
+  text-align: center;
+  padding: 12px;
+  /* Estilo de nota en blanco */
+  border: 1px dashed #cfd8dc;
+  border-radius: 4px;
+  background-color: #f5f7f8;
+}
+
 /* Tarjeta individual de Plan */
 .tarjeta-plan {
     display: flex;
@@ -23,26 +90,20 @@
     border-radius: 16px;
     text-align: center;
     
-    /* SOMBRA ELEGANTE: 
-       Capa 1 (Negro puro): Da profundidad y separa la tarjeta del fondo oscuro.
-       Capa 2 (Dorado muy sutil): Crea un halo premium que hace juego con los bordes. */
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 
-                0 0 15px rgba(200, 178, 119, 0.04);
+    /* Sombra base: Casi invisible, integrada al fondo oscuro */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
                 
-    /* Se agregó 'box-shadow' a la transición y se suavizó el tiempo a 0.4s */
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-                box-shadow 0.4s ease;
+    /* TRANSICIÓN: Clásica y lineal pero suave */
+    transition: all 0.35s ease-in-out;
 }
 
 .tarjeta-plan:hover {
-    /* Elevación un poco más pronunciada para el hover */
-    transform: translateY(-8px);
+    /* Animación: Solo sube */
+    transform: translateY(-12px);
     
-    /* SOMBRA HOVER: 
-       Se expande la sombra negra para dar la ilusión de que se acercó a la pantalla, 
-       y se intensifica levemente el brillo dorado. */
-    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.8), 
-                0 0 30px rgba(200, 178, 119, 0.12);
+    /* Sombra Hover: Se proyecta hacia abajo imitando luz desde arriba */
+    box-shadow: 0 30px 50px rgba(0, 0, 0, 0.9),
+                0 15px 20px rgba(200, 178, 119, 0.1);
 }
 .tarjeta-plan h3 {
     color: #ffffff;
@@ -52,7 +113,7 @@
 
 .tarjeta-plan h2 {
     color: #c8b277;
-    font-size: 3rem;
+    font-size: 2.2rem;
     margin: 25px 0;
 }
 
@@ -131,6 +192,20 @@
 
 .planes-boton {
     width: 300px;
+}
+
+@media (max-width: 1024px) {
+    .contenedor-planes-grid{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+    .tarjeta-plan {
+        width: 60%;
+        /* max-width: 400px; */
+    }
 }
 
 @media (max-width: 810px) {

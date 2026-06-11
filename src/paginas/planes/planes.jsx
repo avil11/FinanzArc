@@ -1,8 +1,53 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
 import "../Principal/General/general.css";
 import "./planes.css";
 
 const API_BASE_URL = "http://localhost:60496/api";
+
+// ------------------------------------------------------------------
+// NUEVO COMPONENTE: Procesador de detalles optimizado con React.memo
+// ------------------------------------------------------------------
+const DetallesLista = memo(({ texto }) => {
+  // 1. Evitar errores si viene null, undefined o vacío
+  if (!texto || typeof texto !== "string" || texto.trim() === "") {
+    return <p className="detalle-vacio">Sin descripción disponible.</p>;
+  }
+
+  // 2. Separar por líneas y limpiar espacios en blanco, omitiendo líneas vacías
+  const lineas = texto.split("\n").map(line => line.trim()).filter(line => line.length > 0);
+
+  if (lineas.length === 0) {
+    return <p className="detalle-vacio">Sin descripción disponible.</p>;
+  }
+
+  // 3. Renderizar la lista evaluando el primer carácter de cada línea
+  return (
+    <ul className="lista-detalles">
+      {lineas.map((linea, index) => {
+        if (linea.startsWith("+")) {
+          return (
+            <li key={index} className="detalle-incluido">
+              ✅ {linea.substring(1).trim()}
+            </li>
+          );
+        } else if (linea.startsWith("-")) {
+          return (
+            <li key={index} className="detalle-excluido">
+              ❌ {linea.substring(1).trim()}
+            </li>
+          );
+        } else {
+          return (
+            <li key={index} className="detalle-normal">
+              {linea}
+            </li>
+          );
+        }
+      })}
+    </ul>
+  );
+});
+// ------------------------------------------------------------------
 
 const PlanesCompra = () => {
   const [planes, setPlanes] = useState([]);
@@ -10,7 +55,7 @@ const PlanesCompra = () => {
   const [cargandoPago, setCargandoPago] = useState(false);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [esEdicion, setEsEdicion] = useState(false);
-  const [planForm, setPlanForm] = useState({ id: null, Nombre: "", Precio: "", Detalle: "", IdRol: "" });
+  const [planForm, setPlanForm] = useState({ id: 0, Nombre: "", Precio: "", Detalle: "", IdRol: "" });
 
   useEffect(() => {
     cargarDatos();
@@ -58,12 +103,13 @@ const PlanesCompra = () => {
       setCargandoPago(false);
     }
   };
+
   const guardarPlan = () => {
     const metodo = esEdicion ? "PUT" : "POST";
     const url = esEdicion ? `${API_BASE_URL}/Planes/${planForm.id}` : `${API_BASE_URL}/Planes`;
 
     const payload = {
-        IdPlanes: planForm.id || 0, 
+        IdPlan: planForm.id || 0, 
         Nombre: planForm.Nombre || "",
         Precio: parseFloat(planForm.Precio) || 0,
         Detalle: planForm.Detalle || "", 
@@ -94,7 +140,7 @@ const PlanesCompra = () => {
     if (plan) {
       setEsEdicion(true);
       setPlanForm({ 
-          id: plan.IdPlanes, 
+          id: plan.IdPlan, 
           Nombre: plan.Nombre || "",
           Precio: plan.Precio || "", 
           Detalle: plan.Detalle || plan.Detalles || "", 
@@ -119,15 +165,16 @@ const PlanesCompra = () => {
         )}
       </div>
 
-      {/* CONTENEDOR GRID LIMPIO */}
       <div className="contenedor-planes-grid">
         {planes.map((p) => {
           return (
-            <div key={p.IdPlanes} className="tarjeta-plan">
+            <div key={p.IdPlan} className="tarjeta-plan">
               <div>
                 <h3>{p.Nombre || `Plan Nivel ${p.IdRol}`}</h3> 
                 <h2>${p.Precio} ARS</h2>
-                <p>{p.Detalle || p.Detalles || "Sin descripción disponible."}</p>
+                
+                {/* Reemplazamos la etiqueta <p> estática por el nuevo componente */}
+                <DetallesLista texto={p.Detalle || p.Detalles} />
               </div>
               
               <button 
@@ -170,6 +217,7 @@ const PlanesCompra = () => {
                   className="textarea-modal"
                   value={planForm.Detalle} 
                   onChange={e => setPlanForm({...planForm, Detalle: e.target.value})} 
+                  placeholder="+ Característica incluida&#10;- Característica no incluida"
                 />
               </div>
               <div className="formulario-grupo">
