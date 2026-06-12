@@ -145,10 +145,10 @@ const Archivos = () => {
 
   const ejecutarSubidaArchivo = async (e) => {
     e.preventDefault();
-   if (!archivoSeleccionado) {
-  toast.warning("Por favor, seleccione un archivo.");
-  return;
-}
+    if (!archivoSeleccionado) {
+      toast.warning("Por favor, seleccione un archivo.");
+      return;
+    }
 
 
     setSubiendo(true);
@@ -181,7 +181,44 @@ const Archivos = () => {
       setSubiendo(false);
     }
   };
+  const eliminarDocumento = async (idDocumento, tipo) => {
+    if (!window.confirm("¿Estás seguro de que deseas eliminar este comprobante? Esta acción no se puede deshacer.")) return;
 
+    const token = localStorage.getItem("Token");
+    const endpoint = tipo === "ingreso" ? "DocumentoIngreso" : "DocumentoGasto";
+
+    try {
+      // ATENCIÓN: Si te da un error 404 (Not Found), quita la palabra "/Eliminar" de la URL de abajo.
+      // Quedaría así: `${API_BASE_URL}/${endpoint}/${idDocumento}`
+      const url = `${API_BASE_URL}/${endpoint}/Eliminar/${idDocumento}`;
+
+      console.log(`Intentando eliminar: ${url}`); // Para debug en consola
+
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+
+      if (!response.ok) {
+        // Capturamos el texto del error exacto que manda el servidor
+        const errorText = await response.text();
+        throw new Error(`Código ${response.status}: ${errorText || "Error en el servidor"}`);
+      }
+
+      toast.success("Comprobante eliminado con éxito.");
+
+      // Actualizamos el estado usando != para evitar fallos por tipos de datos (string vs int)
+      if (tipo === "ingreso") {
+        setDocumentosIngreso((prev) => prev.filter(doc => doc.IdDocumentoIngreso != idDocumento));
+      } else {
+        setDocumentosGasto((prev) => prev.filter(doc => doc.IdDocumentoGasto != idDocumento));
+      }
+
+    } catch (error) {
+      console.error("Error completo al eliminar:", error);
+      toast.error(`Error al eliminar: ${error.message}`);
+    }
+  };
   const abrirModalCarga = (tipo) => {
     setTipoSubida(tipo);
     setIdTransaccion("");
@@ -280,6 +317,19 @@ const Archivos = () => {
                     </div>
                     <div className="acciones-archivo-item">
                       <a href={`${SERVER_HOST}${doc.RutaArchivo}`} target="_blank" rel="noopener noreferrer" className="enlace-descarga-archivo-btn">Ver / Descargar</a>
+                      <button
+                        onClick={() => eliminarDocumento(doc.IdDocumentoIngreso, "ingreso")}
+                        className="boton-eliminar-moderno"
+                        title="Eliminar comprobante"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icono-eliminar">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          <line x1="10" y1="11" x2="10" y2="17"></line>
+                          <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                        Eliminar
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -313,6 +363,19 @@ const Archivos = () => {
                     </div>
                     <div className="acciones-archivo-item">
                       <a href={`${SERVER_HOST}${doc.RutaArchivo}`} target="_blank" rel="noopener noreferrer" className="enlace-descarga-archivo-btn">Ver / Descargar</a>
+                      <button
+                        onClick={() => eliminarDocumento(doc.IdDocumentoGasto, "gasto")}
+                        className="boton-eliminar-moderno"
+                        title="Eliminar comprobante"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icono-eliminar">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          <line x1="10" y1="11" x2="10" y2="17"></line>
+                          <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                        Eliminar
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -353,6 +416,7 @@ const Archivos = () => {
                 <button type="submit" className="boton-primario">Subir</button>
               </div>
             </form>
+
           </div>
         </div>
       )}
