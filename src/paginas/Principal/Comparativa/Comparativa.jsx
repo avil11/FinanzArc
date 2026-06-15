@@ -424,26 +424,26 @@ const Comparativa = () => {
                 </div>
 
                 <div className='botonesFuncionesComparativa'>
-    <div className='botonesBalanceComparativa'>
-        {esPremium && (
-            <button onClick={() => { setTipoPresentacion(3); }} className='botonesComparativa btn-principal'>
-                Ver Evolución Anual
-            </button>
-        )}
-        <button onClick={() => setTipoPresentacion(tipoPresentacion === 1 ? 2 : 1)} className='botonesComparativa btn-principal'>
-            {tipoPresentacion === 1 ? "Ver Balances Mensuales" : "Ver Comparativa Mensual"}
-        </button>
-        <button onClick={() => setModalArchivarAbierto(true)} className='botonesComparativa btn-secundario'>
-            Archivar Datos Actuales
-        </button>
-    </div>
-    <div className='botonVolverPrincipal'>
-        {/* Cambié las flechas múltiples por una sola más limpia */}
-        <Link to="/Principal" className="botonesComparativa btn-volver">
-            ← Volver al Inicio
-        </Link>
-    </div>
-</div>
+                    <div className='botonesBalanceComparativa'>
+                        {esPremium && (
+                            <button onClick={() => { setTipoPresentacion(3); }} className='botonesComparativa btn-principal'>
+                                Ver Evolución Anual
+                            </button>
+                        )}
+                        <button onClick={() => setTipoPresentacion(tipoPresentacion === 1 ? 2 : 1)} className='botonesComparativa btn-principal'>
+                            {tipoPresentacion === 1 ? "Ver Balances Mensuales" : "Ver Comparativa Mensual"}
+                        </button>
+                        <button onClick={() => setModalArchivarAbierto(true)} className='botonesComparativa btn-secundario'>
+                            Archivar Datos Actuales
+                        </button>
+                    </div>
+                    <div className='botonVolverPrincipal'>
+                        {/* Cambié las flechas múltiples por una sola más limpia */}
+                        <Link to="/Principal" className="botonesComparativa btn-volver">
+                            ← Volver al Inicio
+                        </Link>
+                    </div>
+                </div>
             </div>
 
             {renderContenido()}
@@ -461,13 +461,22 @@ const Comparativa = () => {
                                 <tbody>
                                     {datosModal.items.map((item, i) => {
                                         const monto = item.MontoGasto || item.MontoIngreso || item.Monto;
-                                        const moneda = DIVISAS_MAP[item.IdDivisa];
+                                        const idDivisa = item.IdDivisa || 1; // Por defecto ARS
+                                        const moneda = DIVISAS_MAP[idDivisa];
+
                                         return (
                                             <tr key={i}>
                                                 <td>{new Date(item.FechaGasto || item.FechaIngreso || item.Fecha).toLocaleDateString()}</td>
                                                 <td>{item.Descripcion || item.NombreIngreso || "Registro Histórico"}</td>
                                                 <td className={datosModal.tipo === 'gasto' ? 'texto-rojo' : 'texto-verde'}>
-                                                    <span>${monto.toLocaleString()} {moneda}</span>
+                                                    <span>${Number(monto).toLocaleString()} {moneda}</span>
+
+                                                    {/* Condición para mostrar la conversión si es USD o EUR */}
+                                                    {(idDivisa === 2 || idDivisa === 3) && (
+                                                        <span style={{ display: 'block', fontSize: '0.85em', opacity: 0.7, marginTop: '2px' }}>
+                                                            ≈ ${calcularMontoEnPesos(Number(monto), idDivisa).toLocaleString()} ARS
+                                                        </span>
+                                                    )}
                                                 </td>
                                             </tr>
                                         );

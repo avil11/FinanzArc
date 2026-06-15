@@ -71,21 +71,65 @@
 .botones-functions-comparativas .botonesComparativa { width : 150px; padding: 5px }
 /* --- ANIMACIONES --- */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
+/* 1. Primero creamos el "efectito" (la animación) fuera del media query */
+@keyframes aparecerSuave {
+  0% {
+    opacity: 0;
+    transform: translateY(-15px); /* Empieza un poquito más arriba */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0); /* Vuelve a su posición original */
+  }
+}
 /* =========================================
    MEDIA QUERIES (RESPONSIVE)
    ========================================= */
 @media (max-width: 810px)  { .contenedor-principal-general { padding: 100px 20px 40px; } 
-.seccion-encabezado-general h2 { font-size: 1.8rem; } 
+/* .seccion-encabezado-general h2 { font-size: 1.8rem; }  */
 .panel-graficos-general { grid-template-columns: 1fr; } 
 .grafico-con-leyenda { flex-direction: column; text-align: center; } 
 .grafico-pie { width: 100%; max-width: 300px; } 
 .leyenda-grafico { width: 100%; } }
-@media (max-width: 480px) { .seccion-encabezado-general h2 { font-size: 1.5rem; } .encabezado-ahorros-flex { flex-direction: column; gap: 15px; text-align: center; } .formulario-acciones { flex-direction: column; } .boton-primario, .boton-secundario { width: 100%; } }
+@media (max-width: 480px) { .seccion-encabezado-general h2 { font-size: 1.9rem; } .encabezado-ahorros-flex { flex-direction: column; gap: 15px; text-align: center; } .formulario-acciones { flex-direction: column; } .boton-primario, .boton-secundario { width: 100%; } }
 @media (max-width: 435px) { .botones-funciones-comparativas { flex-direction: column; width: 100%; } }
 
-@media (max-width:1060px) {
-   .grafico-con-leyenda{display: flex; align-items: center; justify-content: center!important;} 
+/* 2. Aplicamos la animación dentro de tu Media Query */
+@media (max-width:1100px) {
+   .grafico-con-leyenda {
+       display: flex; 
+       align-items: center; 
+       justify-content: center !important;
+   }
+   
+   .seccion-encabezado-general { 
+       display: flex; 
+       align-items: center; 
+       text-align: center; 
+       width: 100%; 
+       /* Se ejecuta en 0.4s */
+       animation: aparecerSuave 0.4s ease-out forwards; 
+       animación-delay: 0.2s; /* Se ejecuta después del título para crear un efecto en cascada */
+   }
+   
+   .titulo-principal-general { 
+       display: flex; 
+       width: 100%; 
+       align-items: center; 
+       justify-content: center; 
+       flex-direction: column; 
+       /* Se ejecuta en 0.6s para que aparezca justo después */
+       animation: aparecerSuave 0.6s ease-out forwards; 
+   }
+   
+   .botones-functions-comparativas { 
+       display: flex; 
+       width: 100%; 
+       justify-content: center; 
+       align-items: center; 
+       /* Se ejecuta en 0.8s para cerrar el efecto en cascada */
+       animation: aparecerSuave 0.8s ease-out forwards; 
+   } 
 }
 
 
