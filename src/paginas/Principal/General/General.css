@@ -1,3 +1,5 @@
+
+
 /* =========================================
    ESTILOS PÁGINA GENERAL (DASHBOARD)
    ========================================= */
@@ -5,7 +7,7 @@
 .contenedor-principal-general { background: transparent; width: 100%; max-width: 1210px; margin: 0 auto; padding: 100px 20px 60px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; font-family: inherit; }
 
 /* --- ENCABEZADO --- */
-.seccion-encabezado-general { width: 100%; display: flex; flex-direction: column; gap: 20px; padding: 20px; background: #000; align-items: flex-start; }
+.seccion-encabezado-general { width: 100%; display: flex; flex-direction: column; gap: 20px; padding: 20px; align-items: flex-start; }
 .titulo-principal-general h2 { font-size: 2rem; color: #fff; margin: 0; font-weight: 300; letter-spacing: 1px; }
 .titulo-principal-general p { font-size: 1.2rem !important; color: #a0a0a0; margin: 0; font-weight: 400; letter-spacing: 1px; }
 .botones-funciones-comparativas { display: flex; flex-direction: row; gap: 15px; margin-top: 10px; }
@@ -20,7 +22,7 @@
 .tarjeta-general h3, .titulo-ahorros-general { margin-top: 0; margin-bottom: 25px; font-size: 1.2rem; font-weight: 500; color: #c8b277; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
 
 /* --- GRÁFICOS --- */
-.grafico-con-leyenda { display: flex; align-items: center; justify-content: space-between; gap: 25px; flex-wrap: wrap; }
+.grafico-con-leyenda { display: flex; align-items: center; justify-content: space-between; gap: 25px; flex-wrap: wrap; flex-direction: column; }
 .grafico-pie { width: 230px; min-width: 220px; height: 250px; }
 .leyenda-grafico { display: flex; flex-direction: column; gap: 12px; flex: 1; min-width: 170px; }
 .item-leyenda { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 10px 5px; border-radius: 14px; background: rgba(255, 255, 255, .03); border: 1px solid rgba(255, 255, 255, .08);}
@@ -73,10 +75,35 @@
 /* =========================================
    MEDIA QUERIES (RESPONSIVE)
    ========================================= */
-@media (max-width: 810px)  { .contenedor-principal-general { padding: 100px 20px 40px; } .seccion-encabezado-general h2 { font-size: 1.8rem; } .panel-graficos-general { grid-template-columns: 1fr; } .grafico-con-leyenda { flex-direction: column; text-align: center; } .grafico-pie { width: 100%; max-width: 300px; } .leyenda-grafico { width: 100%; } }
+@media (max-width: 810px)  { .contenedor-principal-general { padding: 100px 20px 40px; } 
+.seccion-encabezado-general h2 { font-size: 1.8rem; } 
+.panel-graficos-general { grid-template-columns: 1fr; } 
+.grafico-con-leyenda { flex-direction: column; text-align: center; } 
+.grafico-pie { width: 100%; max-width: 300px; } 
+.leyenda-grafico { width: 100%; } }
 @media (max-width: 480px) { .seccion-encabezado-general h2 { font-size: 1.5rem; } .encabezado-ahorros-flex { flex-direction: column; gap: 15px; text-align: center; } .formulario-acciones { flex-direction: column; } .boton-primario, .boton-secundario { width: 100%; } }
 @media (max-width: 435px) { .botones-funciones-comparativas { flex-direction: column; width: 100%; } }
 
 @media (max-width:1060px) {
    .grafico-con-leyenda{display: flex; align-items: center; justify-content: center!important;} 
+}
+
+
+.truncate-text-general { 
+   
+   display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+    color: #d5d5d5;
+    font-size: 1rem;
+    font-weight: 500;
+}
+.truncate-text-general-ahorro {
+    max-width: 200px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
 }

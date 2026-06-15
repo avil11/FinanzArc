@@ -418,16 +418,6 @@ function Ingreso() {
                   placeholderText="Seleccionar fecha"
                 />
               </div>
-              <div className="formulario-grupo">
-                <label>Fecha</label>
-                <DatePicker
-                  selected={form.FechaIngreso}
-                  onChange={(date) => setForm({ ...form, FechaIngreso: date })}
-                  locale="es"
-                  dateFormat="dd/MM/yyyy"
-                  placeholderText="Seleccionar fecha"
-                />
-              </div>
 
               <div className="formulario-grupo">
                 <label>Tipo ingreso</label>

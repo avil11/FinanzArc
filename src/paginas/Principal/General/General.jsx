@@ -211,9 +211,20 @@ const GastoIngreso = () => {
   const limiteAlcanzado = cantidadMetasActivas >= limiteMetas;
 
   const manejarCambioInput = (e) => {
+    const { name, value } = e.target;
+
+    // Validación para "Nombre": Máximo 100 caracteres
+    if (name === "Nombre" && value.length > 100) return;
+
+    // Validación para Montos (Guardado y Objetivo): Máximo 10 dígitos
+    if (name === "MontoGuardado" || name === "MontoObjetivo") {
+      // Si el usuario intenta escribir más de 10 caracteres, bloqueamos el cambio
+      if (value.length > 10) return;
+    }
+
     setMetaForm({
       ...metaForm,
-      [e.target.name]: e.target.value
+      [name]: value
     });
   };
 
@@ -227,36 +238,38 @@ const GastoIngreso = () => {
       return;
     }
 
-    if (!metaForm.Nombre.trim()) {
+    // Validación: Nombre no vacío
+    if (!metaForm.Nombre || !metaForm.Nombre.trim()) {
       toast.warning("Debes ingresar un nombre para la meta");
       return;
     }
 
-    if (!metaForm.MontoObjetivo || Number(metaForm.MontoObjetivo) <= 0) {
+    // Validación: Monto válido y tope de 10 dígitos
+    const monto = Number(metaForm.MontoObjetivo);
+    if (!metaForm.MontoObjetivo || monto <= 0) {
       toast.warning("Debes ingresar un monto objetivo válido");
       return;
     }
+    if (monto > 9999999999) {
+      toast.error("El monto objetivo no puede superar los 10 dígitos (9,999,999,999)");
+      return;
+    }
 
+    // Validación: Fechas
     if (!metaForm.FechaInicio) {
       toast.warning("Debes seleccionar una fecha de inicio");
       return;
     }
-
     if (!metaForm.FechaObjetivo) {
       toast.warning("Debes seleccionar una fecha objetivo");
       return;
     }
-
-    if (
-      new Date(metaForm.FechaObjetivo) <
-      new Date(metaForm.FechaInicio)
-    ) {
-      toast.error(
-        "La fecha objetivo no puede ser menor a la fecha de inicio"
-      );
+    if (new Date(metaForm.FechaObjetivo) < new Date(metaForm.FechaInicio)) {
+      toast.error("La fecha objetivo no puede ser menor a la fecha de inicio");
       return;
     }
 
+    // Fetch para guardar
     fetch(`${API_BASE_URL}${API_ENDPOINTS.usuarios}/ByToken`, {
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -269,7 +282,7 @@ const GastoIngreso = () => {
           MontoGuardado: parseFloat(metaForm.MontoGuardado),
           FechaMeta: metaForm.FechaObjetivo ? metaForm.FechaObjetivo.toISOString() : null,
           FechaInicio: metaForm.FechaInicio ? metaForm.FechaInicio.toISOString() : null,
-          IdDivisa: metaForm.IdDivisa, // Asegúrate de que apunte a IdDivisa
+          IdDivisa: metaForm.IdDivisa,
           IdUsuario: userData.IdUsuario
         };
 
@@ -549,7 +562,7 @@ const GastoIngreso = () => {
                         <Cell key={i} fill={COLORESgasto[i % COLORESgasto.length]} stroke="none" />
                       ))}
                     </Pie>
-                    <Tooltip contentStyle={{ backgroundColor: "#1e1e1f", border: "1px solid rgba(200,178,119,0.3)", color: "#fff", borderRadius: "8px" }}   formatter={(value, name) => [`$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, name]} />
+                    <Tooltip contentStyle={{ backgroundColor: "#1e1e1f", border: "1px solid rgba(200,178,119,0.3)", color: "#fff", borderRadius: "8px" }} formatter={(value, name) => [`$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, name]} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -600,7 +613,7 @@ const GastoIngreso = () => {
                         <Cell key={i} fill={COLORES[i % COLORES.length]} stroke="none" />
                       ))}
                     </Pie>
-                    <Tooltip contentStyle={{ backgroundColor: "#1e1e1f", border: "1px solid rgba(200,178,119,0.3)", color: "#fff", borderRadius: "8px" }}  formatter={(value, name) => [`$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, name]}  />
+                    <Tooltip contentStyle={{ backgroundColor: "#1e1e1f", border: "1px solid rgba(200,178,119,0.3)", color: "#fff", borderRadius: "8px" }} formatter={(value, name) => [`$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, name]} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -704,7 +717,7 @@ const GastoIngreso = () => {
                   boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <span style={{ fontWeight: '600', color: '#ffffff', fontSize: '1.1rem' }}>
+                    <span className="truncate-text-general-ahorro" style={{ fontWeight: '600', color: '#ffffff', fontSize: '1.1rem' }}>
                       {meta.etiqueta}
                     </span>
                     <span style={{ color: '#c8b277', fontWeight: 'bold' }}>
@@ -740,16 +753,49 @@ const GastoIngreso = () => {
             <h3>Editar Meta de Ahorro</h3>
             <div className="formulario-cuerpo">
               <div className="formulario-grupo">
-                <label htmlFor="nombreMeta">Nombre de la Meta</label>
-                <input type="text" name="Nombre" value={metaForm.Nombre} onChange={manejarCambioInput} id="nombreMeta" placeholder="Ej: Fondo de Emergencia" />
+                <label htmlFor="nombreMeta">
+                  Nombre de la Meta
+                  {/* Este es el contador en vivo */}
+                  <span style={{ fontSize: '0.8rem', color: '#666', marginLeft: '10px' }}>
+                    ({metaForm.Nombre ? metaForm.Nombre.length : 0}/100)
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  name="Nombre"
+                  value={metaForm.Nombre}
+                  onChange={manejarCambioInput}
+                  id="nombreMeta"
+                  maxLength={100}
+                  placeholder="Ej: Fondo de Emergencia"
+                />
               </div>
+              {/* INPUT MONTO ACTUAL */}
               <div className="formulario-grupo">
-                <label htmlFor="montoGuardado">Monto Actual ($)</label>
-                <input type="number" name="MontoGuardado" value={metaForm.MontoGuardado} onChange={manejarCambioInput} id="MontoGuardado" placeholder="0.00" />
+                <label htmlFor="MontoGuardado">Monto Actual ($)</label>
+                <input
+                  type="number"
+                  name="MontoGuardado"
+                  value={metaForm.MontoGuardado}
+                  onChange={manejarCambioInput}
+                  id="MontoGuardado"
+                  max={9999999999} // Límite de 10 dígitos
+                  placeholder="0.00"
+                />
               </div>
+
+              {/* INPUT MONTO OBJETIVO */}
               <div className="formulario-grupo">
                 <label htmlFor="montoObjetivo">Monto Objetivo ($)</label>
-                <input type="number" name="MontoObjetivo" value={metaForm.MontoObjetivo} onChange={manejarCambioInput} id="montoObjetivo" placeholder="0.00" />
+                <input
+                  type="number"
+                  name="MontoObjetivo"
+                  value={metaForm.MontoObjetivo}
+                  onChange={manejarCambioInput}
+                  id="montoObjetivo"
+                  max={9999999999} // Límite de 10 dígitos
+                  placeholder="0.00"
+                />
               </div>
               <div className="formulario-grupo">
                 <label>Fecha de Inicio</label>
@@ -770,15 +816,19 @@ const GastoIngreso = () => {
                   locale="es"
                   dateFormat="dd/MM/yyyy"
                   placeholderText="Seleccionar fecha"
-                  minDate={metaForm.FechaInicio} // TIP: Bloquea que elijan una fecha de fin menor a la de inicio
+                  minDate={metaForm.FechaInicio} //Bloquea que elijan una fecha de fin menor a la de inicio
                   className="input-custom-finanzarc"
                 />
               </div>
 
               <div className="formulario-grupo">
                 <label htmlFor="divisa">Divisa</label>
-                {/* CAMBIA name="Divisa" POR name="IdDivisa" */}
-                <select name="IdDivisa" value={metaForm.IdDivisa} onChange={manejarCambioInput} id="divisa">
+                <select
+                  name="IdDivisa"
+                  value={metaForm.IdDivisa}
+                  onChange={manejarCambioInput}
+                  id="divisa"
+                >
                   <option value="1">ARS - Peso Argentino</option>
                   <option value="2">USD - Dólar Estadounidense</option>
                   <option value="3">EUR - Euro</option>
@@ -807,8 +857,22 @@ const GastoIngreso = () => {
             <h3>Nueva Meta de Ahorro</h3>
             <div className="formulario-cuerpo">
               <div className="formulario-grupo">
-                <label htmlFor="nombreMeta">Nombre de la Meta</label>
-                <input type="text" name="Nombre" value={metaForm.Nombre} onChange={manejarCambioInput} id="nombreMeta" placeholder="Ej: Fondo de Emergencia" />
+                <label htmlFor="nombreMeta">
+                  Nombre de la Meta
+                  {/* Este es el contador en vivo */}
+                  <span style={{ fontSize: '0.8rem', color: '#666', marginLeft: '10px' }}>
+                    ({metaForm.Nombre ? metaForm.Nombre.length : 0}/100)
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  name="Nombre"
+                  value={metaForm.Nombre}
+                  onChange={manejarCambioInput}
+                  id="nombreMeta"
+                  maxLength={100}
+                  placeholder="Ej: Fondo de Emergencia"
+                />
               </div>
               <div className="formulario-grupo" style={{ display: "none" }}>
                 <label htmlFor="montoGuardado">Monto Actual ($)</label>
