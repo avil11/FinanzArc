@@ -2,6 +2,14 @@ import React, { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+
+//DatePicker
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import es from "date-fns/locale/es";
+
+registerLocale("es", es);
+
 import "./General.css";
 
 const API_BASE_URL = "http://localhost:60496/api";
@@ -37,23 +45,23 @@ const GastoIngreso = () => {
         fetch("https://dolarapi.com/v1/cotizaciones/eur")
       ]);
 
-      if (!resUsd.ok || !resEur.ok) {
-        throw new Error("Error en la conexión con DolarAPI");
-      }
+      if (!resUsd.ok || !resEur.ok) throw new Error("Error en la conexión");
 
       const dataUsd = await resUsd.json();
       const dataEur = await resEur.json();
 
-      setCotizaciones({
+      const nuevasCotizaciones = {
         USD: Number(dataUsd.venta).toFixed(2),
         EUR: Number(dataEur.venta).toFixed(2)
-      });
+      };
+
+      setCotizaciones(nuevasCotizaciones);
+      return nuevasCotizaciones; // <-- Retornamos los datos
     } catch (error) {
-      console.error("Error obteniendo cotizaciones de DolarAPI, usando respaldo:", error);
-      setCotizaciones({
-        USD: "1300.00",
-        EUR: "1450.00"
-      });
+      console.error("Error, usando respaldo:", error);
+      const respaldo = { USD: "1300.00", EUR: "1450.00" };
+      setCotizaciones(respaldo);
+      return respaldo; // <-- Retornamos respaldo si falla la API
     }
   };
 
@@ -74,39 +82,42 @@ const GastoIngreso = () => {
     MontoGuardado: "",
     FechaObjetivo: "",
     FechaInicio: "",
-    Divisa: "1"
+    Divisa: ""
   });
 
   const COLORES = ["#007AFF", "#FF9500", "#34C759", "#AF52DE"];
   const COLORESgasto = ["#FF4B4B", "#FFD700", "#4B79FF", "#FF7F50"];
 
   useEffect(() => {
-    const temporizador = setTimeout(() => {
-      setMostrarSaludo(false);
-    }, 4000);
+    const temporizador = setTimeout(() => setMostrarSaludo(false), 4000);
 
-    obtenerCotizaciones();
-    obtenerDatos();
+    const inicializarDatos = async () => {
+      const cotizacionesData = await obtenerCotizaciones();
+      obtenerDatos(cotizacionesData);
+    };
+
+    inicializarDatos();
 
     return () => clearTimeout(temporizador);
   }, []);
 
-  const convertirAPesos = (monto, divisa) => {
+  const convertirAPesos = (monto, divisa, cotizacionesObj) => {
     const valor = Number(monto) || 0;
-    const cotUSD = Number(cotizaciones.USD);
-    const cotEUR = Number(cotizaciones.EUR);
+    // Si cotizacionesObj es undefined (por error), usa el state actual
+    const c = cotizacionesObj || cotizaciones;
+
+    const cotUSD = Number(c.USD);
+    const cotEUR = Number(c.EUR);
 
     switch (Number(divisa)) {
-      case 2:
-        return valor * cotUSD;
-      case 3:
-        return valor * cotEUR;
-      default:
-        return valor;
+      case 2: return valor * cotUSD;
+      case 3: return valor * cotEUR;
+      default: return valor;
     }
   };
 
-  const obtenerDatos = () => {
+  // Ahora recibe las cotizaciones como parámetro, no las busca de nuevo
+  const obtenerDatos = (cotizacionesData) => {
     const token = localStorage.getItem("Token");
     if (!token) return;
 
@@ -118,13 +129,15 @@ const GastoIngreso = () => {
         setIdUsuarioActual(data.IdUsuario);
         setRolUsuario(data.IdRol);
 
-        obtenerGastos(data.IdUsuario);
-        obtenerIngresos(data.IdUsuario);
-        obtenerAhorros(data.IdUsuario);
-      });
+        // Pasamos las cotizaciones a todas las funciones
+        obtenerGastos(data.IdUsuario, cotizacionesData);
+        obtenerIngresos(data.IdUsuario, cotizacionesData);
+        obtenerAhorros(data.IdUsuario, cotizacionesData);
+      })
+      .catch(err => console.error("Error al obtener usuario:", err));
   };
 
-  const obtenerGastos = (idusuario) => {
+  const obtenerGastos = (idusuario, cotizacionesData) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.gastos}/ByUsuario/${idusuario}`, {
       headers: {
         "Content-Type": "application/json",
@@ -135,76 +148,43 @@ const GastoIngreso = () => {
       .then(data => {
         const gastosProcesados = data.map(item => ({
           name: item.Descripcion || "Sin descripción",
-          valor: convertirAPesos(
-            item.MontoGasto,
-            item.IdDivisa
-          ),
-          monedaOriginal:
-            Number(item.IdDivisa) === 2
-              ? "USD"
-              : Number(item.IdDivisa) === 3
-                ? "EUR"
-                : "ARS"
+          valor: convertirAPesos(item.MontoGasto, item.IdDivisa, cotizacionesData), // <--- USO AQUÍ
+          monedaOriginal: Number(item.IdDivisa) === 2 ? "USD" : Number(item.IdDivisa) === 3 ? "EUR" : "ARS"
         }));
-
         setDatosGastos(gastosProcesados);
-      })
-      .catch(error => console.error(error));
+      });
   };
 
-  const obtenerIngresos = (idusuario) => {
+  // HAZ EXACTAMENTE LO MISMO EN ESTAS DOS:
+  const obtenerIngresos = (idusuario, cotizacionesData) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.ingresos}/ByUsuario/${idusuario}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("Token")}`
-      }
+      // ... mismos headers
     })
       .then(res => res.json())
       .then(data => {
         const ingresosProcesados = data.map(item => ({
           name: item.Descripcion || "Sin Descripción",
-          valor: convertirAPesos(
-            item.MontoIngreso,
-            item.IdDivisa
-          ),
-          monedaOriginal:
-            Number(item.IdDivisa) === 2
-              ? "USD"
-              : Number(item.IdDivisa) === 3
-                ? "EUR"
-                : "ARS"
+          valor: convertirAPesos(item.MontoIngreso, item.IdDivisa, cotizacionesData), // <--- USO AQUÍ
+          monedaOriginal: Number(item.IdDivisa) === 2 ? "USD" : Number(item.IdDivisa) === 3 ? "EUR" : "ARS"
         }));
-
         setDatosIngresos(ingresosProcesados);
-      })
-      .catch(error => console.error(error));
+      });
   };
 
-  const obtenerAhorros = (idusuario) => {
+  const obtenerAhorros = (idusuario, cotizacionesData) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.ahorros}/ByUsuario/${idusuario}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("Token")}`
-      }
+      // ... mismos headers
     })
       .then(res => res.json())
       .then(data => {
         const metasProcesadas = data.map(item => ({
           ...item,
           etiqueta: item.Nombre || "Meta de ahorro",
-          actual: convertirAPesos(
-            item.MontoGuardado,
-            item.IdDivisa
-          ),
-          objetivo: convertirAPesos(
-            item.MontoObjetivo,
-            item.IdDivisa
-          )
+          actual: convertirAPesos(item.MontoGuardado, item.IdDivisa, cotizacionesData), // <--- USO AQUÍ
+          objetivo: convertirAPesos(item.MontoObjetivo, item.IdDivisa, cotizacionesData) // <--- USO AQUÍ
         }));
-
         setMetasAhorro(metasProcesadas);
-      })
-      .catch(error => console.error(error));
+      });
   };
 
   // --- LÓGICA DE LÍMITES POR ROL ---
@@ -239,7 +219,7 @@ const GastoIngreso = () => {
 
   const manejarGuardarMeta = () => {
     const token = localStorage.getItem("Token");
-    
+
     // Validación de límites (Solo si es creación)
     const esEdicion = metaForm.IdMetaAhorro !== null && metaForm.IdMetaAhorro !== undefined;
     if (!esEdicion && limiteAlcanzado) {
@@ -278,9 +258,7 @@ const GastoIngreso = () => {
     }
 
     fetch(`${API_BASE_URL}${API_ENDPOINTS.usuarios}/ByToken`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
       .then(userData => {
@@ -289,9 +267,9 @@ const GastoIngreso = () => {
           Nombre: metaForm.Nombre,
           MontoObjetivo: parseFloat(metaForm.MontoObjetivo),
           MontoGuardado: parseFloat(metaForm.MontoGuardado),
-          FechaMeta: metaForm.FechaObjetivo,
-          FechaInicio: metaForm.FechaInicio,
-          IdDivisa: metaForm.Divisa,
+          FechaMeta: metaForm.FechaObjetivo ? metaForm.FechaObjetivo.toISOString() : null,
+          FechaInicio: metaForm.FechaInicio ? metaForm.FechaInicio.toISOString() : null,
+          IdDivisa: metaForm.IdDivisa, // Asegúrate de que apunte a IdDivisa
           IdUsuario: userData.IdUsuario
         };
 
@@ -453,6 +431,7 @@ const GastoIngreso = () => {
       <div className="item-progreso-general">
         <div className="info-progreso-general">
           <span
+            className="truncate-text-general-ahorro"
             style={{
               fontWeight: "500",
               color: "#ffffff"
@@ -462,6 +441,7 @@ const GastoIngreso = () => {
           </span>
 
           <span
+            className="truncate-text-general-ahorro-precio"
             style={{
               color: "#c8b277",
               fontWeight: "bold"
@@ -496,9 +476,9 @@ const GastoIngreso = () => {
       Nombre: "",
       MontoObjetivo: "",
       MontoGuardado: "",
-      FechaObjetivo: "",
-      FechaInicio: "",
-      Divisa: "1"
+      FechaObjetivo: null,
+      FechaInicio: null,
+      IdDivisa: "1" // Cambiado de Divisa a IdDivisa
     });
 
     setModalAgregarAbierto(true);
@@ -510,12 +490,9 @@ const GastoIngreso = () => {
       Nombre: meta.Nombre || "",
       MontoObjetivo: meta.MontoObjetivo || "",
       MontoGuardado: meta.MontoGuardado || "",
-      FechaObjetivo: meta.FechaMeta
-        ? meta.FechaMeta.split("T")[0]
-        : "",
-      FechaInicio: meta.FechaInicio
-        ? meta.FechaInicio.split("T")[0]
-        : "",
+      // Convertimos el string de la DB a un objeto Date para el calendario
+      FechaObjetivo: meta.FechaMeta ? new Date(meta.FechaMeta) : null,
+      FechaInicio: meta.FechaInicio ? new Date(meta.FechaInicio) : null,
       IdDivisa: parseInt(meta.IdDivisa) || 1
     });
     setModalEditarAbierto(true);
@@ -562,7 +539,7 @@ const GastoIngreso = () => {
                     <Pie
                       data={datosGastos}
                       cx="50%" cy="50%"
-                      innerRadius={60} outerRadius={80}
+                      innerRadius={100} outerRadius={115}
                       paddingAngle={5}
                       dataKey="valor"
                       label={(props) => renderCenterLabel(props, calcularTotal(datosGastos))}
@@ -572,18 +549,28 @@ const GastoIngreso = () => {
                         <Cell key={i} fill={COLORESgasto[i % COLORESgasto.length]} stroke="none" />
                       ))}
                     </Pie>
-                    <Tooltip contentStyle={{ backgroundColor: "#1e1e1f", border: "1px solid rgba(200,178,119,0.3)", color: "#fff", borderRadius: "8px" }} />
+                    <Tooltip contentStyle={{ backgroundColor: "#1e1e1f", border: "1px solid rgba(200,178,119,0.3)", color: "#fff", borderRadius: "8px" }}   formatter={(value, name) => [`$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, name]} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
               <div className="leyenda-grafico">
                 {obtenerTopCinco(datosGastos).map((item, index) => (
                   <div className="item-leyenda" key={index}>
-                    <span className="item-color-circulo" style={{ backgroundColor: COLORESgasto[index % COLORESgasto.length] }} />
+                    {/* 1. Icono */}
+                    <span
+                      className="item-color-circulo"
+                      style={{ backgroundColor: COLORESgasto[index % COLORESgasto.length] }}
+                    />
+
+                    {/* 2. Contenedor de Texto (El que trunca) */}
                     <div className="leyenda-texto">
-                      <span>{item.name}</span>
-                      <strong>${item.valor.toLocaleString()}</strong>
+                      <span className="truncate-text-general" title={item.name}>
+                        {item.name}
+                      </span>
                     </div>
+
+                    {/* 3. Valor (Se mantiene fijo a la derecha) */}
+                    <h4 className="valor-gasto">${item.valor.toLocaleString()}</h4>
                   </div>
                 ))}
               </div>
@@ -603,7 +590,7 @@ const GastoIngreso = () => {
                     <Pie
                       data={datosIngresos}
                       cx="50%" cy="50%"
-                      innerRadius={60} outerRadius={80}
+                      innerRadius={100} outerRadius={115}
                       paddingAngle={5}
                       dataKey="valor"
                       label={(props) => renderCenterLabel(props, calcularTotal(datosIngresos))}
@@ -613,7 +600,7 @@ const GastoIngreso = () => {
                         <Cell key={i} fill={COLORES[i % COLORES.length]} stroke="none" />
                       ))}
                     </Pie>
-                    <Tooltip contentStyle={{ backgroundColor: "#1e1e1f", border: "1px solid rgba(200,178,119,0.3)", color: "#fff", borderRadius: "8px" }} />
+                    <Tooltip contentStyle={{ backgroundColor: "#1e1e1f", border: "1px solid rgba(200,178,119,0.3)", color: "#fff", borderRadius: "8px" }}  formatter={(value, name) => [`$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, name]}  />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -622,9 +609,9 @@ const GastoIngreso = () => {
                   <div className="item-leyenda" key={index}>
                     <span className="item-color-circulo" style={{ backgroundColor: COLORES[index % COLORES.length] }} />
                     <div className="leyenda-texto">
-                      <span>{item.name}</span>
-                      <strong>${item.valor.toLocaleString()}</strong>
+                      <span className="truncate-text-general">{item.name}</span>
                     </div>
+                    <h4 className="valor-ingreso">${item.valor.toLocaleString()}</h4>
                   </div>
                 ))}
               </div>
@@ -636,13 +623,13 @@ const GastoIngreso = () => {
       </div>
 
       <div className="contenedor-ahorros-general">
-        
+
         {/* ENCABEZADO CON CONTADOR DE LÍMITES */}
         <div style={{ marginBottom: "1.5rem" }}>
           <div className="encabezado-ahorros-flex" style={{ marginBottom: "12px" }}>
             <h3 className="titulo-ahorros-general">Objetivos en Curso</h3>
-            <button 
-              onClick={abrirModalAgregar} 
+            <button
+              onClick={abrirModalAgregar}
               className="boton-primario"
               disabled={limiteAlcanzado}
               style={{
@@ -662,7 +649,7 @@ const GastoIngreso = () => {
                 {cantidadMetasActivas} / {limiteMetas === Infinity ? "∞" : limiteMetas}
               </span>
             </div>
-            
+
             {rolUsuario === 4 ? (
               <span style={{ fontSize: "0.85rem", color: "#8e8e93" }}>Administrador - sin restricciones.</span>
             ) : limiteAlcanzado ? (
@@ -765,17 +752,34 @@ const GastoIngreso = () => {
                 <input type="number" name="MontoObjetivo" value={metaForm.MontoObjetivo} onChange={manejarCambioInput} id="montoObjetivo" placeholder="0.00" />
               </div>
               <div className="formulario-grupo">
-                <label htmlFor="fechaInicio">Fecha de Inicio</label>
-                <input type="date" name="FechaInicio" value={metaForm.FechaInicio} onChange={manejarCambioInput} id="fechaInicio" />
+                <label>Fecha de Inicio</label>
+                <DatePicker
+                  selected={metaForm.FechaInicio}
+                  onChange={(date) => setMetaForm({ ...metaForm, FechaInicio: date })}
+                  locale="es"
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="Seleccionar fecha"
+                  className="input-custom-finanzarc" // Agrega tu clase CSS para que coincida con tus inputs
+                />
               </div>
               <div className="formulario-grupo">
-                <label htmlFor="fechaObjetivo">Fecha Objetivo</label>
-                <input type="date" name="FechaObjetivo" value={metaForm.FechaObjetivo} onChange={manejarCambioInput} id="fechaObjetivo" />
+                <label>Fecha Objetivo</label>
+                <DatePicker
+                  selected={metaForm.FechaObjetivo}
+                  onChange={(date) => setMetaForm({ ...metaForm, FechaObjetivo: date })}
+                  locale="es"
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="Seleccionar fecha"
+                  minDate={metaForm.FechaInicio} // TIP: Bloquea que elijan una fecha de fin menor a la de inicio
+                  className="input-custom-finanzarc"
+                />
               </div>
+
               <div className="formulario-grupo">
                 <label htmlFor="divisa">Divisa</label>
-                <select name="Divisa" value={metaForm.IdDivisa} onChange={manejarCambioInput} id="divisa" >
-                  <option value="1" >ARS - Peso Argentino</option>
+                {/* CAMBIA name="Divisa" POR name="IdDivisa" */}
+                <select name="IdDivisa" value={metaForm.IdDivisa} onChange={manejarCambioInput} id="divisa">
+                  <option value="1">ARS - Peso Argentino</option>
                   <option value="2">USD - Dólar Estadounidense</option>
                   <option value="3">EUR - Euro</option>
                 </select>
@@ -815,12 +819,27 @@ const GastoIngreso = () => {
                 <input type="number" name="MontoObjetivo" value={metaForm.MontoObjetivo} onChange={manejarCambioInput} id="montoObjetivo" placeholder="0.00" />
               </div>
               <div className="formulario-grupo">
-                <label htmlFor="fechaInicio">Fecha de Inicio</label>
-                <input type="date" name="FechaInicio" value={metaForm.FechaInicio} onChange={manejarCambioInput} id="fechaInicio" />
+                <label>Fecha de Inicio</label>
+                <DatePicker
+                  selected={metaForm.FechaInicio}
+                  onChange={(date) => setMetaForm({ ...metaForm, FechaInicio: date })}
+                  locale="es"
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="Seleccionar fecha"
+                  className="input-custom-finanzarc" // Agrega tu clase CSS para que coincida con tus inputs
+                />
               </div>
               <div className="formulario-grupo">
-                <label htmlFor="fechaObjetivo">Fecha Objetivo</label>
-                <input type="date" name="FechaObjetivo" value={metaForm.FechaObjetivo} onChange={manejarCambioInput} id="fechaObjetivo" />
+                <label>Fecha Objetivo</label>
+                <DatePicker
+                  selected={metaForm.FechaObjetivo}
+                  onChange={(date) => setMetaForm({ ...metaForm, FechaObjetivo: date })}
+                  locale="es"
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="Seleccionar fecha"
+                  minDate={metaForm.FechaInicio} // TIP: Bloquea que elijan una fecha de fin menor a la de inicio
+                  className="input-custom-finanzarc"
+                />
               </div>
               <div className="formulario-grupo">
                 <label htmlFor="divisa">Divisa</label>

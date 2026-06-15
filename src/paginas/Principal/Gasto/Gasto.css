@@ -77,3 +77,11 @@
 @media (max-width: 810px) { .pagina-gasto-contenedor { padding-top: 100px; } .pagina-gasto-tarjeta { grid-template-columns: 1fr; gap: 20px; } .pagina-gasto-contenedor .buscador-gasto-categoria { flex-direction: column; align-items: flex-start; } .pagina-gasto-contenedor .grupo-input-buscar { width: 100%; } .pagina-gasto-contenedor .input-buscar { flex: 1; } }
 @media (max-width: 480px) { .pagina-gasto-contenedor .boton-primario { width: 100%; padding: 15px; } .pagina-gasto-contenedor .formulario-acciones { flex-direction: column-reverse; gap: 12px; } .pagina-gasto-contenedor .formulario-acciones button { width: 100%; } }
 @media (max-width: 1050px) { .pagina-gasto-tarjeta { display: flex; flex-direction: column; } }
+
+.truncate-text {
+  max-width: 200px; /* Ajusta este valor según cuánto espacio quieras darle */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block; /* Necesario para que funcione dentro de la celda */
+}

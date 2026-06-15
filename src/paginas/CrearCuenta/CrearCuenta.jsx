@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import PhoneInputPkg from "react-phone-input-2";
+
+
 const PhoneInput = PhoneInputPkg.default ? PhoneInputPkg.default : PhoneInputPkg;
 
 import "react-phone-input-2/lib/style.css";
@@ -121,7 +123,7 @@ const CrearCuenta = () => {
       UrlCarpeta: urlCarpetaGenerada,
       FechaAlta: new Date().toISOString(),
       Activo: true,
-      IdRol: 1
+      IdRol: 1,
     };
 
     try {

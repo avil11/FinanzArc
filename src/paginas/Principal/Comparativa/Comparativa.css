@@ -10,226 +10,649 @@
     --blue-accent: #007AFF;
     --success-green: #4caf50;
     --danger-red: #ff5252;
-    
+
     --border-radius-lg: 24px;
     --border-radius-md: 16px;
     --border-radius-sm: 8px;
-    --transition-fast: 1s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.grafico-linea-container{
+
+/* ==========================================================================
+   ESTRUCTURA Y COMPONENTES GLOBALES
+   ========================================================================== */
+.contenedor-principal-general {
+    color: var(--crisp-white);
+    min-height: 100vh;
+    padding: 2rem 5%;
+}
+
+.comparativa-grid-layout {
+    padding: 20px 0;
+    animation: fadeIn 0.4s ease-out forwards;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.seccion-comparativa-fila {
+    margin-bottom: 3rem;
+}
+
+.seccion-encabezado-general {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    gap: 20px;
+}
+
+.titulo-principal-general {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.titulo-principal-general h2 {
+    color: #D4AF37;
+    font-size: 2rem;
+    margin-bottom: 5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.descripcion-encabezado {
+    color: #888;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 700px;
+}
+
+.subtitulo-seccion {
+    color: var(--gold-accent);
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 0; /* Ajustado para alinear con el banner */
+    padding-left: 12px;
+    border-left: 3px solid var(--blue-accent);
+    display: flex;
+    align-items: center;
+}
+
+/* ==========================================================================
+   GRILLA Y BANNER SUPERIOR (NUEVO DISEÑO)
+   ========================================================================== */
+.fila-comparativa-master {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 columnas perfectas para los gráficos */
+    gap: 2rem;
+    align-items: stretch;
+}
+
+.encabezado-fila-premium {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* --- NUEVO DISEÑO DEL BALANCE (Banner Superior Azul) --- */
+.tarjeta-balance-superior {
+    /* Gradiente azul oscuro profundo con transparencia */
+    background: linear-gradient(135deg, rgba(0, 122, 255, 0.08) 0%, rgba(8, 14, 26, 0.7) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    
+    /* Bordes con un brillo azul muy sutil */
+    border: 1px solid rgba(0, 122, 255, 0.15);
+    border-left: 4px solid var(--blue-accent); /* Acento izquierdo en tu azul principal */
+    border-radius: var(--border-radius-md);
+    padding: 12px 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    
+    /* Sombra ligeramente tintada de azul */
+    box-shadow: 0 10px 30px rgba(0, 122, 255, 0.05); 
+    width: 100%;
+    max-width: 450px;
+    box-sizing: border-box;
+}
+.tarjeta-balance-superior .icon-comparar {
+    color: var(--crisp-white); /* Texto en blanco para mayor contraste */
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    
+    /* Fondo del logo "VS" en azul translúcido en lugar de dorado */
+    background: rgba(0, 122, 255, 0.2); 
+    padding: 8px 12px;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.tarjeta-balance-superior .info-balance {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    flex: 1;
+    min-width: 0; /* LA MAGIA: Obliga a Flexbox a truncar textos gigantes */
+}
+
+.tarjeta-balance-superior .monto-balance {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 0 4px 0;
+    line-height: 1.2;
+    width: 100%;
+}
+
+.tarjeta-balance-superior .porcentaje-balance {
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0.9;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Utilidad para truncar textos largos */
+.truncate-text-comparativa {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+/* ==========================================================================
+   TARJETAS DE GRÁFICOS (PIE CHARTS)
+   ========================================================================== */
+.tarjeta-general.grafico-ajustado {
+    background: var(--steel-grey);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: var(--border-radius-lg);
+    padding: 24px 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    transition: all var(--transition-fast);
+    will-change: transform;
+    height: 100%;
+}
+
+.tarjeta-general.grafico-ajustado:hover {
+    transform: translateY(-4px);
+    border-color: rgba(200, 178, 119, 0.15);
+}
+
+.encabezado-grafico-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 12px;
+}
+
+.badge-periodo {
+    background: var(--blue-accent);
+    color: var(--crisp-white);
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.selector-mes-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--steel-grey-light);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius-md);
+    padding: 6px 12px;
+    width: 100%;
+    max-width: 240px;
+    box-sizing: border-box;
+}
+
+.selector-mes-nav span {
+    color: #e0e0e0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    width: 140px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+
+.selector-mes-nav button {
+    background: none;
+    border: none;
+    color: var(--gold-accent);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0 8px;
+    transition: opacity var(--transition-fast);
+}
+
+.selector-mes-nav button:disabled {
+    opacity: 0.2;
+    cursor: default;
+}
+
+.contenedor-chart-relativo {
+    width: 100%;
+    min-height: 350px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.circulo-vacio {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 2px dashed rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.85rem;
+}
+
+.info-balance.tendencia-positiva .monto-balance,
+.info-balance.tendencia-positiva .porcentaje-balance,
+.texto-verde {
+    color: #007AFF;
+}
+
+.info-balance.tendencia-negativa .monto-balance,
+.info-balance.tendencia-negativa .porcentaje-balance,
+.texto-rojo {
+    color: var(--danger-red);
+}
+
+.btn-ver-detalles {
+    width: 100%;
+    margin-top: auto;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--gold-accent);
+    border-radius: var(--border-radius-md);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.btn-ver-detalles:hover:not(:disabled) {
+    background: rgba(200, 178, 119, 0.05);
+    border-color: rgba(200, 178, 119, 0.3);
+}
+
+.btn-ver-detalles:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+/* ==========================================================================
+   BOTONES SUPERIORES (CONTROLES)
+   ========================================================================== */
+.botonesFuncionesComparativa {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    background: rgba(22, 22, 24, 0.6); /* Efecto Glassmorphism */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 12px 20px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.botonesBalanceComparativa {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.botonesComparativa {
+    height: 42px;
+    padding: 0 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.btn-principal {
+    background: rgba(0, 122, 255, 0.08);
+    color: #66b2ff; /* Azul claro para buen contraste */
+    border: 1px solid rgba(0, 122, 255, 0.2);
+}
+
+.btn-principal:hover {
+    background: rgba(0, 122, 255, 0.2);
+    color: var(--crisp-white);
+    border-color: rgba(0, 122, 255, 0.5);
+    box-shadow: 0 4px 15px rgba(0, 122, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.btn-secundario {
+    background: rgba(200, 178, 119, 0.05);
+    color: var(--gold-accent);
+    border: 1px solid rgba(200, 178, 119, 0.2);
+}
+
+.btn-secundario:hover {
+    background: rgba(200, 178, 119, 0.15);
+    color: var(--crisp-white);
+    border-color: rgba(200, 178, 119, 0.5);
+    box-shadow: 0 4px 15px rgba(200, 178, 119, 0.15);
+    transform: translateY(-2px);
+}
+
+.btn-volver {
+    background: rgba(255, 255, 255, 0.03);
+    color: #aaa;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-volver:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--crisp-white);
+    border-color: rgba(255, 255, 255, 0.25);
+    /* En lugar de saltar hacia arriba, se desliza un poco a la izquierda indicando "Atrás" */
+    transform: translateX(-4px); 
+}
+
+/* ==========================================================================
+   MODAL GLASSMORPHISM
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    animation: fadeInModal 0.3s ease;
+}
+
+.modal-contenido {
+    background: #141414;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: 28px;
+    width: 90%;
+    max-width: 550px;
+    max-height: 85vh;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    animation: slideUpModal 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header {
+    padding: 25px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(212, 175, 55, 0.03);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.modal-header h3 {
+    color: #D4AF37;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+.btn-cerrar {
+    background: none;
+    border: none;
+    color: #555;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    line-height: 1;
+}
+
+.btn-cerrar:hover {
+    color: #D4AF37;
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 35px 30px;
+    overflow-y: auto;
+    text-align: center;
+}
+
+.modal-body h3 {
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.modal-body strong {
+    color: #FFD700;
+    font-weight: 800;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+}
+
+.modal-acciones {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.btn-cancelar-modal {
+    background: #222;
+    color: #777;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn-cancelar-modal:hover {
+    background: #2a2a2a;
+    color: #fff;
+    border-color: rgba(212, 175, 55, 0.3);
+}
+
+.btn-confirmar-modal {
+    background: linear-gradient(145deg, #D4AF37, #B8860B);
+    color: #000;
+    box-shadow: 0 10px 20px rgba(184, 134, 11, 0.2);
+}
+
+.btn-confirmar-modal:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 25px rgba(212, 175, 55, 0.4);
+    filter: brightness(1.1);
+}
+
+.tabla-detalle {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.tabla-detalle th {
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 500;
+    font-size: 0.85rem;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.tabla-detalle td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+    font-size: 0.9rem;
+    color: #e0e0e0;
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUpModal {
+    from { opacity: 0; transform: translateY(30px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ==========================================================================
+   GRÁFICO ANUAL (PREMIUM)
+   ========================================================================== */
+.grafico-linea-container {
     width: 100%;
     padding: 30px;
     min-height: 550px;
 }
 
-.header-linea{
+.header-linea {
     margin-bottom: 30px;
 }
 
-.header-linea h2{
-    color: #fff;
-    margin-bottom: 10px;
-}
-
-.header-linea p{
-    color: #999;
-}
-
-.recharts-cartesian-axis-tick-value{
+.recharts-cartesian-axis-tick-value {
     fill: #aaa;
 }
 
-.recharts-legend-item-text{
+.recharts-legend-item-text {
     color: #fff !important;
 }
-/* ==========================================================================
-   ESTRUCTURA Y COMPONENTES GLOBALES
-   ========================================================================== */
-.contenedor-principal-general {  color: var(--crisp-white); min-height: 100vh; padding: 2rem 5%; }
-.comparativa-grid-layout { padding: 20px 0; animation: fadeIn 0.4s ease-out forwards; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.seccion-comparativa-fila { margin-bottom: 3rem; }
 
-/* Encabezados y Botones Generales */
-.seccion-encabezado-general { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; gap: 20px; }
-.titulo-principal-general { display: flex; flex-direction: column; gap: 10px; }
-.titulo-principal-general h2 { font-weight: 600; margin-bottom: 0.3rem; }
-.subtitulo-seccion { color: var(--gold-accent); font-size: 1.2rem; font-weight: 500; margin-bottom: 1.5rem; padding-left: 12px; border-left: 3px solid var(--blue-accent); display: flex; align-items: center; }
- 
-.botonesComparativa { background: rgba(200, 178, 119, 0.1); color: var(--gold-accent); border: 1px solid var(--gold-accent); padding: 8px 24px; border-radius: var(--border-radius-sm); font-weight: 600; font-size: 0.85rem; transition: var(--transition-fast); }
-.botonesComparativa:hover { background: var(--gold-accent); color: var(--carbon-black); }
-
-.toast-loading { position: fixed; bottom: 30px; right: 30px; background: var(--steel-grey-light); color: var(--gold-accent); border: 1px solid rgba(200, 178, 119, 0.2); padding: 12px 24px; border-radius: var(--border-radius-sm); font-weight: 600; font-size: 0.9rem; z-index: 9999; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+.toast-loading {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--steel-grey-light);
+    color: var(--gold-accent);
+    border: 1px solid rgba(200, 178, 119, 0.2);
+    padding: 12px 24px;
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    font-size: 0.9rem;
+    z-index: 9999;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
 
 /* ==========================================================================
-   GRILLA Y TARJETAS
+   MEDIA QUERIES (RESPONSIVE)
    ========================================================================== */
-.fila-comparativa-master { display: grid; grid-template-columns: minmax(0, 1fr) 260px minmax(0, 1fr); gap: 1.5rem; align-items: stretch; }
 
-.tarjeta-general.grafico-ajustado { background: var(--steel-grey); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: var(--border-radius-lg); padding: 24px 20px; position: relative; display: flex; flex-direction: column; transition: all var(--transition-fast); will-change: transform; }
-.tarjeta-general.grafico-ajustado:hover { transform: translateY(-4px); border-color: rgba(200, 178, 119, 0.15); }
-
-.tarjeta-balance-central { background: var(--carbon-black); border: 1px solid rgba(255, 255, 255, 0.04); border-top: 2px solid var(--gold-accent); border-radius: var(--border-radius-lg); padding: 30px 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-
-/* Contenidos de Tarjeta (Nav, Gráficos, Textos) */
-.encabezado-grafico-nav { display: flex; flex-direction: column; align-items: center; margin-bottom: 1.5rem; gap: 12px; }
-.badge-periodo { background: var(--blue-accent); color: var(--crisp-white); padding: 4px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
-.selector-mes-nav { display: flex; align-items: center; justify-content: space-between; background: var(--steel-grey-light); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: var(--border-radius-md); padding: 6px 12px; width: 100%; max-width: 240px; box-sizing: border-box; }
-.selector-mes-nav span { color: #e0e0e0; font-size: 0.9rem; font-weight: 500; text-transform: capitalize; width: 140px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; }
-.selector-mes-nav button { background: none; border: none; color: var(--gold-accent); font-size: 1.1rem; cursor: pointer; padding: 0 8px; transition: opacity var(--transition-fast); }
-.selector-mes-nav button:disabled { opacity: 0.2; cursor: default; }
-
-.contenedor-chart-relativo { width: 100%; height: 220px; display: flex; justify-content: center; align-items: center; }
-.circulo-vacio { width: 140px; height: 140px; border-radius: 50%; border: 2px dashed rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; color: rgba(255,255,255,0.3); font-size: 0.85rem; }
-
-.icon-comparar { color: var(--crisp-white); font-weight: 800; font-size: 0.8rem; letter-spacing: 4px; margin-bottom: auto; opacity: 0.7; }
-.monto-balance { font-size: 2.2rem; font-weight: 800; margin: 15px 0 8px; width: 100%; overflow-wrap: break-word; line-height: 1.1; }
-.porcentaje-balance { font-size: 0.8rem; font-weight: 500; opacity: 0.8; }
-
-/* Utilidades de Color Agrupadas */
-.info-balance.tendencia-positiva .monto-balance, .info-balance.tendencia-positiva .porcentaje-balance, .texto-verde { color: #007AFF; }
-.info-balance.tendencia-negativa .monto-balance, .info-balance.tendencia-negativa .porcentaje-balance, .texto-rojo { color: var(--danger-red); }
-.texto-verde, .texto-rojo { font-weight: 600; text-align: right; }
-
-/* Botones Internos de Tarjeta */
-.btn-ver-detalles { width: 100%; margin-top: 20px; padding: 10px; background: transparent; border: 1px solid rgba(255, 255, 255, 0.1); color: var(--gold-accent); border-radius: var(--border-radius-md); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: var(--transition-fast); }
-.btn-ver-detalles:hover:not(:disabled) { background: rgba(200, 178, 119, 0.05); border-color: rgba(200, 178, 119, 0.3); }
-.btn-ver-detalles:disabled { opacity: 0.3; cursor: default; }
-
-/* ==========================================================================
-   TOOLTIP ICONO CARPETA
-   ========================================================================== */
-.btn-archivar-icono { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--gold-accent); cursor: pointer; font-size: 1.2rem; opacity: 0.5; z-index: 10; transition: var(--transition-fast); }
-.btn-archivar-icono:hover { opacity: 1; transform: scale(1.1); }
-
-/* Base compartida para globo y flecha */
-.btn-archivar-icono::before, .btn-archivar-icono::after { position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%) translateY(8px); opacity: 0; visibility: hidden; pointer-events: none; transition: all var(--transition-fast); }
-
-/* Globo de texto */
-.btn-archivar-icono::after { content: "Queres archivar este mes?"; background: var(--carbon-black); color: var(--crisp-white); border: 1px solid rgba(200, 178, 119, 0.2); padding: 6px 12px; border-radius: var(--border-radius-sm); font-size: 0.75rem; font-weight: 500; white-space: nowrap; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); z-index: 10; }
-
-/* Flecha */
-.btn-archivar-icono::before { content: ""; border: 6px solid transparent; border-top-color: var(--carbon-black); z-index: 11; }
-
-/* Animaciones hover */
-.btn-archivar-icono:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
-.btn-archivar-icono:hover::before { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(6px); }
-
-/* ==========================================================================
-   MODAL
-   ========================================================================== */
-.modal-overlay { position: fixed; inset: 0; background: rgba(8, 8, 8, 0.85); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 1000; animation: fadeIn 0.2s ease-out; }
-.modal-contenido { background: var(--steel-grey); width: 90%; max-width: 650px; max-height: 85vh; border-radius: var(--border-radius-lg); border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
-.modal-header { padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; justify-content: space-between; align-items: center; }
-.modal-header h3 { margin: 0; font-size: 1.1rem; color: var(--crisp-white); }
-.btn-cerrar { background: none; border: none; color: rgba(255,255,255,0.5); font-size: 1.8rem; cursor: pointer; transition: var(--transition-fast); }
-.btn-cerrar:hover { color: var(--crisp-white); }
-.modal-body { padding: 20px 24px; overflow-y: auto; }
-
-.tabla-detalle { width: 100%; border-collapse: collapse; text-align: left; }
-.tabla-detalle th { color: rgba(255,255,255,0.4); font-weight: 500; font-size: 0.85rem; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
-.tabla-detalle td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.02); font-size: 0.9rem; color: #e0e0e0; }
-
-/* ==========================================================================
-   RESPONSIVE
-   ========================================================================== */
+/* Tablet y pantallas medianas */
 @media (max-width: 1100px) {
-    .fila-comparativa-master { grid-template-columns: 1fr 1fr; gap: 2rem; }
-    .tarjeta-balance-central { grid-column: 1 / -1; order: -1; flex-direction: row; justify-content: space-around; padding: 20px 30px; min-height: auto; border-top: 1px solid rgba(255, 255, 255, 0.04); border-left: none; }
-    .icon-comparar, .monto-balance { margin: 0; }
-    .icon-comparar { font-size: 1rem; }
+    .seccion-encabezado-general {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .titulo-principal-general h2 {
+        font-size: 1.8rem;
+    }
+
+    .botonesFuncionesComparativa {
+        justify-content: center;
+    }
+    
+    .tarjeta-balance-superior {
+        max-width: 100%; /* En tablet permitimos que el banner crezca */
+    }
 }
 
-@media (max-width: 670px) {
-   .fila-comparativa-master { grid-template-columns: 1fr; gap: 1.5rem;}
-    .tarjeta-balance-central { flex-direction: column; justify-content: center; border-top: none; border-left: 3px solid var(--gold-accent); padding: 25px 20px; }
-    .icon-comparar { margin-bottom: 12px; }
-    .monto-balance { margin: 12px 0; }
-    .tarjeta-general.grafico-ajustado, .tarjeta-balance-central { width: 100%; max-width: 100%; }
-
-    .comparativa-grid-layout {width: 80%;}
-    .seccion-comparativa-fila{ display: flex; flex-direction: column; gap: 20px; } 
-    .seccion-comparativa-fila .subtitulo-seccion{width: 100%; }
-
-    .botonesComparativa .btn-volver { width: 100%; }
-    .seccion-encabezado-general{ display: flex;flex-direction: column; align-items: flex-start;align-items: center; width: 100%;}
-     .seccion-encabezado-general a{ text-align: center;} 
-     .seccion-encabezado-general p { text-align: center;}
-     .seccion-encabezado-general{text-align: center}
-}
-
-
-
-/* --- Modal Overlay (Efecto Glassmorphism) --- */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 2000; animation: fadeInModal 0.3s ease; }
-
-/* --- Tarjeta del Modal --- */
-.modal-contenido { background: #141414; border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 28px; width: 90%; max-width: 480px; box-shadow: 0 25px 80px rgba(0, 0, 0, 0.9); overflow: hidden; animation: slideUpModal 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-
-/* --- Header y Título --- */
-.modal-header { padding: 25px 30px; display: flex; justify-content: space-between; align-items: center; background: rgba(212, 175, 55, 0.03); border-bottom: 1px solid rgba(212, 175, 55, 0.1); }
-.modal-header h3 { color: #D4AF37; font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin: 0; }
-.btn-cerrar { background: none; border: none; color: #555; font-size: 2rem; cursor: pointer; transition: all 0.3s ease; line-height: 1; }
-.btn-cerrar:hover { color: #D4AF37; transform: rotate(90deg); }
-
-/* --- Cuerpo del Mensaje --- */
-.modal-body { padding: 35px 30px; text-align: center; }
-.modal-body h3 { color: #fff; font-size: 1.2rem; font-weight: 500; line-height: 1.5; margin-bottom: 15px; }
-.modal-body strong { color: #FFD700; font-weight: 800; text-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
-.modal-body p { color: #888; font-size: 0.95rem; line-height: 1.6; margin-bottom: 30px; }
-
-/* --- Contenedor de Botones --- */
-.modal-acciones { display: flex; gap: 15px; justify-content: center; }
-
-/* --- Botones Base --- */
-.botonesComparativa { padding: 14px 28px; border-radius: 14px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: none; text-transform: uppercase; letter-spacing: 1px; }
-
-/* Botón Cancelar (Estilo Dark) */
-.btn-cancelar-modal { background: #222; color: #777; border: 1px solid rgba(255, 255, 255, 0.05); }
-.btn-cancelar-modal:hover { background: #2a2a2a; color: #fff; border-color: rgba(212, 175, 55, 0.3); }
-
-/* Botón Confirmar (Estilo Golden Premium) */
-.btn-confirmar-modal { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #000; box-shadow: 0 10px 20px rgba(184, 134, 11, 0.2); }
-.btn-confirmar-modal:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(212, 175, 55, 0.4); filter: brightness(1.1); }
-.btn-confirmar-modal:active { transform: translateY(0) scale(0.97); }
-
-/* --- Animaciones --- */
-@keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUpModal { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-
-/* --- Contenedor Encabezado --- */
-.seccion-encabezado-general { width: 100%; padding: 40px 0; display: flex; flex-direction: column; gap: 30px; }
-.titulo-principal-general { width: 100%; text-align: left; }
-.titulo-principal-general h2 { color: #D4AF37; font-size: 2rem; margin-bottom: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-.descripcion-encabezado { color: #888; font-weight: 600; font-size: 1rem; line-height: 1.6; max-width: 900px; }
-
-/* --- Contenedores de Botones --- */
-.botonesFuncionesComparativa { display: flex; gap: 15px; flex-wrap: wrap; width: 100%; justify-content: space-between; align-items: center; }
-.botonesBalanceComparativa { display: flex; gap: 15px; flex-wrap: wrap; }
-.botonVolverPrincipal { display: flex; align-items: center; justify-content: center; }
-
-/* --- Botones Estilo Premium (Sincronizados) --- */
-.botonesComparativa { height: 50px; padding: 0 25px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; border: none; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
-
-/* Variantes de Botón */
-.btn-principal { background: linear-gradient(145deg, #D4AF37, #B8860B); color: #000; box-shadow: 0 4px 15px rgba(184, 134, 11, 0.2); }
-.btn-principal:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4); filter: brightness(1.1); }
-
-.btn-secundario { background: #141414; color: #D4AF37; border: 1px solid rgba(212, 175, 55, 0.3); }
-.btn-secundario:hover { background: rgba(212, 175, 55, 0.05); border-color: #D4AF37; color: #FFD700; }
-
-.btn-volver { background: #222; color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); }
-.btn-volver:hover { background: #333; border-color: rgba(255, 255, 255, 0.3); }
-
-/* --- RESPONSIVE (Ajustado) --- */
-@media (max-width: 810px) {
-    .seccion-encabezado-general { padding: 20px 10px; text-align: center; }
-    .titulo-principal-general h2 { font-size: 1.6rem; text-align: center; }
-    .descripcion-encabezado { font-size: 0.9rem; text-align: center; margin: 0 auto; }
+/* Dispositivos Móviles */
+@media (max-width: 768px) {
+    .fila-comparativa-master {
+        grid-template-columns: 1fr; /* Apila los gráficos */
+        gap: 1.5rem;
+    }
     
-    .botonesFuncionesComparativa { flex-direction: column; gap: 20px; align-items: center; height: auto; }
-    .botonesBalanceComparativa { flex-direction: column; width: 100%; align-items: center; gap: 12px; }
+    .encabezado-fila-premium {
+        flex-direction: column;
+        align-items: stretch; 
+        gap: 15px;
+    }
     
-    .botonesComparativa { width: 100%; max-width: 320px; height: 55px; } /* Más grandes para touch */
-    .botonVolverPrincipal { width: 100%; }
+    .tarjeta-balance-superior {
+        flex-direction: column; /* Apila el icono y el texto del balance */
+        align-items: flex-start;
+        padding: 16px 20px;
+    }
+
+    .tarjeta-balance-superior .info-balance {
+        align-items: flex-start; 
+        text-align: left;
+        width: 100%;
+        margin-top: 5px;
+    }
+
+    .tarjeta-balance-superior .monto-balance {
+        font-size: 1.4rem; 
+    }
+
+    .botonesFuncionesComparativa {
+        flex-direction: column;
+        width: 100%;
+        gap: 15px;
+    }
+
+    .botonesBalanceComparativa {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .botonesComparativa,
+    .botonVolverPrincipal .btn-volver {
+        width: 100%;
+        max-width: 100%;
+        height: 50px;
+    }
+
+    .seccion-encabezado-general h2 {
+        font-size: 1.5rem;
+    }
 }

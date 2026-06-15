@@ -280,14 +280,14 @@ const Comparativa = () => {
                     {esVacio ? (
                         <div className="estado-vacio-grafico"><div className="circulo-vacio"><span>Sin datos</span></div></div>
                     ) : (
-                        <ResponsiveContainer width="100%" height={220}>
+                        <ResponsiveContainer width="100%" height={350}>
                             <PieChart>
-                                <Pie data={dataGrafico} cx="50%" cy="50%" innerRadius={60} outerRadius={80} dataKey="valor" nameKey="nombre" stroke="none" paddingAngle={5}>
+                                <Pie data={dataGrafico} cx="50%" cy="50%" innerRadius={110} outerRadius={130} dataKey="valor" nameKey="nombre" stroke="none" paddingAngle={2} animationDuration={2500}>
                                     {dataGrafico.map((entry, index) => (<Cell key={`cell-${index}`} fill={paleta[index % paleta.length]} />))}
                                 </Pie>
                                 <Tooltip contentStyle={{ backgroundColor: '#1e1e1f', borderRadius: '10px', border: '1px solid rgba(200, 178, 119, 0.3)', color: '#fff' }} itemStyle={{ color: '#c8b277' }} formatter={(value, name) => [`$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, name]} />
-                                <text x="50%" y="45%" textAnchor="middle" fill="#888" fontSize="12">Total</text>
-                                <text x="50%" y="60%" textAnchor="middle" fill="#c8b277" fontSize="18" fontWeight="bold">${valorTotal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</text>
+                                <text x="50%" y="45%" textAnchor="middle" fill="#888" fontSize="13" fontWeight="600">Total</text>
+                                <text x="50%" y="60%" textAnchor="middle" fill="#c8b277" fontSize="16" fontWeight="600">${valorTotal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</text>
                             </PieChart>
                         </ResponsiveContainer>
                     )}
@@ -307,31 +307,38 @@ const Comparativa = () => {
         if (tipoPresentacion === 1) {
             return (
                 <div className="comparativa-grid-layout">
+                    {/* SECCIÓN GASTOS */}
                     <div className="seccion-comparativa-fila">
-                        <h2 className="subtitulo-seccion">Comparacion Mensual Gasto </h2>
-                        <div className="fila-comparativa-master">
-                            <GraficoConNav titulo="Gastos Periodo A" valorTotal={datos.gastoATotal} listaDetalle={datos.gastoALista} offset={offsets.gastoA} setOffsetKey="gastoA" tipo="gasto" />
-                            <div className="tarjeta-balance-central">
-                                <div className="icon-comparar">vs</div>
+                        <div className="encabezado-fila-premium">
+                            <h2 className="subtitulo-seccion">Comparación Mensual Gasto</h2>
+                            <div className="tarjeta-balance-superior" >
+                                <div className="icon-comparar">VS</div>
                                 <div className={`info-balance ${calcularDiferencia(datos.gastoATotal, datos.gastoBTotal, true).clase}`}>
-                                    <p className="monto-balance">${calcularDiferencia(datos.gastoATotal, datos.gastoBTotal, true).monto.toLocaleString()}</p>
+                                    <p className="monto-balance truncate-text-comparativa">${calcularDiferencia(datos.gastoATotal, datos.gastoBTotal, true).monto.toLocaleString()}</p>
                                     <span className="porcentaje-balance">{calcularDiferencia(datos.gastoATotal, datos.gastoBTotal, true).texto} B ({calcularDiferencia(datos.gastoATotal, datos.gastoBTotal, true).percentage}%)</span>
                                 </div>
                             </div>
+                        </div>
+                        <div className="fila-comparativa-master">
+                            <GraficoConNav titulo="Gastos Periodo A" valorTotal={datos.gastoATotal} listaDetalle={datos.gastoALista} offset={offsets.gastoA} setOffsetKey="gastoA" tipo="gasto" />
                             <GraficoConNav titulo="Gastos Periodo B" valorTotal={datos.gastoBTotal} listaDetalle={datos.gastoBLista} offset={offsets.gastoB} setOffsetKey="gastoB" tipo="gasto" />
                         </div>
                     </div>
+
+                    {/* SECCIÓN INGRESOS */}
                     <div className="seccion-comparativa-fila" style={{ marginTop: '50px' }}>
-                        <h2 className="subtitulo-seccion">Comparacion Mensual Ingresos</h2>
-                        <div className="fila-comparativa-master">
-                            <GraficoConNav titulo="Ingresos Periodo A" valorTotal={datos.ingresoATotal} listaDetalle={datos.ingresoALista} offset={offsets.ingresoA} setOffsetKey="ingresoA" tipo="ingreso" />
-                            <div className="tarjeta-balance-central">
-                                <div className="icon-comparar">vs</div>
+                        <div className="encabezado-fila-premium">
+                            <h2 className="subtitulo-seccion">Comparación Mensual Ingresos</h2>
+                            <div className="tarjeta-balance-superior">
+                                <div className="icon-comparar">VS</div>
                                 <div className={`info-balance ${calcularDiferencia(datos.ingresoATotal, datos.ingresoBTotal, false).clase}`}>
-                                    <p className="monto-balance">${calcularDiferencia(datos.ingresoATotal, datos.ingresoBTotal, false).monto.toLocaleString()}</p>
+                                    <p className="monto-balance truncate-text-comparativa">${calcularDiferencia(datos.ingresoATotal, datos.ingresoBTotal, false).monto.toLocaleString()}</p>
                                     <span className="porcentaje-balance">{calcularDiferencia(datos.ingresoATotal, datos.ingresoBTotal, false).texto} B ({calcularDiferencia(datos.ingresoATotal, datos.ingresoBTotal, false).percentage}%)</span>
                                 </div>
                             </div>
+                        </div>
+                        <div className="fila-comparativa-master">
+                            <GraficoConNav titulo="Ingresos Periodo A" valorTotal={datos.ingresoATotal} listaDetalle={datos.ingresoALista} offset={offsets.ingresoA} setOffsetKey="ingresoA" tipo="ingreso" />
                             <GraficoConNav titulo="Ingresos Periodo B" valorTotal={datos.ingresoBTotal} listaDetalle={datos.ingresoBLista} offset={offsets.ingresoB} setOffsetKey="ingresoB" tipo="ingreso" />
                         </div>
                     </div>
@@ -341,16 +348,18 @@ const Comparativa = () => {
             return (
                 <div className="comparativa-grid-layout">
                     <div className="seccion-comparativa-fila">
-                        <h2 className="subtitulo-seccion">Balance Mensual</h2>
-                        <div className="fila-comparativa-master">
-                            <GraficoConNav titulo="Ingresos A" valorTotal={datos.ingresoATotal} listaDetalle={datos.ingresoALista} offset={offsets.ingresoA} setOffsetKey="ingresoA" tipo="ingreso" syncOffsets={["gastoA"]} />
-                            <div className="tarjeta-balance-central">
-                                <div className="icon-comparar">DIF</div>
+                        <div className="encabezado-fila-premium">
+                            <h2 className="subtitulo-seccion">Balance Mensual Neto</h2>
+                            <div className="tarjeta-balance-superior">
+                                <div className="icon-comparar">NETO</div>
                                 <div className={`info-balance ${(datos.ingresoATotal - datos.gastoATotal) >= 0 ? "tendencia-positiva" : "tendencia-negativa"}`}>
-                                    <p className="monto-balance">${Math.abs(datos.ingresoATotal - datos.gastoATotal).toLocaleString()}</p>
-                                    <span className="porcentaje-balance">Resultado Neto</span>
+                                    <p className="monto-balance truncate-text-comparativa">${Math.abs(datos.ingresoATotal - datos.gastoATotal).toLocaleString()}</p>
+                                    <span className="porcentaje-balance">Diferencia Ingresos - Gastos</span>
                                 </div>
                             </div>
+                        </div>
+                        <div className="fila-comparativa-master">
+                            <GraficoConNav titulo="Ingresos A" valorTotal={datos.ingresoATotal} listaDetalle={datos.ingresoALista} offset={offsets.ingresoA} setOffsetKey="ingresoA" tipo="ingreso" syncOffsets={["gastoA"]} />
                             <GraficoConNav titulo="Gastos A" valorTotal={datos.gastoATotal} listaDetalle={datos.gastoALista} offset={offsets.gastoA} setOffsetKey="gastoA" tipo="gasto" syncOffsets={["ingresoA"]} />
                         </div>
                     </div>
@@ -395,7 +404,7 @@ const Comparativa = () => {
                             className="botonesComparativa btn-principal"
                             onClick={() => toast.info("Redirigiendo a planes...")}
                         >   Explorar Planes</Link>
-                            <Link to="/Principal" className="botonesComparativa btn-volver" style={{ textDecoration: 'none', display: 'block', textAlign: 'center' }}>Volver al Inicio</Link>
+                        <Link to="/Principal" className="botonesComparativa btn-volver" style={{ textDecoration: 'none', display: 'block', textAlign: 'center' }}>Volver al Inicio</Link>
                     </div>
                 </div>
             </div>
@@ -415,19 +424,26 @@ const Comparativa = () => {
                 </div>
 
                 <div className='botonesFuncionesComparativa'>
-                    <div className='botonesBalanceComparativa'>
-                        {esPremium && (
-                            <button onClick={() => { setTipoPresentacion(3); }} className='botonesComparativa btn-principal'>Ver Evolución Anual</button>
-                        )}
-                        <button onClick={() => setTipoPresentacion(tipoPresentacion === 1 ? 2 : 1)} className='botonesComparativa btn-principal'>
-                            {tipoPresentacion === 1 ? "Ver Balances mensuales" : "Ver Comparativa Mensual"}
-                        </button>
-                        <button onClick={() => setModalArchivarAbierto(true)} className='botonesComparativa btn-secundario'>Archivar datos actuales</button>
-                    </div>
-                    <div className='botonVolverPrincipal'>
-                        <Link to="/Principal" className="botonesComparativa btn-volver">⇐⇐⇐ IR A INICIO ⇐⇐⇐</Link>
-                    </div>
-                </div>
+    <div className='botonesBalanceComparativa'>
+        {esPremium && (
+            <button onClick={() => { setTipoPresentacion(3); }} className='botonesComparativa btn-principal'>
+                Ver Evolución Anual
+            </button>
+        )}
+        <button onClick={() => setTipoPresentacion(tipoPresentacion === 1 ? 2 : 1)} className='botonesComparativa btn-principal'>
+            {tipoPresentacion === 1 ? "Ver Balances Mensuales" : "Ver Comparativa Mensual"}
+        </button>
+        <button onClick={() => setModalArchivarAbierto(true)} className='botonesComparativa btn-secundario'>
+            Archivar Datos Actuales
+        </button>
+    </div>
+    <div className='botonVolverPrincipal'>
+        {/* Cambié las flechas múltiples por una sola más limpia */}
+        <Link to="/Principal" className="botonesComparativa btn-volver">
+            ← Volver al Inicio
+        </Link>
+    </div>
+</div>
             </div>
 
             {renderContenido()}

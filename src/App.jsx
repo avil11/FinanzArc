@@ -20,6 +20,7 @@ import Archivos from './paginas/Principal/Archivos/Archivos';
 // Este es el componente limpio que acabamos de corregir arriba
 import RutaProtegida from './RutaProtegida'; 
 
+
 function App() {
   return (
     <BrowserRouter>
