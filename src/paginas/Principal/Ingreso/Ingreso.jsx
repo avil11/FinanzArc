@@ -399,15 +399,14 @@ function Ingreso() {
               <div className="formulario-grupo">
                 <label>Monto</label>
                 <input
-<<<<<<< HEAD
+
                   type="text"
                   value={formatMiles(form.MontoIngreso)}
                   onChange={(e) => setForm({ ...form, MontoIngreso: desformatMiles(e.target.value) })}
-=======
+
                   type="text" // Cambiado de 'number' a 'text' para evitar errores del navegador
                   inputMode="decimal" // Abre teclado numérico en móviles
                   value={form.MontoIngreso}
->>>>>>> f9ecf5349776e6bf10071465f28503a5350cb233
                   placeholder='"850.000..."'
                   onChange={(e) => {
                     const val = e.target.value;

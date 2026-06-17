@@ -303,10 +303,10 @@ function Gasto() {
           <div className="contenido-modal">
             <h3 className="modal-titulo">{form.IdGasto ? "Editar Gasto" : "Nuevo Gasto"}</h3>
             <div className="formulario-grid">
-<<<<<<< HEAD
+
               <div className="formulario-grupo full-width"><label>Descripción</label><input placeholder='"Gasto realizado en colegio para merienda..."' type="text" value={form.Descripcion} onChange={(e) => setForm({ ...form, Descripcion: e.target.value })} /></div>
               <div className="formulario-grupo"><label>Monto</label><input placeholder='"7.000..."' type="text" value={formatMiles(form.MontoGasto)} onChange={(e) => setForm({ ...form, MontoGasto: desformatMiles(e.target.value) })} /></div>
-=======
+
               <div className="formulario-grupo full-width">
                 <label>Descripción</label>
                 <input
@@ -344,7 +344,7 @@ function Gasto() {
                   }}
                 />
               </div>
->>>>>>> f9ecf5349776e6bf10071465f28503a5350cb233
+
               <div className="formulario-grupo"><label>Fecha</label><input type="date" value={form.FechaGasto} onChange={(e) => setForm({ ...form, FechaGasto: e.target.value })} /></div>
 
               <div className="formulario-grupo">
