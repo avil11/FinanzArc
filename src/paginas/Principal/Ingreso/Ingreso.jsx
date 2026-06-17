@@ -1,3 +1,4 @@
+// Ingreso.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
@@ -10,6 +11,14 @@ import "./Ingreso.css";
 import { obtenerTasas } from "../../../apiConfig";
 
 const API_BASE_URL = "http://localhost:60496/api";
+
+const formatMontoParaInput = (val) => {
+  if (val === "" || val === null || val === undefined) return "";
+  const stringVal = val.toString();
+  const parts = stringVal.split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return parts.length > 1 ? parts[0] + "," + parts[1] : (stringVal.endsWith(".") ? parts[0] + "," : parts[0]);
+};
 
 function Ingreso() {
 
@@ -390,10 +399,10 @@ function Ingreso() {
                 <input
                   type="text" // Cambiado de 'number' a 'text' para evitar errores del navegador
                   inputMode="decimal" // Abre teclado numérico en móviles
-                  value={form.MontoIngreso}
+                  value={formatMontoParaInput(form.MontoIngreso)}
                   placeholder='"850.000..."'
                   onChange={(e) => {
-                    const val = e.target.value;
+                    const val = e.target.value.replace(/\./g, "").replace(/,/g, ".");
                     const numVal = parseFloat(val);
                     const MAX_VALOR = 1000000000;
 

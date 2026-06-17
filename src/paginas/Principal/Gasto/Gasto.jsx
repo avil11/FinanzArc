@@ -1,9 +1,18 @@
+// Gasto.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import "./Gasto.css";
 import { obtenerTasas } from "../../../apiConfig";
 
 const API_BASE_URL = "http://localhost:60496/api";
+
+const formatMontoParaInput = (val) => {
+  if (val === "" || val === null || val === undefined) return "";
+  const stringVal = val.toString();
+  const parts = stringVal.split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return parts.length > 1 ? parts[0] + "," + parts[1] : (stringVal.endsWith(".") ? parts[0] + "," : parts[0]);
+};
 
 function Gasto() {
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -161,7 +170,6 @@ function Gasto() {
                   nameKey="nombre"
                   innerRadius={120}
                   outerRadius={140}
-                   paddingAngle={5}
                   stroke="none"
                 >
                   {gastosFiltrados.map((_, i) => (
@@ -313,9 +321,9 @@ function Gasto() {
                   type="text"
                   inputMode="decimal"
                   placeholder="7.000..."
-                  value={form.MontoGasto}
+                  value={formatMontoParaInput(form.MontoGasto)}
                   onChange={(e) => {
-                    const val = e.target.value;
+                    const val = e.target.value.replace(/\./g, "").replace(/,/g, ".");
                     const numVal = parseFloat(val); // Convertimos para comparar
                     const MAX_VALOR = 1000000000;
 

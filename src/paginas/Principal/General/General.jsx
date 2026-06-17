@@ -1,3 +1,4 @@
+// General.jsx
 import React, { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
@@ -20,6 +21,14 @@ const API_ENDPOINTS = {
   usuarios: "/Usuarios",
   ahorros: "/MetaAhorro",
   transacciones: "/Transacciones"
+};
+
+const formatMontoParaInput = (val) => {
+  if (val === "" || val === null || val === undefined) return "";
+  const stringVal = val.toString();
+  const parts = stringVal.split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return parts.length > 1 ? parts[0] + "," + parts[1] : (stringVal.endsWith(".") ? parts[0] + "," : parts[0]);
 };
 
 
@@ -774,12 +783,16 @@ const GastoIngreso = () => {
               <div className="formulario-grupo">
                 <label htmlFor="MontoGuardado">Monto Actual ($)</label>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
                   name="MontoGuardado"
-                  value={metaForm.MontoGuardado}
-                  onChange={manejarCambioInput}
+                  value={formatMontoParaInput(metaForm.MontoGuardado)}
+                  onChange={(e) => {
+                    const rawVal = e.target.value.replace(/\./g, "").replace(/,/g, ".");
+                    if (rawVal !== "" && !/^\d*\.?\d*$/.test(rawVal)) return;
+                    manejarCambioInput({ target: { name: e.target.name, value: rawVal } });
+                  }}
                   id="MontoGuardado"
-                  max={9999999999} // Límite de 10 dígitos
                   placeholder="0.00"
                 />
               </div>
@@ -788,12 +801,16 @@ const GastoIngreso = () => {
               <div className="formulario-grupo">
                 <label htmlFor="montoObjetivo">Monto Objetivo ($)</label>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
                   name="MontoObjetivo"
-                  value={metaForm.MontoObjetivo}
-                  onChange={manejarCambioInput}
+                  value={formatMontoParaInput(metaForm.MontoObjetivo)}
+                  onChange={(e) => {
+                    const rawVal = e.target.value.replace(/\./g, "").replace(/,/g, ".");
+                    if (rawVal !== "" && !/^\d*\.?\d*$/.test(rawVal)) return;
+                    manejarCambioInput({ target: { name: e.target.name, value: rawVal } });
+                  }}
                   id="montoObjetivo"
-                  max={9999999999} // Límite de 10 dígitos
                   placeholder="0.00"
                 />
               </div>
@@ -876,11 +893,35 @@ const GastoIngreso = () => {
               </div>
               <div className="formulario-grupo" style={{ display: "none" }}>
                 <label htmlFor="montoGuardado">Monto Actual ($)</label>
-                <input type="number" name="MontoGuardado" value={metaForm.MontoGuardado} onChange={manejarCambioInput} id="montoGuardado" placeholder="0.00" />
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  name="MontoGuardado"
+                  value={formatMontoParaInput(metaForm.MontoGuardado)}
+                  onChange={(e) => {
+                    const rawVal = e.target.value.replace(/\./g, "").replace(/,/g, ".");
+                    if (rawVal !== "" && !/^\d*\.?\d*$/.test(rawVal)) return;
+                    manejarCambioInput({ target: { name: e.target.name, value: rawVal } });
+                  }}
+                  id="montoGuardado"
+                  placeholder="0.00"
+                />
               </div>
               <div className="formulario-grupo">
                 <label htmlFor="montoObjetivo">Monto Objetivo ($)</label>
-                <input type="number" name="MontoObjetivo" value={metaForm.MontoObjetivo} onChange={manejarCambioInput} id="montoObjetivo" placeholder="0.00" />
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  name="MontoObjetivo"
+                  value={formatMontoParaInput(metaForm.MontoObjetivo)}
+                  onChange={(e) => {
+                    const rawVal = e.target.value.replace(/\./g, "").replace(/,/g, ".");
+                    if (rawVal !== "" && !/^\d*\.?\d*$/.test(rawVal)) return;
+                    manejarCambioInput({ target: { name: e.target.name, value: rawVal } });
+                  }}
+                  id="montoObjetivo"
+                  placeholder="0.00"
+                />
               </div>
               <div className="formulario-grupo">
                 <label>Fecha de Inicio</label>
