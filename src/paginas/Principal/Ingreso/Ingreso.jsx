@@ -1,8 +1,13 @@
 // Ingreso.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import "./Ingreso.css";
 
+// Importaciones de react-datepicker
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import es from "date-fns/locale/es";
+
+import "./Ingreso.css";
 import { obtenerTasas } from "../../../apiConfig";
 
 const API_BASE_URL = "http://localhost:60496/api";
@@ -37,7 +42,7 @@ function Ingreso() {
     IdTipoIngreso: "",
     IdDivisa: "",
     MontoIngreso: "",
-    FechaIngreso: new Date().toISOString().split('T')[0],
+    FechaIngreso: new Date(), // <-- Cambiamos a objeto Date
     Descripcion: ""
   });
 
@@ -115,6 +120,12 @@ function Ingreso() {
     const url = esEdicion ? `${API_BASE_URL}/Ingreso/${form.IdIngreso}` : `${API_BASE_URL}/Ingreso`;
     const metodo = esEdicion ? "PUT" : "POST";
 
+    // NUEVO: Formateamos la fecha a texto ISO para el backend
+    const ingresoAEnviar = {
+      ...form,
+      FechaIngreso: form.FechaIngreso ? form.FechaIngreso.toISOString() : null
+    };
+
     try {
       const res = await fetch(url, {
         method: metodo,
@@ -122,7 +133,7 @@ function Ingreso() {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${localStorage.getItem("Token")}`
         },
-        body: JSON.stringify(form)
+        body: JSON.stringify(ingresoAEnviar) // <-- Usamos el objeto formateado
       });
 
       if (res.ok) {
@@ -189,7 +200,7 @@ function Ingreso() {
       IdIngreso: null,
       MontoIngreso: "",
       Descripcion: "",
-      FechaIngreso: new Date().toISOString().split('T')[0],
+      FechaIngreso: new Date(),
       IdCuenta: 1,
       IdTipoIngreso: 1,
       IdDivisa: 1
@@ -204,7 +215,7 @@ function Ingreso() {
       IdTipoIngreso: item.IdTipoIngreso,
       IdDivisa: item.IdDivisa,
       MontoIngreso: item.MontoIngreso,
-      FechaIngreso: item.FechaIngreso.split('T')[0],
+      FechaIngreso: item.FechaIngreso ? new Date(item.FechaIngreso) : new Date(),
       Descripcion: item.Descripcion
     });
     setModalAbierto(true);
@@ -238,9 +249,9 @@ function Ingreso() {
                   data={datosGrafico}
                   cx="50%"
                   cy="50%"
-                  innerRadius={70}
-                  outerRadius={120}
-                  paddingAngle={6}
+                   innerRadius={120}
+                  outerRadius={140}
+                   paddingAngle={5}
                   dataKey="valor"
                   nameKey="nombre"
                   stroke="none"
@@ -299,7 +310,11 @@ function Ingreso() {
                 ) : (
                   ingresosFiltrados.map((item) => (
                     <tr key={item.IdIngreso || Math.random()}>
-                      <td>{item.Descripcion}</td>
+                      <td>
+                        <div className="truncate-text" title={item.Descripcion}>
+                          {item.Descripcion}
+                        </div>
+                      </td>
                       <td className="monto-destacado" style={{ color: 'rgb(70, 130, 180)' }}>
                         {FormatearMoneda(Number(item.MontoIngreso), item.IdDivisa)}
                       </td>
@@ -322,45 +337,45 @@ function Ingreso() {
         Registrar Ingreso
       </button>
 
-     {vermas && itemSeleccionado && (
-  <div className="seccion-detalle-inferior" style={{ marginTop: "20px", padding: "20px", backgroundColor: "#1e1e1f", borderRadius: "12px", border: "1px solid #333", width: "80%" }}>
-    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
-      <h2>Detalle: {itemSeleccionado.Descripcion}</h2>
-      <button onClick={() => setVerMas(false)} className="btn-link">Cerrar ✕</button>
-    </div>
+      {vermas && itemSeleccionado && (
+        <div className="seccion-detalle-inferior" style={{ marginTop: "20px", padding: "20px", backgroundColor: "#1e1e1f", borderRadius: "12px", border: "1px solid #333", width: "80%" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
+            <h2>Detalle: {itemSeleccionado.Descripcion}</h2>
+            <button onClick={() => setVerMas(false)} className="btn-link">Cerrar ✕</button>
+          </div>
 
-    <div className="formulario-grid">
-      {/* Campos existentes */}
-      <div className="formulario-grupo">
-        <label>Tipo de Ingreso</label>
-        <p>{tipoIngreso.find(t => t.IdTipoIngreso === itemSeleccionado.IdTipoIngreso)?.Nombre || "Cargando..."}</p>
-      </div>
+          <div className="formulario-grid">
+            {/* Campos existentes */}
+            <div className="formulario-grupo">
+              <label>Tipo de Ingreso</label>
+              <p>{tipoIngreso.find(t => t.IdTipoIngreso === itemSeleccionado.IdTipoIngreso)?.Nombre || "Cargando..."}</p>
+            </div>
 
-      <div className="formulario-grupo">
-        <label>Divisa</label>
-        <p>{divisa.find(d => d.IdDivisa === itemSeleccionado.IdDivisa)?.CodigoISO || "Cargando..."}</p>
-      </div>
+            <div className="formulario-grupo">
+              <label>Divisa</label>
+              <p>{divisa.find(d => d.IdDivisa === itemSeleccionado.IdDivisa)?.CodigoISO || "Cargando..."}</p>
+            </div>
 
-      {/* Nuevos campos traídos de la base de datos */}
-      <div className="formulario-grupo">
-        <label>Monto</label>
-        <p className="monto-destacado" style={{ color: 'rgb(70, 130, 180)', fontWeight: 'bold' }}>
-          {FormatearMoneda(Number(itemSeleccionado.MontoIngreso), itemSeleccionado.IdDivisa)}
-        </p>
-      </div>
+            {/* Nuevos campos traídos de la base de datos */}
+            <div className="formulario-grupo">
+              <label>Monto</label>
+              <p className="monto-destacado" style={{ color: 'rgb(70, 130, 180)', fontWeight: 'bold' }}>
+                {FormatearMoneda(Number(itemSeleccionado.MontoIngreso), itemSeleccionado.IdDivisa)}
+              </p>
+            </div>
 
-      <div className="formulario-grupo">
-        <label>Fecha de Ingreso</label>
-        <p>{new Date(itemSeleccionado.FechaIngreso).toLocaleDateString()}</p>
-      </div>
+            <div className="formulario-grupo">
+              <label>Fecha de Ingreso</label>
+              <p>{new Date(itemSeleccionado.FechaIngreso).toLocaleDateString()}</p>
+            </div>
 
-      <div className="formulario-grupo">
-        <label>Fecha de Creación</label>
-        <p>{new Date(itemSeleccionado.FechaCreacion).toLocaleDateString()}</p>
-      </div>
-    </div>
-  </div>
-)}
+            <div className="formulario-grupo">
+              <label>Fecha de Creación</label>
+              <p>{new Date(itemSeleccionado.FechaCreacion).toLocaleDateString()}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {modalAbierto && (
         <div className="capa-modal">
@@ -372,25 +387,52 @@ function Ingreso() {
                 <input
                   type="text"
                   value={form.Descripcion}
+                  maxLength={100} // Límite de 100 caracteres
                   onChange={(e) => setForm({ ...form, Descripcion: e.target.value })}
                   placeholder='"Ingreso de aguinaldo..."'
                 />
+                <small style={{ color: form.Descripcion.length >= 100 ? '#ff4b4b' : '#8e8e93', marginTop: "5px", display: "block" }}>
+                  {form.Descripcion.length} / 100 caracteres
+                </small>
               </div>
+
               <div className="formulario-grupo">
                 <label>Monto</label>
                 <input
+<<<<<<< HEAD
                   type="text"
                   value={formatMiles(form.MontoIngreso)}
                   onChange={(e) => setForm({ ...form, MontoIngreso: desformatMiles(e.target.value) })}
+=======
+                  type="text" // Cambiado de 'number' a 'text' para evitar errores del navegador
+                  inputMode="decimal" // Abre teclado numérico en móviles
+                  value={form.MontoIngreso}
+>>>>>>> f9ecf5349776e6bf10071465f28503a5350cb233
                   placeholder='"850.000..."'
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    const numVal = parseFloat(val);
+                    const MAX_VALOR = 1000000000;
+
+                    // Regex: permite números y hasta 2 decimales
+                    const regex = /^\d*\.?\d{0,2}$/;
+
+                    // Validamos: formato correcto (regex) Y que no supere el 1.000.000.000
+                    if (val === "" || (regex.test(val) && (isNaN(numVal) || numVal <= MAX_VALOR))) {
+                      setForm({ ...form, MontoIngreso: val });
+                    }
+                  }}
                 />
               </div>
+
               <div className="formulario-grupo">
                 <label>Fecha</label>
-                <input
-                  type="date"
-                  value={form.FechaIngreso}
-                  onChange={(e) => setForm({ ...form, FechaIngreso: e.target.value })}
+                <DatePicker
+                  selected={form.FechaIngreso}
+                  onChange={(date) => setForm({ ...form, FechaIngreso: date })}
+                  locale="es"
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="Seleccionar fecha"
                 />
               </div>
 
@@ -422,7 +464,7 @@ function Ingreso() {
               </div>
             </div>
             <div className="formulario-acciones">
-              <button className="boton-secundario" onClick={() => setModalAbierto(false)}>Cancelar</button>
+              <button className="boton-secundario" onClick={() => setModalAbierto(false)}>CANCELAR</button>
               <button className="boton-primario" onClick={manejarGuardar}>Guardar Ingreso</button>
             </div>
           </div>

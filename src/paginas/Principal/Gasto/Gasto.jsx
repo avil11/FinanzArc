@@ -35,7 +35,7 @@ function Gasto() {
     IdGasto: null, IdUsuario: null, MontoGasto: "",
     FechaGasto: new Date().toISOString().split('T')[0], Descripcion: ""
   });
-  
+
   // CORRECCIÓN: Carga inicial consolidada para evitar redundancia y errores
   useEffect(() => {
     const cargarDatosIniciales = async () => {
@@ -170,8 +170,9 @@ function Gasto() {
                   paddingAngle={6}
                   dataKey="valor"
                   nameKey="nombre"
-                  innerRadius={70}
-                  outerRadius={120}
+                  innerRadius={120}
+                  outerRadius={140}
+                   paddingAngle={5}
                   stroke="none"
                 >
                   {gastosFiltrados.map((_, i) => (
@@ -219,7 +220,11 @@ function Gasto() {
                 ) : (
                   gastosFiltrados.map((item) => (
                     <tr key={item.IdGasto}>
-                      <td>{item.Descripcion}</td>
+                      <td>
+                        <div className="truncate-text" title={item.Descripcion}>
+                          {item.Descripcion}
+                        </div>
+                      </td>
                       <td className="monto-destacado" style={{ color: '#FF4B4B' }}>{FormatearMoneda(Number(item.MontoGasto), item.IdDivisa)}</td>
                       <td className="texto-gris">{new Date(item.FechaGasto).toLocaleDateString()}</td>
                       <td>
@@ -237,69 +242,109 @@ function Gasto() {
       </div>
 
       <button className="boton-primario" onClick={() => { resetearForm(); setModalAbierto(true); }}>Registrar Gasto</button>
-{vermas && itemSeleccionado && (
-  <div className="seccion-detalle-inferior" style={{ marginTop: "20px", padding: "20px", backgroundColor: "#1e1e1f", borderRadius: "12px", border: "1px solid #333", width: "80%" }}>
-    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
-      <h2>Detalle: {itemSeleccionado.Descripcion}</h2>
-      <button onClick={() => setVerMas(false)} className="btn-link">Cerrar ✕</button>
-    </div>
+      {vermas && itemSeleccionado && (
+        <div className="seccion-detalle-inferior" style={{ marginTop: "20px", padding: "20px", backgroundColor: "#1e1e1f", borderRadius: "12px", border: "1px solid #333", width: "80%" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
+            <h2>Detalle: {itemSeleccionado.Descripcion}</h2>
+            <button onClick={() => setVerMas(false)} className="btn-link">Cerrar ✕</button>
+          </div>
 
-    <div className="formulario-grid">
-      {/* Categoría */}
-      <div className="formulario-grupo">
-        <label>Categoría</label>
-        <p>
-          {categorias.find(c => c.IdCategoria === itemSeleccionado.IdCategoria)?.Nombre || "Cargando..."}
-        </p>
-      </div>
+          <div className="formulario-grid">
+            {/* Categoría */}
+            <div className="formulario-grupo">
+              <label>Categoría</label>
+              <p>
+                {categorias.find(c => c.IdCategoria === itemSeleccionado.IdCategoria)?.Nombre || "Cargando..."}
+              </p>
+            </div>
 
-      {/* Divisa */}
-      <div className="formulario-grupo">
-        <label>Divisa</label>
-        <p>
-          {divisa.find(d => d.IdDivisa === itemSeleccionado.IdDivisa)?.CodigoISO || "Cargando..."}
-        </p>
-      </div>
+            {/* Divisa */}
+            <div className="formulario-grupo">
+              <label>Divisa</label>
+              <p>
+                {divisa.find(d => d.IdDivisa === itemSeleccionado.IdDivisa)?.CodigoISO || "Cargando..."}
+              </p>
+            </div>
 
-      {/* Modo de Pago */}
-      <div className="formulario-grupo">
-        <label>Modo de Pago</label>
-        <p>
-          {modosPago.find(m => m.IdModoPago === itemSeleccionado.IdModoPago)?.Nombre || "Cargando..."}
-        </p>
-      </div>
+            {/* Modo de Pago */}
+            <div className="formulario-grupo">
+              <label>Modo de Pago</label>
+              <p>
+                {modosPago.find(m => m.IdModoPago === itemSeleccionado.IdModoPago)?.Nombre || "Cargando..."}
+              </p>
+            </div>
 
-      {/* Monto (Gasto) */}
-      <div className="formulario-grupo">
-        <label>Monto</label>
-        <p className="monto-destacado" style={{ color: '#ff4b4b', fontWeight: 'bold' }}>
-          {/* Asegúrate de usar la propiedad correcta: MontoGasto */}
-          {FormatearMoneda(Number(itemSeleccionado.MontoGasto), itemSeleccionado.IdDivisa)}
-        </p>
-      </div>
+            {/* Monto (Gasto) */}
+            <div className="formulario-grupo">
+              <label>Monto</label>
+              <p className="monto-destacado" style={{ color: '#ff4b4b', fontWeight: 'bold' }}>
+                {/* Asegúrate de usar la propiedad correcta: MontoGasto */}
+                {FormatearMoneda(Number(itemSeleccionado.MontoGasto), itemSeleccionado.IdDivisa)}
+              </p>
+            </div>
 
-      {/* Fecha Gasto */}
-      <div className="formulario-grupo">
-        <label>Fecha del Gasto</label>
-        <p>{new Date(itemSeleccionado.FechaGasto).toLocaleDateString()}</p>
-      </div>
+            {/* Fecha Gasto */}
+            <div className="formulario-grupo">
+              <label>Fecha del Gasto</label>
+              <p>{new Date(itemSeleccionado.FechaGasto).toLocaleDateString()}</p>
+            </div>
 
-      {/* Fecha Creación */}
-      <div className="formulario-grupo">
-        <label>Fecha de Creación</label>
-        <p>{new Date(itemSeleccionado.FechaCreacion).toLocaleDateString()}</p>
-      </div>
-    </div>
-  </div>
-)}
+            {/* Fecha Creación */}
+            <div className="formulario-grupo">
+              <label>Fecha de Creación</label>
+              <p>{new Date(itemSeleccionado.FechaCreacion).toLocaleDateString()}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {modalAbierto && (
         <div className="capa-modal">
           <div className="contenido-modal">
             <h3 className="modal-titulo">{form.IdGasto ? "Editar Gasto" : "Nuevo Gasto"}</h3>
             <div className="formulario-grid">
+<<<<<<< HEAD
               <div className="formulario-grupo full-width"><label>Descripción</label><input placeholder='"Gasto realizado en colegio para merienda..."' type="text" value={form.Descripcion} onChange={(e) => setForm({ ...form, Descripcion: e.target.value })} /></div>
               <div className="formulario-grupo"><label>Monto</label><input placeholder='"7.000..."' type="text" value={formatMiles(form.MontoGasto)} onChange={(e) => setForm({ ...form, MontoGasto: desformatMiles(e.target.value) })} /></div>
+=======
+              <div className="formulario-grupo full-width">
+                <label>Descripción</label>
+                <input
+                  placeholder="Gasto realizado en colegio para merienda..."
+                  type="text"
+                  value={form.Descripcion}
+                  maxLength={100}
+                  onChange={(e) => setForm({ ...form, Descripcion: e.target.value })}
+                />
+
+                {/* Contador de caracteres */}
+                <small style={{ color: form.Descripcion.length >= 100 ? '#ff4b4b' : '#8e8e93' }}>
+                  {form.Descripcion.length} / 100 caracteres
+                </small>
+              </div>
+              <div className="formulario-grupo">
+                <label>Monto</label>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="7.000..."
+                  value={form.MontoGasto}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    const numVal = parseFloat(val); // Convertimos para comparar
+                    const MAX_VALOR = 1000000000;
+
+                    // Regex para permitir solo números y hasta 2 decimales
+                    const regex = /^\d*\.?\d{0,2}$/;
+
+                    // Lógica: Si está vacío, O cumple el formato y es menor al límite, actualizamos
+                    if (val === "" || (regex.test(val) && numVal <= MAX_VALOR)) {
+                      setForm({ ...form, MontoGasto: val });
+                    }
+                  }}
+                />
+              </div>
+>>>>>>> f9ecf5349776e6bf10071465f28503a5350cb233
               <div className="formulario-grupo"><label>Fecha</label><input type="date" value={form.FechaGasto} onChange={(e) => setForm({ ...form, FechaGasto: e.target.value })} /></div>
 
               <div className="formulario-grupo">
@@ -346,7 +391,7 @@ function Gasto() {
 
             </div>
             <div className="formulario-acciones">
-              <button className="boton-secundario" onClick={() => setModalAbierto(false)}>Cancelar</button>
+              <button className="boton-secundario" onClick={() => setModalAbierto(false)}>CANCELAR</button>
               <button className="boton-primario" onClick={manejarGuardar}>Guardar</button>
             </div>
           </div>

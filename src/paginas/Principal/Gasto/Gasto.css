@@ -33,7 +33,23 @@
 /* =========================================
    4. TABLAS RESPONSIVAS
    ========================================= */
-.pagina-gasto-contenedor .tabla-responsive { width: 100%; overflow-x: auto; display: block; -webkit-overflow-scrolling: touch; }
+.pagina-gasto-contenedor .tabla-responsive { 
+    width: 100%; 
+    max-height: 480px; /* Define el alto máximo antes de activar el scroll (aprox 10-12 filas) */
+    overflow-y: auto;  /* Activa la barra vertical */
+    display: block; 
+    -webkit-overflow-scrolling: touch; 
+    border-radius: 10px;
+    border: 1px solid rgba(255, 75, 75, 0.1);
+}
+/* Fija el encabezado para que no se pierda al hacer scroll */
+.pagina-gasto-contenedor .tabla-gasto thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #1e1e1f; /* Asegúrate que sea el mismo color de fondo que la tabla */
+    box-shadow: 0 2px 2px rgba(0,0,0,0.2);
+}
 .pagina-gasto-contenedor .tabla-gasto { width: 100%; min-width: 600px; border-collapse: collapse; background: transparent; }
 .pagina-gasto-contenedor .tabla-gasto th { background: #2a2a2b; color: #FF4B4B; text-align: left; padding: 15px; font-weight: 600; font-size: .9rem; text-transform: uppercase; letter-spacing: 1px; }
 .pagina-gasto-contenedor .tabla-gasto td { padding: 15px; border-bottom: 1px solid rgba(255, 255, 255, .05); color: #fff; font-size: .95rem; white-space: nowrap; }
@@ -68,6 +84,55 @@
 .pagina-gasto-contenedor .formulario-acciones .boton-secundario { background: rgba(255, 255, 255, .03); border: 1px solid rgba(255, 255, 255, .1); color: #aaa; }
 .pagina-gasto-contenedor .formulario-acciones .boton-secundario:hover { background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .3); color: #fff; transform: translateY(-2px); }
 
+/* =========================================
+   CORRECCIÓN: ESTRUCTURA PARA EL SCROLL
+   ========================================= */
+
+/* 1. Contenedor padre de la tabla: Aseguramos que sea un Flex vertical */
+.contenedor-tabla-filtradaCategoria {
+    display: flex;
+    flex-direction: column;
+    height: 600px; /* Define aquí la altura total que quieres que ocupe la tabla + buscador */
+    background: #1e1e1f;
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid rgba(255, 75, 75, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+}
+
+/* 2. El contenedor responsive: El 'flex: 1' y 'min-height: 0' activan el scroll */
+.pagina-gasto-contenedor .tabla-responsive { 
+    width: 100%; 
+    flex: 1;           /* Ocupa todo el espacio disponible que sobra en el contenedor padre */
+    overflow-y: auto;  /* ACTIVA EL SCROLL VERTICAL */
+    min-height: 0;     /* CRÍTICO: Permite que el contenedor se encoja para mostrar el scroll */
+    margin-top: 20px;
+    border-radius: 10px;
+}
+
+/* 3. Fija el encabezado: Siempre visible mientras haces scroll */
+.pagina-gasto-contenedor .tabla-gasto thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #1e1e1f; 
+    box-shadow: 0 2px 2px rgba(0,0,0,0.2);
+}
+
+/* 4. Barra de scroll personalizada */
+.pagina-gasto-contenedor .tabla-responsive::-webkit-scrollbar {
+    width: 6px;
+}
+.pagina-gasto-contenedor .tabla-responsive::-webkit-scrollbar-track {
+    background: #161616;
+}
+.pagina-gasto-contenedor .tabla-responsive::-webkit-scrollbar-thumb {
+    background-color: #FF4B4B;
+    border-radius: 10px;
+}
+.pagina-gasto-contenedor .tabla-responsive::-webkit-scrollbar-thumb:hover {
+    background-color: #CC3333;
+}
 @keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUpModal { from { transform: translateY(30px) scale(.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
 
@@ -77,3 +142,29 @@
 @media (max-width: 810px) { .pagina-gasto-contenedor { padding-top: 100px; } .pagina-gasto-tarjeta { grid-template-columns: 1fr; gap: 20px; } .pagina-gasto-contenedor .buscador-gasto-categoria { flex-direction: column; align-items: flex-start; } .pagina-gasto-contenedor .grupo-input-buscar { width: 100%; } .pagina-gasto-contenedor .input-buscar { flex: 1; } }
 @media (max-width: 480px) { .pagina-gasto-contenedor .boton-primario { width: 100%; padding: 15px; } .pagina-gasto-contenedor .formulario-acciones { flex-direction: column-reverse; gap: 12px; } .pagina-gasto-contenedor .formulario-acciones button { width: 100%; } }
 @media (max-width: 1050px) { .pagina-gasto-tarjeta { display: flex; flex-direction: column; } }
+
+.truncate-text {
+  max-width: 200px; /* Ajusta este valor según cuánto espacio quieras darle */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block; /* Necesario para que funcione dentro de la celda */
+}
+ /* Barra de scroll personalizada para FinanzARC */
+.pagina-gasto-contenedor .tabla-responsive::-webkit-scrollbar {
+    width: 6px;
+}
+
+.pagina-gasto-contenedor .tabla-responsive::-webkit-scrollbar-track {
+    background: #161616;
+}
+
+.pagina-gasto-contenedor .tabla-responsive::-webkit-scrollbar-thumb {
+    background-color: #FF4B4B; /* Color rojo de tus botones */
+    border-radius: 10px;
+    border: 1px solid #161616;
+}
+
+.pagina-gasto-contenedor .tabla-responsive::-webkit-scrollbar-thumb:hover {
+    background-color: #CC3333; /* Un tono más oscuro al hacer hover */
+}
