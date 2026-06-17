@@ -63,10 +63,17 @@ const Comparativa = () => {
         } catch (error) { console.error(error); setCargando(false); }
     }, []);
 
-    // --- UTILIDADES ---
     const getNombreMes = (offset) => {
-        const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() + (offset || 0));
-        return d.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+        const d = new Date();
+        d.setDate(1);
+        d.setMonth(d.getMonth() + (offset || 0));
+
+
+        const mes = d.toLocaleDateString('es-ES', { month: 'long' });
+        const nombreMes = mes.charAt(0).toUpperCase() + mes.slice(1);
+        const anio = d.getFullYear();
+
+        return `${nombreMes} - ${anio}`;
     };
 
     const getRangoMes = (offset) => {
@@ -249,7 +256,9 @@ const Comparativa = () => {
         const diferencia = valorA - valorB;
         const porcentaje = valorB !== 0 ? ((diferencia / valorB) * 100).toFixed(1) : "100";
         const esPositivo = esGasto ? diferencia <= 0 : diferencia >= 0;
-        return { monto: Math.abs(diferencia), percentage: Math.abs(porcentaje), clase: esPositivo ? "tendencia-positiva" : "tendencia-negativa", texto: diferencia >= 0 ? "Más que periodo" : "Menos que periodo" };
+        const esIgual = diferencia === 0;
+        if (esIgual) return { monto: 0, percentage: 0, clase: "tendencia-neutral", texto: "Lo mismo que en el periodo" };
+        return { monto: Math.abs(diferencia), percentage: Math.abs(porcentaje), clase: esPositivo ? "tendencia-positiva" : "tendencia-negativa", texto: diferencia >= 0 ? "Más que en el periodo" : "Menos que en el periodo" };
     };
 
     // --- RENDERIZADO DE COMPONENTES ---
@@ -272,7 +281,7 @@ const Comparativa = () => {
                     <span className="badge-periodo">{titulo}</span>
                     <div className="selector-mes-nav">
                         <button onClick={() => handleOffsetChange(offset - 1)}>❮</button>
-                        <span>{getNombreMes(offset)}</span>
+                        <span> {getNombreMes(offset)}</span>
                         <button onClick={() => handleOffsetChange(offset + 1)} disabled={offset >= 0}>❯</button>
                     </div>
                 </div>
@@ -310,11 +319,11 @@ const Comparativa = () => {
                     {/* SECCIÓN GASTOS */}
                     <div className="seccion-comparativa-fila">
                         <div className="encabezado-fila-premium">
-                            <h2 className="subtitulo-seccion">Comparación Mensual Gasto</h2>
+                            <h2 className="subtitulo-seccion">Comparación Mensual de Gastos</h2>
                             <div className="tarjeta-balance-superior" >
                                 <div className="icon-comparar">VS</div>
                                 <div className={`info-balance ${calcularDiferencia(datos.gastoATotal, datos.gastoBTotal, true).clase}`}>
-                                    <p className="monto-balance truncate-text-comparativa">${calcularDiferencia(datos.gastoATotal, datos.gastoBTotal, true).monto.toLocaleString()}</p>
+                                    <p className="monto-balance truncate-text-comparativa">Gastaste ${calcularDiferencia(datos.gastoATotal, datos.gastoBTotal, true).monto.toLocaleString()}</p>
                                     <span className="porcentaje-balance">{calcularDiferencia(datos.gastoATotal, datos.gastoBTotal, true).texto} B ({calcularDiferencia(datos.gastoATotal, datos.gastoBTotal, true).percentage}%)</span>
                                 </div>
                             </div>
@@ -328,11 +337,11 @@ const Comparativa = () => {
                     {/* SECCIÓN INGRESOS */}
                     <div className="seccion-comparativa-fila" style={{ marginTop: '50px' }}>
                         <div className="encabezado-fila-premium">
-                            <h2 className="subtitulo-seccion">Comparación Mensual Ingresos</h2>
+                            <h2 className="subtitulo-seccion">Comparación Mensual de Ingresos</h2>
                             <div className="tarjeta-balance-superior">
                                 <div className="icon-comparar">VS</div>
                                 <div className={`info-balance ${calcularDiferencia(datos.ingresoATotal, datos.ingresoBTotal, false).clase}`}>
-                                    <p className="monto-balance truncate-text-comparativa">${calcularDiferencia(datos.ingresoATotal, datos.ingresoBTotal, false).monto.toLocaleString()}</p>
+                                    <p className="monto-balance truncate-text-comparativa">Ingresaste ${calcularDiferencia(datos.ingresoATotal, datos.ingresoBTotal, false).monto.toLocaleString()}</p>
                                     <span className="porcentaje-balance">{calcularDiferencia(datos.ingresoATotal, datos.ingresoBTotal, false).texto} B ({calcularDiferencia(datos.ingresoATotal, datos.ingresoBTotal, false).percentage}%)</span>
                                 </div>
                             </div>
@@ -417,7 +426,12 @@ const Comparativa = () => {
                 <div className="titulo-principal-general">
                     <h2>{tipoPresentacion === 1 ? "Comparativa Mensual Detallada" : tipoPresentacion === 2 ? "Balance de Ingresos y Gastos" : "Gráfico de Desempeño Económico"}</h2>
                     <p className="descripcion-encabezado">
-                        {tipoPresentacion === 1 ? "Seleccione dos meses para contrastar registros y porcentaje de crecimiento." :
+                        {tipoPresentacion === 1 ? <p>
+                            Seleccione dos meses de interés para comparar visualmente sus ingresos y gastos,
+                            y descubrir tendencias en su comportamiento financiero.
+                            <br />
+                            En la sección "Ver Detalles" podrá profundizar sobre los movimientos registrados en el mes.
+                        </p> :
                             tipoPresentacion === 2 ? "Cruza datos de ingresos y gastos de un mismo periodo para mostrar resultado neto." :
                                 "Analice visualmente el comportamiento anual de sus finanzas."}
                     </p>
