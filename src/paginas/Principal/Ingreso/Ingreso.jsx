@@ -1,4 +1,3 @@
-// Ingreso.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
@@ -11,16 +10,6 @@ import "./Ingreso.css";
 import { obtenerTasas } from "../../../apiConfig";
 
 const API_BASE_URL = "http://localhost:60496/api";
-
-const formatMiles = (val) => {
-  if (val === undefined || val === null || val === "") return "";
-  const normalized = val.toString().replace(/\./g, "").replace(/\D/g, "");
-  return normalized.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-};
-
-const desformatMiles = (val) => {
-  return val.replace(/\./g, "");
-};
 
 function Ingreso() {
 
@@ -399,11 +388,6 @@ function Ingreso() {
               <div className="formulario-grupo">
                 <label>Monto</label>
                 <input
-
-                  type="text"
-                  value={formatMiles(form.MontoIngreso)}
-                  onChange={(e) => setForm({ ...form, MontoIngreso: desformatMiles(e.target.value) })}
-
                   type="text" // Cambiado de 'number' a 'text' para evitar errores del navegador
                   inputMode="decimal" // Abre teclado numérico en móviles
                   value={form.MontoIngreso}
