@@ -1,9 +1,20 @@
+// Gasto.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import "./Gasto.css";
 import { obtenerTasas } from "../../../apiConfig";
 
 const API_BASE_URL = "http://localhost:60496/api";
+
+const formatMiles = (val) => {
+  if (val === undefined || val === null || val === "") return "";
+  const normalized = val.toString().replace(/\./g, "").replace(/\D/g, "");
+  return normalized.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
+const desformatMiles = (val) => {
+  return val.replace(/\./g, "");
+};
 
 function Gasto() {
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -288,7 +299,7 @@ function Gasto() {
             <h3 className="modal-titulo">{form.IdGasto ? "Editar Gasto" : "Nuevo Gasto"}</h3>
             <div className="formulario-grid">
               <div className="formulario-grupo full-width"><label>Descripción</label><input placeholder='"Gasto realizado en colegio para merienda..."' type="text" value={form.Descripcion} onChange={(e) => setForm({ ...form, Descripcion: e.target.value })} /></div>
-              <div className="formulario-grupo"><label>Monto</label><input placeholder='"7.000..."' type="number" value={form.MontoGasto} onChange={(e) => setForm({ ...form, MontoGasto: e.target.value })} /></div>
+              <div className="formulario-grupo"><label>Monto</label><input placeholder='"7.000..."' type="text" value={formatMiles(form.MontoGasto)} onChange={(e) => setForm({ ...form, MontoGasto: desformatMiles(e.target.value) })} /></div>
               <div className="formulario-grupo"><label>Fecha</label><input type="date" value={form.FechaGasto} onChange={(e) => setForm({ ...form, FechaGasto: e.target.value })} /></div>
 
               <div className="formulario-grupo">

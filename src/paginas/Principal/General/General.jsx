@@ -1,3 +1,4 @@
+// General.jsx
 import React, { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
@@ -14,6 +15,15 @@ const API_ENDPOINTS = {
   transacciones: "/Transacciones"
 };
 
+const formatMiles = (val) => {
+  if (val === undefined || val === null || val === "") return "";
+  const normalized = val.toString().replace(/\./g, "").replace(/\D/g, "");
+  return normalized.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
+const desformatMiles = (val) => {
+  return val.replace(/\./g, "");
+};
 
 const GastoIngreso = () => {
   const [mostrarSaludo, setMostrarSaludo] = useState(true);
@@ -49,7 +59,7 @@ const GastoIngreso = () => {
         EUR: Number(dataEur.venta).toFixed(2)
       });
     } catch (error) {
-      console.error("Error obteniendo cotizaciones de DolarAPI, usando respaldo:", error);
+      console.error("Error obtaining cotizaciones de DolarAPI, usando respaldo:", error);
       setCotizaciones({
         USD: "1300.00",
         EUR: "1450.00"
@@ -204,7 +214,7 @@ const GastoIngreso = () => {
 
         setMetasAhorro(metasProcesadas);
       })
-      .catch(error => console.error(error));
+      .catch(error => !console.error(error));
   };
 
   // --- LÓGICA DE LÍMITES POR ROL ---
@@ -231,10 +241,18 @@ const GastoIngreso = () => {
   const limiteAlcanzado = cantidadMetasActivas >= limiteMetas;
 
   const manejarCambioInput = (e) => {
-    setMetaForm({
-      ...metaForm,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    if (name === "MontoGuardado" || name === "MontoObjetivo") {
+      setMetaForm({
+        ...metaForm,
+        [name]: desformatMiles(value)
+      });
+    } else {
+      setMetaForm({
+        ...metaForm,
+        [name]: value
+      });
+    }
   };
 
   const manejarGuardarMeta = () => {
@@ -369,7 +387,7 @@ const GastoIngreso = () => {
           throw new Error();
         }
 
-        toast.success("Meta eliminada correctamente");
+        toast.success("Meta actualizada correctamente");
 
         setModalEditarAbierto(false);
         obtenerDatos();
@@ -758,11 +776,11 @@ const GastoIngreso = () => {
               </div>
               <div className="formulario-grupo">
                 <label htmlFor="montoGuardado">Monto Actual ($)</label>
-                <input type="number" name="MontoGuardado" value={metaForm.MontoGuardado} onChange={manejarCambioInput} id="MontoGuardado" placeholder="0.00" />
+                <input type="text" name="MontoGuardado" value={formatMiles(metaForm.MontoGuardado)} onChange={manejarCambioInput} id="MontoGuardado" placeholder="0.00" />
               </div>
               <div className="formulario-grupo">
                 <label htmlFor="montoObjetivo">Monto Objetivo ($)</label>
-                <input type="number" name="MontoObjetivo" value={metaForm.MontoObjetivo} onChange={manejarCambioInput} id="montoObjetivo" placeholder="0.00" />
+                <input type="text" name="MontoObjetivo" value={formatMiles(metaForm.MontoObjetivo)} onChange={manejarCambioInput} id="montoObjetivo" placeholder="0.00" />
               </div>
               <div className="formulario-grupo">
                 <label htmlFor="fechaInicio">Fecha de Inicio</label>
@@ -808,11 +826,11 @@ const GastoIngreso = () => {
               </div>
               <div className="formulario-grupo" style={{ display: "none" }}>
                 <label htmlFor="montoGuardado">Monto Actual ($)</label>
-                <input type="number" name="MontoGuardado" value={metaForm.MontoGuardado} onChange={manejarCambioInput} id="montoGuardado" placeholder="0.00" />
+                <input type="text" name="MontoGuardado" value={formatMiles(metaForm.MontoGuardado)} onChange={manejarCambioInput} id="montoGuardado" placeholder="0.00" />
               </div>
               <div className="formulario-grupo">
                 <label htmlFor="montoObjetivo">Monto Objetivo ($)</label>
-                <input type="number" name="MontoObjetivo" value={metaForm.MontoObjetivo} onChange={manejarCambioInput} id="montoObjetivo" placeholder="0.00" />
+                <input type="text" name="MontoObjetivo" value={formatMiles(metaForm.MontoObjetivo)} onChange={manejarCambioInput} id="montoObjetivo" placeholder="0.00" />
               </div>
               <div className="formulario-grupo">
                 <label htmlFor="fechaInicio">Fecha de Inicio</label>

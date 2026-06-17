@@ -24,7 +24,14 @@ const CrearCuenta = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // Validación estricta de longitud máxima de 30 caracteres para Nombre, Apellido y Nombre de Usuario
+    if (["nombre", "apellido", "nombreUsuario"].includes(name) && value.length > 30) {
+      return;
+    }
+
+    setFormData({ ...formData, [name]: value });
   };
 
   const handlePhoneChange = (value) => {
@@ -182,11 +189,11 @@ const CrearCuenta = () => {
           <div className="form-row">
             <div className="input-box">
               <label>Nombre</label>
-              <input type="text" name="nombre" placeholder="Agustin" onChange={handleChange} required />
+              <input type="text" name="nombre" placeholder="Agustin" onChange={handleChange} maxLength={30} required />
             </div>
             <div className="input-box">
               <label>Apellido</label>
-              <input type="text" name="apellido" placeholder="Garcia" onChange={handleChange} required />
+              <input type="text" name="apellido" placeholder="Garcia" onChange={handleChange} maxLength={30} required />
             </div>
           </div>
 
@@ -212,7 +219,7 @@ const CrearCuenta = () => {
 
           <div className="input-box">
             <label>Nombre de Usuario</label>
-            <input type="text" name="nombreUsuario" placeholder="agusting_dev" onChange={handleChange} required />
+            <input type="text" name="nombreUsuario" placeholder="agusting_dev" onChange={handleChange} maxLength={30} required />
           </div>
 
           <div className="form-row">
