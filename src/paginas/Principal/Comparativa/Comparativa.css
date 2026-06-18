@@ -588,10 +588,17 @@
     transform: scale(1);
   }
 }
-.tabla-detalle {
+/* Ajuste específico para la tabla */
+
+.table-responsive-wrapper {
     width: 100%;
-    border-collapse: collapse;
-    text-align: left;
+    overflow-x: auto; /* Habilita el scroll horizontal */
+    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+    padding-bottom: 10px; /* Espacio extra para el scrollbar */
+}
+.tabla-detalle {
+    min-width: 400px; /* Asegura que la tabla tenga espacio antes de romperse */
+    width: 100%;      /* Ocupa el espacio disponible */
 }
 
 .tabla-detalle th {
@@ -603,6 +610,7 @@
 }
 
 .tabla-detalle td {
+    white-space: nowrap;
     padding: 10px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.02);
     font-size: 0.9rem;

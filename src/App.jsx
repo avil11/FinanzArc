@@ -28,6 +28,7 @@ function App() {
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
       <Navbar />
       <Routes>
+        
         {/* --- RUTAS PÚBLICAS --- */}
         <Route path="/" element={<Inicio />} />
         <Route path="/registro" element={<Registro />} />
@@ -36,7 +37,6 @@ function App() {
         <Route path="/planes" element={<PlanesCompra />} />
 
         {/* --- RUTAS PRIVADAS --- */}
-        {/* Todo lo que esté acá adentro va a pasar primero por el filtro de RutaProtegida */}
         <Route element={<RutaProtegida />}>
           <Route path="/dashboard" element={<div style={{ padding: '50px' }}><h1>Bienvenido a tu Panel</h1></div>} />
           <Route path="/principal" element={<Principal />} />

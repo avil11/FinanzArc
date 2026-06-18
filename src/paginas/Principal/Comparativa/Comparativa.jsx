@@ -452,33 +452,35 @@ const Comparativa = () => {
                             <button className="btn-cerrar" onClick={() => setModalAbierto(false)}>&times;</button>
                         </div>
                         <div className="modal-body">
-                            <table className="tabla-detalle">
-                                <thead><tr><th>Fecha</th><th>Descripción</th><th>Monto</th></tr></thead>
-                                <tbody>
-                                    {datosModal.items.map((item, i) => {
-                                        const monto = item.MontoGasto || item.MontoIngreso || item.Monto;
-                                        const idDivisa = item.IdDivisa || 1; // Por defecto ARS
-                                        const moneda = DIVISAS_MAP[idDivisa];
+                            <div className="table-responsive">
+                                <table className="tabla-detalle">
+                                    <thead><tr><th>Fecha</th><th>Descripción</th><th>Monto</th></tr></thead>
+                                    <tbody>
+                                        {datosModal.items.map((item, i) => {
+                                            const monto = item.MontoGasto || item.MontoIngreso || item.Monto;
+                                            const idDivisa = item.IdDivisa || 1; // Por defecto ARS
+                                            const moneda = DIVISAS_MAP[idDivisa];
 
-                                        return (
-                                            <tr key={i}>
-                                                <td>{new Date(item.FechaGasto || item.FechaIngreso || item.Fecha).toLocaleDateString()}</td>
-                                                <td className='truncate-text-descripcion-detalle'>{item.Descripcion || item.NombreIngreso || "Registro Histórico"}</td>
-                                                <td className={datosModal.tipo === 'gasto' ? 'texto-rojo' : 'texto-verde'}>
-                                                    <span>${Number(monto).toLocaleString()} {moneda}</span>
+                                            return (
+                                                <tr key={i}>
+                                                    <td>{new Date(item.FechaGasto || item.FechaIngreso || item.Fecha).toLocaleDateString()}</td>
+                                                    <td className='truncate-text-descripcion-detalle'>{item.Descripcion || item.NombreIngreso || "Registro Histórico"}</td>
+                                                    <td className={datosModal.tipo === 'gasto' ? 'texto-rojo' : 'texto-verde'}>
+                                                        <span>${Number(monto).toLocaleString()} {moneda}</span>
 
-                                                    {/* Condición para mostrar la conversión si es USD o EUR */}
-                                                    {(idDivisa === 2 || idDivisa === 3) && (
-                                                        <span style={{ display: 'block', fontSize: '0.85em', opacity: 0.7, marginTop: '2px' }}>
-                                                            ≈ ${calcularMontoEnPesos(Number(monto), idDivisa).toLocaleString()} ARS
-                                                        </span>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
+                                                        {/* Condición para mostrar la conversión si es USD o EUR */}
+                                                        {(idDivisa === 2 || idDivisa === 3) && (
+                                                            <span style={{ display: 'block', fontSize: '0.6rem', opacity: 0.7, marginTop: '2px' }}>
+                                                                ≈ ${calcularMontoEnPesos(Number(monto), idDivisa).toLocaleString()} ARS
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -33,8 +33,8 @@ const GastoIngreso = () => {
   const [idUsuarioActual, setIdUsuarioActual] = useState(null);
 
   const [cotizaciones, setCotizaciones] = useState({
-    USD: 1300,
-    EUR: 1450
+    USD: 1450,
+    EUR: 1650
   });
   const [rolUsuario, setRolUsuario] = useState(null);
 
@@ -59,7 +59,7 @@ const GastoIngreso = () => {
       return nuevasCotizaciones;
     } catch (error) {
       console.error("Error, usando respaldo:", error);
-      const respaldo = { USD: "1300.00", EUR: "1450.00" };
+      const respaldo = { USD: "1450.00", EUR: "1650.00" };
       setCotizaciones(respaldo);
       return respaldo;
     }
@@ -905,7 +905,12 @@ const GastoIngreso = () => {
               </div>
               <div className="formulario-grupo">
                 <label htmlFor="divisa">Divisa</label>
-                <select name="Divisa" value={metaForm.Divisa} onChange={manejarCambioInput} id="divisa">
+                <select
+                  name="IdDivisa" // Cambiado de "Divisa" a "IdDivisa"
+                  value={metaForm.IdDivisa} // Cambiado de "metaForm.Divisa" a "metaForm.IdDivisa"
+                  onChange={manejarCambioInput}
+                  id="divisa"
+                >
                   <option value="1">ARS - Peso Argentino</option>
                   <option value="2">USD - Dólar Estadounidense</option>
                   <option value="3">EUR - Euro</option>
@@ -923,8 +928,6 @@ const GastoIngreso = () => {
           </div>
         </div>
       )}
-
-
 
 
       {
@@ -945,7 +948,8 @@ const GastoIngreso = () => {
               </div>
             </div>
           </div>
-        )};
+        )
+      }
     </div>
   )
 };
