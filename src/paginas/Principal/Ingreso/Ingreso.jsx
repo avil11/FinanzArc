@@ -9,29 +9,43 @@ import es from "date-fns/locale/es";
 import "./Ingreso.css";
 import { obtenerTasas } from "../../../apiConfig";
 
+// 1. REGISTRAMOS EL IDIOMA PARA EL DATEPICKER (Soluciona advertencias o que quede en inglés)
+registerLocale("es", es);
+
 const API_BASE_URL = "http://localhost:60496/api";
 
-function Ingreso() {
+// 2. FUNCIÓN DE FORMATEO MEJORADA
+const formatMontoParaInput = (val) => {
+  if (val === "" || val === null || val === undefined) return "";
+  const stringVal = val.toString();
+  const parts = stringVal.split(".");
+  // Agregamos puntos para separar miles
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  // Retornamos con coma si hay decimales, o si el usuario acaba de tipear una coma
+  return parts.length > 1 
+    ? parts[0] + "," + parts[1] 
+    : (stringVal.endsWith(".") ? parts[0] + "," : parts[0]);
+};
 
+function Ingreso() {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [listaIngresos, setListaIngresos] = useState([]);
   const [busqueda, setBusqueda] = useState("");
   const [vermas, setVerMas] = useState(false);
   const [itemSeleccionado, setItemSeleccionado] = useState(null);
 
-  // Estado inicial con valores por defecto para evitar undefined
   const [tasas, setTasas] = useState({ USD: 1450, EUR: 1650 });
-
   const [tipoIngreso, setTipoIngreso] = useState([]);
   const [divisa, setDivisa] = useState([]);
 
+  // 3. ESTADO INICIAL UNIFICADO
   const [form, setForm] = useState({
     IdIngreso: null,
     IdUsuario: null,
-    IdTipoIngreso: "",
-    IdDivisa: "",
+    IdTipoIngreso: 1, // Inicializado en 1
+    IdDivisa: 1,      // Inicializado en 1
     MontoIngreso: "",
-    FechaIngreso: new Date(), // <-- Cambiamos a objeto Date
+    FechaIngreso: new Date(),
     Descripcion: ""
   });
 
@@ -39,7 +53,6 @@ function Ingreso() {
     const cargarDatos = async () => {
       try {
         const tasasActuales = await obtenerTasas();
-        // Solo actualizamos si recibimos un objeto válido
         if (tasasActuales && typeof tasasActuales === 'object') {
           setTasas(tasasActuales);
         }
@@ -51,7 +64,6 @@ function Ingreso() {
     cargarDatos();
   }, []);
 
-  // USE EFFECT PARA TRAER INFORMACION DE LA TABLA TipoIngreso
   useEffect(() => {
     const fetchTipoIngreso = async () => {
       try {
@@ -65,7 +77,6 @@ function Ingreso() {
     fetchTipoIngreso();
   }, []);
 
-  // USE EFFECT PARA TRAER INFORMACION DE LA TABLA Divisa
   useEffect(() => {
     const fetchDivisa = async () => {
       try {
@@ -109,7 +120,6 @@ function Ingreso() {
     const url = esEdicion ? `${API_BASE_URL}/Ingreso/${form.IdIngreso}` : `${API_BASE_URL}/Ingreso`;
     const metodo = esEdicion ? "PUT" : "POST";
 
-    // NUEVO: Formateamos la fecha a texto ISO para el backend
     const ingresoAEnviar = {
       ...form,
       FechaIngreso: form.FechaIngreso ? form.FechaIngreso.toISOString() : null
@@ -122,7 +132,7 @@ function Ingreso() {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${localStorage.getItem("Token")}`
         },
-        body: JSON.stringify(ingresoAEnviar) // <-- Usamos el objeto formateado
+        body: JSON.stringify(ingresoAEnviar)
       });
 
       if (res.ok) {
@@ -144,7 +154,6 @@ function Ingreso() {
   };
 
   const calcularMontoEnPesos = (monto, idDivisa) => {
-    // Uso de || 1 como fallback de seguridad
     const tasaUSD = tasas?.USD || 1450;
     const tasaEUR = tasas?.EUR || 1650;
 
@@ -155,12 +164,12 @@ function Ingreso() {
 
   const FormatearMoneda = (monto, idDivisa) => {
     const totalPesos = calcularMontoEnPesos(monto, idDivisa);
-    if (idDivisa === 1) return `$${monto.toLocaleString()}`;
+    if (idDivisa === 1) return `$${monto.toLocaleString('es-AR')}`;
     const simbolo = idDivisa === 2 ? "USD" : "EUR";
     return (
       <div style={{ display: "flex", flexDirection: "column" }}>
-        <span>{simbolo} {monto.toLocaleString()}</span>
-        <span style={{ fontSize: "10px", color: "#888" }}>≈ ${totalPesos.toLocaleString()} ARS</span>
+        <span>{simbolo} {monto.toLocaleString('es-AR')}</span>
+        <span style={{ fontSize: "10px", color: "#888" }}>≈ ${totalPesos.toLocaleString('es-AR')} ARS</span>
       </div>
     );
   };
@@ -190,7 +199,6 @@ function Ingreso() {
       MontoIngreso: "",
       Descripcion: "",
       FechaIngreso: new Date(),
-      IdCuenta: 1,
       IdTipoIngreso: 1,
       IdDivisa: 1
     }));
@@ -200,7 +208,6 @@ function Ingreso() {
     setForm({
       IdIngreso: item.IdIngreso,
       IdUsuario: item.IdUsuario,
-      IdCuenta: item.IdCuenta,
       IdTipoIngreso: item.IdTipoIngreso,
       IdDivisa: item.IdDivisa,
       MontoIngreso: item.MontoIngreso,
@@ -238,9 +245,9 @@ function Ingreso() {
                   data={datosGrafico}
                   cx="50%"
                   cy="50%"
-                   innerRadius={120}
+                  innerRadius={120}
                   outerRadius={140}
-                   paddingAngle={5}
+                  paddingAngle={5}
                   dataKey="valor"
                   nameKey="nombre"
                   stroke="none"
@@ -253,7 +260,7 @@ function Ingreso() {
                 <text x="50%" y="50%" fill="#fff" textAnchor="middle" dominantBaseline="central">
                   <tspan x="50%" dy="-0.5em" fontSize="14" fill="#a0a0a0">Total (ARS)</tspan>
                   <tspan x="50%" dy="1.5em" fontSize="20" fontWeight="bold">
-                    ${totalMonto.toLocaleString()}
+                    ${totalMonto.toLocaleString('es-AR')}
                   </tspan>
                 </text>
 
@@ -297,8 +304,9 @@ function Ingreso() {
                     </td>
                   </tr>
                 ) : (
-                  ingresosFiltrados.map((item) => (
-                    <tr key={item.IdIngreso || Math.random()}>
+                  ingresosFiltrados.map((item, index) => (
+                    /* 4. KEY CORREGIDA: evitamos usar Math.random() para no perder rendimiento */
+                    <tr key={item.IdIngreso || `temp-${index}`}>
                       <td>
                         <div className="truncate-text" title={item.Descripcion}>
                           {item.Descripcion}
@@ -307,7 +315,7 @@ function Ingreso() {
                       <td className="monto-destacado" style={{ color: 'rgb(70, 130, 180)' }}>
                         {FormatearMoneda(Number(item.MontoIngreso), item.IdDivisa)}
                       </td>
-                      <td className="texto-gris">{new Date(item.FechaIngreso).toLocaleDateString()}</td>
+                      <td className="texto-gris">{new Date(item.FechaIngreso).toLocaleDateString('es-AR')}</td>
                       <td>
                         <button className="btn-icon" onClick={() => prepararEdicion(item)}>✏️</button>
                         <button className="btn-icon" onClick={() => eliminarIngreso(item.IdIngreso)}>🗑️</button>
@@ -334,7 +342,6 @@ function Ingreso() {
           </div>
 
           <div className="formulario-grid">
-            {/* Campos existentes */}
             <div className="formulario-grupo">
               <label>Tipo de Ingreso</label>
               <p>{tipoIngreso.find(t => t.IdTipoIngreso === itemSeleccionado.IdTipoIngreso)?.Nombre || "Cargando..."}</p>
@@ -345,7 +352,6 @@ function Ingreso() {
               <p>{divisa.find(d => d.IdDivisa === itemSeleccionado.IdDivisa)?.CodigoISO || "Cargando..."}</p>
             </div>
 
-            {/* Nuevos campos traídos de la base de datos */}
             <div className="formulario-grupo">
               <label>Monto</label>
               <p className="monto-destacado" style={{ color: 'rgb(70, 130, 180)', fontWeight: 'bold' }}>
@@ -355,12 +361,12 @@ function Ingreso() {
 
             <div className="formulario-grupo">
               <label>Fecha de Ingreso</label>
-              <p>{new Date(itemSeleccionado.FechaIngreso).toLocaleDateString()}</p>
+              <p>{new Date(itemSeleccionado.FechaIngreso).toLocaleDateString('es-AR')}</p>
             </div>
 
             <div className="formulario-grupo">
               <label>Fecha de Creación</label>
-              <p>{new Date(itemSeleccionado.FechaCreacion).toLocaleDateString()}</p>
+              <p>{new Date(itemSeleccionado.FechaCreacion).toLocaleDateString('es-AR')}</p>
             </div>
           </div>
         </div>
@@ -376,7 +382,7 @@ function Ingreso() {
                 <input
                   type="text"
                   value={form.Descripcion}
-                  maxLength={100} // Límite de 100 caracteres
+                  maxLength={100}
                   onChange={(e) => setForm({ ...form, Descripcion: e.target.value })}
                   placeholder='"Ingreso de aguinaldo..."'
                 />
@@ -388,21 +394,22 @@ function Ingreso() {
               <div className="formulario-grupo">
                 <label>Monto</label>
                 <input
-                  type="text" // Cambiado de 'number' a 'text' para evitar errores del navegador
-                  inputMode="decimal" // Abre teclado numérico en móviles
-                  value={form.MontoIngreso}
+                  type="text"
+                  inputMode="decimal"
+                  value={formatMontoParaInput(form.MontoIngreso)}
                   placeholder='"850.000..."'
                   onChange={(e) => {
                     const val = e.target.value;
-                    const numVal = parseFloat(val);
+                    
+                    // 5. VALIDACIÓN CORREGIDA: quitamos puntos (miles) y convertimos coma en punto para validar
+                    const rawVal = val.replace(/\./g, "").replace(",", ".");
+                    const numVal = parseFloat(rawVal);
                     const MAX_VALOR = 1000000000;
-
-                    // Regex: permite números y hasta 2 decimales
                     const regex = /^\d*\.?\d{0,2}$/;
 
-                    // Validamos: formato correcto (regex) Y que no supere el 1.000.000.000
-                    if (val === "" || (regex.test(val) && (isNaN(numVal) || numVal <= MAX_VALOR))) {
-                      setForm({ ...form, MontoIngreso: val });
+                    // Validamos contra el valor puro (rawVal)
+                    if (rawVal === "" || (regex.test(rawVal) && (isNaN(numVal) || numVal <= MAX_VALOR))) {
+                      setForm({ ...form, MontoIngreso: rawVal });
                     }
                   }}
                 />
