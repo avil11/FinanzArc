@@ -114,7 +114,18 @@ function Gasto() {
       </div>
     );
   };
-
+  // 2. FUNCIÓN DE FORMATEO MEJORADA
+  const formatMontoParaInput = (val) => {
+    if (val === "" || val === null || val === undefined) return "";
+    const stringVal = val.toString();
+    const parts = stringVal.split(".");
+    // Agregamos puntos para separar miles
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    // Retornamos con coma si hay decimales, o si el usuario acaba de tipear una coma
+    return parts.length > 1
+      ? parts[0] + "," + parts[1]
+      : (stringVal.endsWith(".") ? parts[0] + "," : parts[0]);
+  };
   const gastosFiltrados = useMemo(() => listaGastos.filter(i => i.Descripcion?.toLowerCase().includes(busqueda.toLowerCase())), [listaGastos, busqueda]);
   const totalMonto = useMemo(() => gastosFiltrados.reduce((acc, item) => acc + calcularMontoEnPesos(Number(item.MontoGasto), item.IdDivisa), 0), [gastosFiltrados, tasas]);
 
@@ -163,7 +174,7 @@ function Gasto() {
                   nameKey="nombre"
                   innerRadius={120}
                   outerRadius={140}
-                   paddingAngle={5}
+                  paddingAngle={5}
                   stroke="none"
                 >
                   {gastosFiltrados.map((_, i) => (
@@ -315,10 +326,18 @@ function Gasto() {
                   type="text"
                   inputMode="decimal"
                   placeholder="7.000..."
-                  value={form.MontoGasto}
+                  value={formatMontoParaInput(form.MontoGasto)}
                   onChange={(e) => {
-                    const val = e.target.value;
-                    const numVal = parseFloat(val); // Convertimos para comparar
+                    // 1. Obtenemos el valor crudo del input
+                    let val = e.target.value;
+
+                    // 2. Quitamos los puntos de los miles para evitar conflictos
+                    val = val.replace(/\./g, "");
+
+                    // 3. Reemplazamos la coma por un punto para que la regex y parseFloat lo entiendan
+                    val = val.replace(/,/g, ".");
+
+                    const numVal = parseFloat(val);
                     const MAX_VALOR = 1000000000;
 
                     // Regex para permitir solo números y hasta 2 decimales

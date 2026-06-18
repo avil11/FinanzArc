@@ -56,20 +56,31 @@ const GastoIngreso = () => {
       };
 
       setCotizaciones(nuevasCotizaciones);
-      return nuevasCotizaciones; // <-- Retornamos los datos
+      return nuevasCotizaciones;
     } catch (error) {
       console.error("Error, usando respaldo:", error);
       const respaldo = { USD: "1300.00", EUR: "1450.00" };
       setCotizaciones(respaldo);
-      return respaldo; // <-- Retornamos respaldo si falla la API
+      return respaldo;
     }
   };
-
+  // 2. FUNCIÓN DE FORMATEO MEJORADA
+  const formatMontoParaInput = (val) => {
+    if (val === "" || val === null || val === undefined) return "";
+    const stringVal = val.toString();
+    const parts = stringVal.split(".");
+    // Agregamos puntos para separar miles
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    // Retornamos con coma si hay decimales, o si el usuario acaba de tipear una coma
+    return parts.length > 1
+      ? parts[0] + "," + parts[1]
+      : (stringVal.endsWith(".") ? parts[0] + "," : parts[0]);
+  };
   const [modalConectarAbierto, setModalConectarAbierto] = useState(false);
   const [modalImportarAbierto, setModalImportarAbierto] = useState(false);
   const [modalAgregarAbierto, setModalAgregarAbierto] = useState(false);
   const [modalEditarAbierto, setModalEditarAbierto] = useState(false);
-const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
+  const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
   const [cargandoConexion, setCargandoConexion] = useState(false);
   const [cargandoCsv, setCargandoCsv] = useState(false);
 
@@ -103,7 +114,6 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
 
   const convertirAPesos = (monto, divisa, cotizacionesObj) => {
     const valor = Number(monto) || 0;
-    // Si cotizacionesObj es undefined (por error), usa el state actual
     const c = cotizacionesObj || cotizaciones;
 
     const cotUSD = Number(c.USD);
@@ -116,7 +126,6 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
     }
   };
 
-  // Ahora recibe las cotizaciones como parámetro, no las busca de nuevo
   const obtenerDatos = (cotizacionesData) => {
     const token = localStorage.getItem("Token");
     if (!token) return;
@@ -127,9 +136,8 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
       .then(res => res.json())
       .then(data => {
         setIdUsuarioActual(data.IdUsuario);
-        setRolUsuario(data.IdRol);
+        setRolUsuario(data.IdRol); // Guardamos el rol en el estado local
 
-        // Pasamos las cotizaciones a todas las funciones
         obtenerGastos(data.IdUsuario, cotizacionesData);
         obtenerIngresos(data.IdUsuario, cotizacionesData);
         obtenerAhorros(data.IdUsuario, cotizacionesData);
@@ -148,23 +156,25 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
       .then(data => {
         const gastosProcesados = data.map(item => ({
           name: item.Descripcion || "Sin descripción",
-          valor: convertirAPesos(item.MontoGasto, item.IdDivisa, cotizacionesData), // <--- USO AQUÍ
+          valor: convertirAPesos(item.MontoGasto, item.IdDivisa, cotizacionesData),
           monedaOriginal: Number(item.IdDivisa) === 2 ? "USD" : Number(item.IdDivisa) === 3 ? "EUR" : "ARS"
         }));
         setDatosGastos(gastosProcesados);
       });
   };
 
-  // HAZ EXACTAMENTE LO MISMO EN ESTAS DOS:
   const obtenerIngresos = (idusuario, cotizacionesData) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.ingresos}/ByUsuario/${idusuario}`, {
-      // ... mismos headers
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
+      }
     })
       .then(res => res.json())
       .then(data => {
         const ingresosProcesados = data.map(item => ({
           name: item.Descripcion || "Sin Descripción",
-          valor: convertirAPesos(item.MontoIngreso, item.IdDivisa, cotizacionesData), // <--- USO AQUÍ
+          valor: convertirAPesos(item.MontoIngreso, item.IdDivisa, cotizacionesData),
           monedaOriginal: Number(item.IdDivisa) === 2 ? "USD" : Number(item.IdDivisa) === 3 ? "EUR" : "ARS"
         }));
         setDatosIngresos(ingresosProcesados);
@@ -173,34 +183,41 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
 
   const obtenerAhorros = (idusuario, cotizacionesData) => {
     fetch(`${API_BASE_URL}${API_ENDPOINTS.ahorros}/ByUsuario/${idusuario}`, {
-      // ... mismos headers
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("Token")}`
+      }
     })
       .then(res => res.json())
       .then(data => {
         const metasProcesadas = data.map(item => ({
           ...item,
           etiqueta: item.Nombre || "Meta de ahorro",
-          actual: convertirAPesos(item.MontoGuardado, item.IdDivisa, cotizacionesData), // <--- USO AQUÍ
-          objetivo: convertirAPesos(item.MontoObjetivo, item.IdDivisa, cotizacionesData) // <--- USO AQUÍ
+          actual: convertirAPesos(item.MontoGuardado, item.IdDivisa, cotizacionesData),
+          objetivo: convertirAPesos(item.MontoObjetivo, item.IdDivisa, cotizacionesData)
         }));
         setMetasAhorro(metasProcesadas);
       });
   };
 
-  // --- LÓGICA DE LÍMITES POR ROL ---
   const obtenerLimiteMetas = (idRol) => {
     switch (idRol) {
-      case 1:
-        return 1;
-      case 2:
-        return 3;
-      case 3:
-        return 5;
-      case 4:
-        return Infinity;
-      default:
-        return 1;
+      case 1: return 1;
+      case 2: return 3;
+      case 3: return 5;
+      case 4: return Infinity;
+      default: return 1;
     }
+  };
+
+  const getNombreMes = (offset = 0) => {
+    const meses = [
+      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+    const fecha = new Date();
+    fecha.setMonth(fecha.getMonth() + offset);
+    return meses[fecha.getMonth()];
   };
 
   const metasActivas = metasAhorro.filter(meta => meta.IdEstadoMetaAhorro !== 2);
@@ -212,56 +229,39 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
 
   const manejarCambioInput = (e) => {
     const { name, value } = e.target;
-
-    // Validación para "Nombre": Máximo 100 caracteres
     if (name === "Nombre" && value.length > 100) return;
-
-    // Validación para Montos (Guardado y Objetivo): Máximo 10 dígitos
     if (name === "MontoGuardado" || name === "MontoObjetivo") {
-      // Si el usuario intenta escribir más de 10 caracteres, bloqueamos el cambio
       if (value.length > 10) return;
     }
-
-    setMetaForm({
-      ...metaForm,
-      [name]: value
-    });
+    setMetaForm({ ...metaForm, [name]: value });
   };
 
   const manejarGuardarMeta = () => {
     const token = localStorage.getItem("Token");
-
-    // Validación de límites (Solo si es creación)
     const esEdicion = metaForm.IdMetaAhorro !== null && metaForm.IdMetaAhorro !== undefined;
+
     if (!esEdicion && limiteAlcanzado) {
-      toast.warning(`Has alcanzado el máximo de ${limiteMetas} meta${limiteMetas !== 1 ? 's' : ''} activa${limiteMetas !== 1 ? 's' : ''} permitido por tu plan.`);
+      toast.warning(`Has alcanzado el máximo de ${limiteMetas} metas permitidas.`);
       return;
     }
 
-    // Validación: Nombre no vacío
     if (!metaForm.Nombre || !metaForm.Nombre.trim()) {
       toast.warning("Debes ingresar un nombre para la meta");
       return;
     }
 
-    // Validación: Monto válido y tope de 10 dígitos
     const monto = Number(metaForm.MontoObjetivo);
     if (!metaForm.MontoObjetivo || monto <= 0) {
       toast.warning("Debes ingresar un monto objetivo válido");
       return;
     }
     if (monto > 9999999999) {
-      toast.error("El monto objetivo no puede superar los 10 dígitos (9,999,999,999)");
+      toast.error("El monto objetivo no puede superar los 10 dígitos");
       return;
     }
 
-    // Validación: Fechas
-    if (!metaForm.FechaInicio) {
-      toast.warning("Debes seleccionar una fecha de inicio");
-      return;
-    }
-    if (!metaForm.FechaObjetivo) {
-      toast.warning("Debes seleccionar una fecha objetivo");
+    if (!metaForm.FechaInicio || !metaForm.FechaObjetivo) {
+      toast.warning("Debes seleccionar las fechas de inicio y objetivo");
       return;
     }
     if (new Date(metaForm.FechaObjetivo) < new Date(metaForm.FechaInicio)) {
@@ -269,7 +269,6 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
       return;
     }
 
-    // Fetch para guardar
     fetch(`${API_BASE_URL}${API_ENDPOINTS.usuarios}/ByToken`, {
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -285,7 +284,6 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
           IdDivisa: metaForm.IdDivisa,
           IdUsuario: userData.IdUsuario
         };
-
         guardarMetaApi(metaAGuardar);
       })
       .catch(error => {
@@ -295,14 +293,8 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
   };
 
   const guardarMetaApi = (metaAGuardar) => {
-    const esEdicion =
-      metaAGuardar.IdMetaAhorro !== null &&
-      metaAGuardar.IdMetaAhorro !== undefined;
-
-    const url = esEdicion
-      ? `${API_BASE_URL}${API_ENDPOINTS.ahorros}/${metaAGuardar.IdMetaAhorro}`
-      : `${API_BASE_URL}${API_ENDPOINTS.ahorros}`;
-
+    const esEdicion = metaAGuardar.IdMetaAhorro !== null && metaAGuardar.IdMetaAhorro !== undefined;
+    const url = esEdicion ? `${API_BASE_URL}${API_ENDPOINTS.ahorros}/${metaAGuardar.IdMetaAhorro}` : `${API_BASE_URL}${API_ENDPOINTS.ahorros}`;
     const metodo = esEdicion ? "PUT" : "POST";
 
     fetch(url, {
@@ -314,29 +306,15 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
       body: JSON.stringify(metaAGuardar)
     })
       .then(response => {
-        if (!response.ok) {
-          throw new Error();
-        }
-
-        toast.success(
-          esEdicion
-            ? "Meta actualizada correctamente"
-            : "Meta creada correctamente"
-        );
-
+        if (!response.ok) throw new Error();
+        toast.success(esEdicion ? "Meta actualizada correctamente" : "Meta creada correctamente");
         setModalAgregarAbierto(false);
         setModalEditarAbierto(false);
-
-        obtenerDatos();
+        obtenerDatos(cotizaciones);
       })
       .catch(error => {
         console.error(error);
-
-        toast.error(
-          esEdicion
-            ? "Error al actualizar la meta"
-            : "Error al crear la meta"
-        );
+        toast.error(esEdicion ? "Error al actualizar la meta" : "Error al crear la meta");
       });
   };
 
@@ -372,118 +350,49 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
   };
 
   const calcularTotal = (datos) => {
-    return datos.reduce((acum, item) => {
-      return acum + Number(item.valor || 0);
-    }, 0);
+    return datos.reduce((acum, item) => acum + Number(item.valor || 0), 0);
   };
 
   const obtenerTopCinco = (items) => {
-    return [...items]
-      .sort((a, b) => b.valor - a.valor)
-      .slice(0, 5);
+    return [...items].sort((a, b) => b.valor - a.valor).slice(0, 5);
   };
 
   const renderCenterLabel = ({ cx, cy }, total) => (
     <g>
-      <text
-        x={cx}
-        y={cy - 12}
-        textAnchor="middle"
-        fill="#ffffff"
-        fontSize={13}
-        fontWeight="600"
-      >
-        Total
-      </text>
-
-      <text
-        x={cx}
-        y={cy + 12}
-        textAnchor="middle"
-        fill="#c8b277"
-        fontSize={16}
-        fontWeight="700"
-      >
-        ${total.toLocaleString("es-AR")}
-      </text>
+      <text x={cx} y={cy - 12} textAnchor="middle" fill="#ffffff" fontSize={13} fontWeight="600">Total</text>
+      <text x={cx} y={cy + 12} textAnchor="middle" fill="#c8b277" fontSize={16} fontWeight="700">${total.toLocaleString("es-AR")}</text>
     </g>
   );
 
-  const EstadoVacio = ({
-    titulo,
-    mensaje,
-    icono = "📊",
-    sugerencia
-  }) => (
+  const EstadoVacio = ({ titulo, mensaje, icono = "📊", sugerencia }) => (
     <div className="tarjeta-general aviso-vacio">
       {titulo && <h3>{titulo}</h3>}
-
       <div className="contenido-aviso-vacio">
         <div className="icono-placeholder">{icono}</div>
-
         <p>{mensaje}</p>
-
-        <span className="sugerencia">
-          {sugerencia || "Registra movimientos para ver información."}
-        </span>
+        <span className="sugerencia">{sugerencia || "Registra movimientos para ver información."}</span>
       </div>
     </div>
   );
 
-  const BarraProgreso = ({
-    actual,
-    objetivo,
-    etiqueta
-  }) => {
-    const porcentaje =
-      objetivo > 0
-        ? Math.min(100, (actual / objetivo) * 100)
-        : 0;
-
+  const BarraProgreso = ({ actual, objetivo, etiqueta }) => {
+    const porcentaje = objetivo > 0 ? Math.min(100, (actual / objetivo) * 100) : 0;
     return (
       <div className="item-progreso-general">
         <div className="info-progreso-general">
-          <span
-            className="truncate-text-general-ahorro"
-            style={{
-              fontWeight: "500",
-              color: "#ffffff"
-            }}
-          >
-            {etiqueta}
-          </span>
-
-          <span
-            className="truncate-text-general-ahorro-precio"
-            style={{
-              color: "#c8b277",
-              fontWeight: "bold"
-            }}
-          >
-            {porcentaje.toFixed(0)}%
-          </span>
+          <span className="truncate-text-general-ahorro" style={{ fontWeight: "500", color: "#ffffff" }}>{etiqueta}</span>
+          <span className="truncate-text-general-ahorro-precio" style={{ color: "#c8b277", fontWeight: "bold" }}>{porcentaje.toFixed(0)}%</span>
         </div>
-
         <div className="pista-barra-general">
-          <div
-            className="relleno-barra-general"
-            style={{
-              width: `${porcentaje}%`
-            }}
-          />
+          <div className="relleno-barra-general" style={{ width: `${porcentaje}%` }} />
         </div>
-
-        <div className="texto-monto-general">
-          ${actual.toLocaleString("es-AR")} / $
-          {objetivo.toLocaleString("es-AR")}
-        </div>
+        <div className="texto-monto-general">${actual.toLocaleString("es-AR")} / ${objetivo.toLocaleString("es-AR")}</div>
       </div>
     );
   };
 
   const abrirModalAgregar = () => {
     if (limiteAlcanzado) return;
-
     setMetaForm({
       IdMetaAhorro: null,
       Nombre: "",
@@ -491,9 +400,8 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
       MontoGuardado: "",
       FechaObjetivo: null,
       FechaInicio: null,
-      IdDivisa: "1" // Cambiado de Divisa a IdDivisa
+      IdDivisa: "1"
     });
-
     setModalAgregarAbierto(true);
   };
 
@@ -503,7 +411,6 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
       Nombre: meta.Nombre || "",
       MontoObjetivo: meta.MontoObjetivo || "",
       MontoGuardado: meta.MontoGuardado || "",
-      // Convertimos el string de la DB a un objeto Date para el calendario
       FechaObjetivo: meta.FechaMeta ? new Date(meta.FechaMeta) : null,
       FechaInicio: meta.FechaInicio ? new Date(meta.FechaInicio) : null,
       IdDivisa: parseInt(meta.IdDivisa) || 1
@@ -511,38 +418,61 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
     setModalEditarAbierto(true);
   };
 
-  // --- ACCIONES ---
+  // --- FUNCIÓN DE ARCHIVADO MODIFICADA CON DOBLE CAPA DE SEGURIDAD ---
   const archivarMesActual = async () => {
-    if (!idUsuario) return;
+    if (!idUsuarioActual) {
+      toast.warning("No se encontró un usuario válido para realizar la acción.");
+      return;
+    }
+
+    // CAPA 2 (Ciberseguridad): Si el usuario modificó el HTML o state local e intenta mandar el fetch
+    if (!rolUsuario || rolUsuario < 2) {
+      toast.error("Acceso denegado: Tu plan actual no te permite realizar esta acción.");
+      return;
+    }
+
+    const confirmacion = window.confirm('¿Estás seguro de que quieres archivar el mes?');
+    if (!confirmacion) return;
+
     try {
-      setCargando(true); setModalArchivarAbierto(false);
-      const response = await fetch(`${API_BASE_URL}/Cierre/FinalizarMes`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ IdUsuario: idUsuario }) });
+      setModalArchivarAbierto(false);
+
+      const response = await fetch(`${API_BASE_URL}/Cierre/FinalizarMes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem("Token")}`
+        },
+        body: JSON.stringify({ IdUsuario: idUsuarioActual })
+      });
+
       if (response.ok) {
         toast.success("¡Mes archivado correctamente!");
-        await cargarTodosLosDatos();
+        obtenerDatos(cotizaciones);
+      } else {
+        toast.error("Error al archivar el mes actual. Verifica el servidor.");
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Error al archivar el mes actual");
+      console.error("Error en la petición de archivo:", error);
+      toast.error("Error de red al intentar archivar el mes.");
     }
   };
 
   const nombre = localStorage.getItem("Nombre") || "Usuario";
   const apellido = localStorage.getItem("Apellido") || "";
 
+  // Auxiliares para evaluar permisos en el renderizado
+  const tienePermisoArchivar = rolUsuario !== null && rolUsuario >= 2;
+
   return (
     <div className="contenedor-principal-general">
       <div className="seccion-encabezado-general">
         <div className="titulo-principal-general">
           <h2>
-            {mostrarSaludo
-              ? `¡Bienvenido, ${nombre} ${apellido}!`
-              : "Resumen financiero"}
+            {mostrarSaludo ? `¡Bienvenido, ${nombre} ${apellido}!` : "Resumen financiero"}
           </h2>
           <p style={{ width: '70%' }}>En este apartado usted verá el balance histórico y acumulado de sus gastos e ingresos. Podrá también establecer metas de ahorro.</p>
-          <p>
-            Todas las monedas son convertidas automáticamente a ARS.
-          </p>
+          <p>Todas las monedas son convertidas automáticamente a ARS.</p>
           <small style={{ color: "#c8b277", fontWeight: "500", fontStyle: "italic", fontSize: "1.1rem" }}>
             USD: ${cotizaciones.USD} | EUR: ${cotizaciones.EUR}
           </small>
@@ -555,8 +485,26 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
           <Link to="/archivos" className="botonesComparativa">
             Archivos
           </Link>
-          <button onClick={() => setModalArchivarAbierto(true)} className='botonesComparativa btn-secundario'>
-            Archivar Datos Actuales
+
+          {/* BOTÓN CON FILTRO DE ROL, TOOLTIP NATIVO Y TOAST ADAPTADO */}
+          <button
+            style={{
+              width: "220px",
+              opacity: tienePermisoArchivar ? 1 : 0.6,
+              cursor: tienePermisoArchivar ? "pointer" : "not-allowed"
+            }}
+            onClick={() => {
+              if (tienePermisoArchivar) {
+                setModalArchivarAbierto(true);
+              } else {
+                toast.warning("Función Premium: Necesitas mejorar tu cuenta (Plan Gold o Platino) para poder archivar todos tu ingreso y gasto historico. 🚀");
+
+              }
+            }}
+            className='botonesComparativa btn-secundario'
+            title={!tienePermisoArchivar ? "Función Premium: Requiere mejorar tu cuenta a un plan superior para archivar." : "Archivar los datos financieros del mes actual"}
+          >
+            Archivar Historico
           </button>
         </div>
       </div>
@@ -589,20 +537,10 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
               <div className="leyenda-grafico">
                 {obtenerTopCinco(datosGastos).map((item, index) => (
                   <div className="item-leyenda" key={index}>
-                    {/* 1. Icono */}
-                    <span
-                      className="item-color-circulo"
-                      style={{ backgroundColor: COLORESgasto[index % COLORESgasto.length] }}
-                    />
-
-                    {/* 2. Contenedor de Texto (El que trunca) */}
+                    <span className="item-color-circulo" style={{ backgroundColor: COLORESgasto[index % COLORESgasto.length] }} />
                     <div className="leyenda-texto">
-                      <span className="truncate-text-general" title={item.name}>
-                        {item.name}
-                      </span>
+                      <span className="truncate-text-general" title={item.name}>{item.name}</span>
                     </div>
-
-                    {/* 3. Valor (Se mantiene fijo a la derecha) */}
                     <h4 className="valor-gasto">${item.valor.toLocaleString()}</h4>
                   </div>
                 ))}
@@ -790,16 +728,25 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
                   placeholder="Ej: Fondo de Emergencia"
                 />
               </div>
-              {/* INPUT MONTO ACTUAL */}
+              {/* INPUT MONTO ACTUAL (GUARDADO) */}
               <div className="formulario-grupo">
                 <label htmlFor="MontoGuardado">Monto Actual ($)</label>
                 <input
-                  type="number"
+                  type="text" // CORREGIDO: Cambiado a text para permitir la limpieza de comas/puntos
                   name="MontoGuardado"
-                  value={metaForm.MontoGuardado}
-                  onChange={manejarCambioInput}
+                  value={formatMontoParaInput(metaForm.MontoGuardado)}
+                  onChange={(e) => {
+                    let val = e.target.value;
+                    val = val.replace(/\./g, "");
+                    val = val.replace(/,/g, ".");
+                    const numVal = parseFloat(val);
+                    const MAX_VALOR = 1000000000;
+                    const regex = /^\d*\.?\d{0,2}$/;
+                    if (val === "" || (regex.test(val) && numVal <= MAX_VALOR)) {
+                      setMetaForm({ ...metaForm, MontoGuardado: val });
+                    }
+                  }}
                   id="MontoGuardado"
-                  max={9999999999} // Límite de 10 dígitos
                   placeholder="0.00"
                 />
               </div>
@@ -808,15 +755,27 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
               <div className="formulario-grupo">
                 <label htmlFor="montoObjetivo">Monto Objetivo ($)</label>
                 <input
-                  type="number"
+                  type="text"
                   name="MontoObjetivo"
-                  value={metaForm.MontoObjetivo}
-                  onChange={manejarCambioInput}
+                  value={formatMontoParaInput(metaForm.MontoObjetivo)}
+                  onChange={(e) => {
+                    let val = e.target.value;
+                    val = val.replace(/\./g, "");
+                    val = val.replace(/,/g, ".");
+
+                    const numVal = parseFloat(val);
+                    const MAX_VALOR = 1000000000;
+                    const regex = /^\d*\.?\d{0,2}$/;
+
+                    if (val === "" || (regex.test(val) && numVal <= MAX_VALOR)) {
+                      setMetaForm({ ...metaForm, MontoObjetivo: val });
+                    }
+                  }}
                   id="montoObjetivo"
-                  max={9999999999} // Límite de 10 dígitos
                   placeholder="0.00"
                 />
               </div>
+
               <div className="formulario-grupo">
                 <label>Fecha de Inicio</label>
                 <DatePicker
@@ -900,7 +859,26 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
               </div>
               <div className="formulario-grupo">
                 <label htmlFor="montoObjetivo">Monto Objetivo ($)</label>
-                <input type="number" name="MontoObjetivo" value={metaForm.MontoObjetivo} onChange={manejarCambioInput} id="montoObjetivo" placeholder="0.00" />
+                <input
+                  type="text"
+                  name="MontoObjetivo"
+                  value={formatMontoParaInput(metaForm.MontoObjetivo)}
+                  onChange={(e) => {
+                    let val = e.target.value;
+                    val = val.replace(/\./g, "");
+                    val = val.replace(/,/g, ".");
+
+                    const numVal = parseFloat(val);
+                    const MAX_VALOR = 1000000000;
+                    const regex = /^\d*\.?\d{0,2}$/;
+
+                    if (val === "" || (regex.test(val) && numVal <= MAX_VALOR)) {
+                      setMetaForm({ ...metaForm, MontoObjetivo: val });
+                    }
+                  }}
+                  id="montoObjetivo"
+                  placeholder="0.00"
+                />
               </div>
               <div className="formulario-grupo">
                 <label>Fecha de Inicio</label>
@@ -945,10 +923,31 @@ const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
           </div>
         </div>
       )}
-      
+
+
+
+
+      {
+        modalArchivarAbierto && (
+          <div className="modal-overlay" onClick={() => setModalArchivarAbierto(false)}>
+            <div className="modal-contenido" onClick={e => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>Archivar Mes Actual</h3>
+                <button className="btn-cerrar" onClick={() => setModalArchivarAbierto(false)}>&times;</button>
+              </div>
+              <div className="modal-body-general">
+                <h3 style={{ textAlign: 'center' }}>¿Estás seguro de que deseas archivar los datos de <strong>{getNombreMes(0)}</strong>?</h3>
+                <p style={{ color: '#8e8e93', marginTop: '10px', fontSize: '0.9rem', textAlign: 'center' }}>Esta acción no se puede deshacer.</p>
+                <div className="modal-acciones">
+                  <button className="btn-Cancelar-General" onClick={() => setModalArchivarAbierto(false)}>Cancelar</button>
+                  <button className="btn-Confirmar-General" onClick={archivarMesActual}>Archivar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )};
     </div>
-    
-  );
+  )
 };
 
 export default GastoIngreso;

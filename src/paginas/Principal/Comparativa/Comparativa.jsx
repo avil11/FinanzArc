@@ -18,7 +18,6 @@ const Comparativa = () => {
     const [esPremium, setEsPremium] = useState(false); // Acceso a gráfico anual
     const [tipoPresentacion, setTipoPresentacion] = useState(1);
     const [modalAbierto, setModalAbierto] = useState(false);
-    const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
     const [datosModal, setDatosModal] = useState({ titulo: "", items: [], tipo: "" });
     const [datosLinea, setDatosLinea] = useState([]);
     const [cargandoLinea, setCargandoLinea] = useState(false);
@@ -222,21 +221,6 @@ const Comparativa = () => {
     useEffect(() => { if (idUsuario && rolHabilitado) { cargarTodosLosDatos(); } }, [idUsuario, rolHabilitado, cargarTodosLosDatos]);
     useEffect(() => { if (tipoPresentacion === 3 && idUsuario && esPremium) { cargarDatosLinea(); } }, [tipoPresentacion, idUsuario, esPremium, cargarDatosLinea]);
 
-    // --- ACCIONES ---
-    const archivarMesActual = async () => {
-        if (!idUsuario) return;
-        try {
-            setCargando(true); setModalArchivarAbierto(false);
-            const response = await fetch(`${API_BASE_URL}/Cierre/FinalizarMes`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ IdUsuario: idUsuario }) });
-            if (response.ok) {
-                toast.success("¡Mes archivado correctamente!");
-                await cargarTodosLosDatos();
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error("Error al archivar el mes actual");
-        }
-    };
 
     const abrirDetalleMes = async (tipo, offset, titulo) => {
         if (!idUsuario) return;
@@ -447,9 +431,7 @@ const Comparativa = () => {
                         <button onClick={() => setTipoPresentacion(tipoPresentacion === 1 ? 2 : 1)} className='botonesComparativa btn-principal'>
                             {tipoPresentacion === 1 ? "Ver Balances Mensuales" : "Ver Comparativa Mensual"}
                         </button>
-                        <button onClick={() => setModalArchivarAbierto(true)} className='botonesComparativa btn-secundario'>
-                            Archivar Datos Actuales
-                        </button>
+
                     </div>
                     <div className='botonVolverPrincipal'>
                         {/* Cambié las flechas múltiples por una sola más limpia */}
@@ -481,7 +463,7 @@ const Comparativa = () => {
                                         return (
                                             <tr key={i}>
                                                 <td>{new Date(item.FechaGasto || item.FechaIngreso || item.Fecha).toLocaleDateString()}</td>
-                                                <td>{item.Descripcion || item.NombreIngreso || "Registro Histórico"}</td>
+                                                <td className='truncate-text-descripcion-detalle'>{item.Descripcion || item.NombreIngreso || "Registro Histórico"}</td>
                                                 <td className={datosModal.tipo === 'gasto' ? 'texto-rojo' : 'texto-verde'}>
                                                     <span>${Number(monto).toLocaleString()} {moneda}</span>
 
@@ -497,24 +479,6 @@ const Comparativa = () => {
                                     })}
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {modalArchivarAbierto && (
-                <div className="modal-overlay" onClick={() => setModalArchivarAbierto(false)}>
-                    <div className="modal-contenido" onClick={e => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h3>Archivar Mes Actual</h3>
-                            <button className="btn-cerrar" onClick={() => setModalArchivarAbierto(false)}>&times;</button>
-                        </div>
-                        <div className="modal-body">
-                            <h3>¿Estás seguro de que deseas archivar los datos de <strong>{getNombreMes(0)}</strong>?</h3>
-                            <div className="modal-acciones">
-                                <button className="botonesComparativa btn-cancelar-modal" onClick={() => setModalArchivarAbierto(false)}>Cancelar</button>
-                                <button className="botonesComparativa btn-confirmar-modal" onClick={archivarMesActual}>Confirmar y Archivar</button>
-                            </div>
                         </div>
                     </div>
                 </div>
