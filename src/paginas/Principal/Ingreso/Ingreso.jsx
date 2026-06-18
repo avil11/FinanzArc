@@ -222,8 +222,9 @@ function Ingreso() {
       <div className="encabezado-simple">
         <h1 className="titulo-seccion">Fuentes de Ingreso</h1>
         <p className="texto-gris">
-          Administra todos tus ingresos en este apartado. <br />
-          Cotizaciones: 1 USD = ${tasas?.USD || "..."} | 1 EUR = ${tasas?.EUR || "..."}
+          Administre todos sus ingresos en este apartado. El mismo es de carácter histórico y acumulado; para más detalles de sus ingresos, clickee en los íconos del apartado "ACCIONES".
+          <br></br>
+         <strong>Cotizaciones: 1 USD = ${tasas?.USD || "..."} | 1 EUR = ${tasas?.EUR || "..."}</strong> 
         </p>
       </div>
 
@@ -290,7 +291,7 @@ function Ingreso() {
                 <tr>
                   <th>Descripción</th>
                   <th>Monto</th>
-                  <th>Fecha</th>
+                  <th className="td-fecha">Fecha</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
@@ -299,8 +300,8 @@ function Ingreso() {
                   <tr>
                     <td colSpan="4" style={{ textAlign: "center", padding: "3rem 1rem", color: "#a0a0a0" }}>
                       {listaIngresos.length === 0
-                        ? "No tenés registrado ningún ingreso. ¡Registrá tu primer ingreso abajo!"
-                        : "No se encontraron ingresos que coincidan con tu búsqueda."}
+                        ? "Usted no tiene registrado ningún ingreso. ¡Registre su primer ingreso abajo!"
+                        : "No se encontraron ingresos que coincidan con su búsqueda."}
                     </td>
                   </tr>
                 ) : (
@@ -364,10 +365,6 @@ function Ingreso() {
               <p>{new Date(itemSeleccionado.FechaIngreso).toLocaleDateString('es-AR')}</p>
             </div>
 
-            <div className="formulario-grupo">
-              <label>Fecha de Creación</label>
-              <p>{new Date(itemSeleccionado.FechaCreacion).toLocaleDateString('es-AR')}</p>
-            </div>
           </div>
         </div>
       )}

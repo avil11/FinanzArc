@@ -69,7 +69,7 @@ const GastoIngreso = () => {
   const [modalImportarAbierto, setModalImportarAbierto] = useState(false);
   const [modalAgregarAbierto, setModalAgregarAbierto] = useState(false);
   const [modalEditarAbierto, setModalEditarAbierto] = useState(false);
-
+const [modalArchivarAbierto, setModalArchivarAbierto] = useState(false);
   const [cargandoConexion, setCargandoConexion] = useState(false);
   const [cargandoCsv, setCargandoCsv] = useState(false);
 
@@ -511,6 +511,22 @@ const GastoIngreso = () => {
     setModalEditarAbierto(true);
   };
 
+  // --- ACCIONES ---
+  const archivarMesActual = async () => {
+    if (!idUsuario) return;
+    try {
+      setCargando(true); setModalArchivarAbierto(false);
+      const response = await fetch(`${API_BASE_URL}/Cierre/FinalizarMes`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ IdUsuario: idUsuario }) });
+      if (response.ok) {
+        toast.success("¡Mes archivado correctamente!");
+        await cargarTodosLosDatos();
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error al archivar el mes actual");
+    }
+  };
+
   const nombre = localStorage.getItem("Nombre") || "Usuario";
   const apellido = localStorage.getItem("Apellido") || "";
 
@@ -521,8 +537,9 @@ const GastoIngreso = () => {
           <h2>
             {mostrarSaludo
               ? `¡Bienvenido, ${nombre} ${apellido}!`
-              : "oadnofkifbfoqwueibvrouvwqeufv"}
+              : "Resumen financiero"}
           </h2>
+          <p style={{ width: '70%' }}>En este apartado usted verá el balance histórico y acumulado de sus gastos e ingresos. Podrá también establecer metas de ahorro.</p>
           <p>
             Todas las monedas son convertidas automáticamente a ARS.
           </p>
@@ -538,6 +555,9 @@ const GastoIngreso = () => {
           <Link to="/archivos" className="botonesComparativa">
             Archivos
           </Link>
+          <button onClick={() => setModalArchivarAbierto(true)} className='botonesComparativa btn-secundario'>
+            Archivar Datos Actuales
+          </button>
         </div>
       </div>
 
@@ -925,7 +945,9 @@ const GastoIngreso = () => {
           </div>
         </div>
       )}
+      
     </div>
+    
   );
 };
 

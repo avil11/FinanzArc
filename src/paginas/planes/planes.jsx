@@ -9,19 +9,16 @@ const API_BASE_URL = "http://localhost:60496/api";
 // NUEVO COMPONENTE: Procesador de detalles optimizado con React.memo
 // ------------------------------------------------------------------
 const DetallesLista = memo(({ texto }) => {
-  // 1. Evitar errores si viene null, undefined o vacío
   if (!texto || typeof texto !== "string" || texto.trim() === "") {
     return <p className="detalle-vacio">Sin descripción disponible.</p>;
   }
 
-  // 2. Separar por líneas y limpiar espacios en blanco, omitiendo líneas vacías
   const lineas = texto.split("\n").map(line => line.trim()).filter(line => line.length > 0);
 
   if (lineas.length === 0) {
     return <p className="detalle-vacio">Sin descripción disponible.</p>;
   }
 
-  // 3. Renderizar la lista evaluando el primer carácter de cada línea
   return (
     <ul className="lista-detalles">
       {lineas.map((linea, index) => {
@@ -35,6 +32,13 @@ const DetallesLista = memo(({ texto }) => {
           return (
             <li key={index} className="detalle-excluido">
               ❌ {linea.substring(1).trim()}
+            </li>
+          );
+        } else if (linea.startsWith(">")) {
+          // NUEVA CONDICIÓN: Para la bajada de línea destacada
+          return (
+            <li key={index} className="detalle-destacado">
+              {linea.substring(1).trim()}
             </li>
           );
         } else {
@@ -174,14 +178,14 @@ const PlanesCompra = () => {
       <div className="seccion-encabezado-general planes-introduccion">
         <div className="titulo-principal-general planes-encabezado">
           <h2>Planes de Suscripción</h2>
-          <p>Centraliza tu gestión financiera con nuestros planes.</p>
+          <p style={{marginBottom: '50px'}}>Centralice su gestión financiera con nuestros planes creados para usted.</p>
           
           {/* Nuevo selector visual de suscripción */}
           <div className="selector-suscripcion">
             <button
               className={`boton-secundario-plan ${TipoSuscripcion === 1 ? "activo" : ""}`}
               onClick={() => setTipoSuscripcion(1)}
-              style={TipoSuscripcion === 1 ? { backgroundColor: "#c8b277", color: "#000", borderColor: "#c8b277" } : {}}
+              
             >
               Mensual
             </button>
@@ -189,7 +193,7 @@ const PlanesCompra = () => {
             <button
               className={`boton-secundario-plan ${TipoSuscripcion === 2 ? "activo" : ""}`}
               onClick={() => setTipoSuscripcion(2)}
-              style={TipoSuscripcion === 2 ? { backgroundColor: "#c8b277", color: "#000", borderColor: "#c8b277" } : {}}
+
             >
               Anual
             </button>
@@ -202,39 +206,56 @@ const PlanesCompra = () => {
       </div>
 
       <div className="contenedor-planes-grid">
-        {planesFiltrados.map((p) => (
-          <div key={p.IdPlan} className="tarjeta-plan">
-            
-            {/* Badge indicativo de tipo de suscripción */}
-            <span className="badge-suscripcion" style={{ 
-                display: "inline-block", 
-                backgroundColor: "#c8b277", 
-                color: "#000", 
-                padding: "4px 8px", 
-                borderRadius: "4px", 
-                fontSize: "0.8rem", 
-                fontWeight: "bold", 
-                marginBottom: "10px" 
-            }}>
-              {Number(p.IdTipoSuscripcion) === 1 ? "Mensual" : "Anual"}
-            </span>
+        {planesFiltrados.map((p) => {
+          const textoDetalle = (p.Detalle || p.Detalles || "").replace(". ", ".\n> ");
 
-            <div>
-              <h3>{p.Nombre || `Plan Nivel ${p.IdRol}`}</h3>
-              <h2>${p.Precio} ARS</h2>
+          return (
+           <div key={p.IdPlan} className="tarjeta-plan">
+              
+              {/* 2. AGRUPAMOS EL CONTENIDO SUPERIOR: 
+                  Al meter el badge, títulos y detalles en un div con flexGrow: 1, 
+                  forzamos a que todo se alinee arriba, independientemente de si hay botón o no. */}
+              <div style={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
+                
+                <div style={{ textAlign: "center" }}>
+                  <span className="badge-suscripcion" style={{ 
+                      display: "inline-block", 
+                      backgroundColor: "#c8b277", 
+                      color: "#ffffff", 
+                      padding: "4px 8px", 
+                      borderRadius: "4px", 
+                      fontSize: "0.8rem", 
+                      fontWeight: "bold", 
+                      marginBottom: "10px" 
+                  }}>
+                    {Number(p.IdTipoSuscripcion) === 1 ? "Mensual" : "Anual"}
+                  </span>
+                </div>
 
-              <DetallesLista texto={p.Detalle || p.Detalles} />
+                <h3>{p.Nombre || `Plan Nivel ${p.IdRol}`}</h3>
+                <h2>${p.Precio} ARS</h2>
+
+                <DetallesLista texto={textoDetalle} />
+              </div>
+
+              {/* 3. CONTENEDOR DEL BOTÓN: 
+                  Le damos un minHeight equivalente a la altura del botón para que 
+                  la tarjeta del Plan Esencial no quede más corta que las demás. */}
+              <div style={{ minHeight: "54px", display: "flex", alignItems: "flex-end" }}>
+                {(Number(p.Precio) > 0 || usuario?.IdRol === 4) && (
+                  <button
+                    className={`btn-plan ${usuario?.IdRol === 4 ? "btn-plan-editar" : "btn-plan-suscribir"}`}
+                    disabled={cargandoPago}
+                    onClick={() => usuario?.IdRol === 4 ? abrirModal(p) : comprarPlan(p)}
+                  >
+                    {usuario?.IdRol === 4 ? "Editar Plan" : (cargandoPago ? "Cargando pago..." : "Suscribirse")}
+                  </button>
+                )}
+              </div>
+
             </div>
-
-            <button
-              className={`btn-plan ${usuario?.IdRol === 4 ? "btn-plan-editar" : "btn-plan-suscribir"}`}
-              disabled={cargandoPago}
-              onClick={() => usuario?.IdRol === 4 ? abrirModal(p) : comprarPlan(p)}
-            >
-              {usuario?.IdRol === 4 ? "Editar Plan" : (cargandoPago ? "Cargando pago..." : "Suscribirse")}
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {modalAbierto && (

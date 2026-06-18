@@ -42,6 +42,7 @@
     border-radius: 10px;
     border: 1px solid rgba(255, 75, 75, 0.1);
 }
+.tabla-responsive .tabla-ingresos .td-fecha{ text-align: center;}
 /* Fija el encabezado para que no se pierda al hacer scroll */
 .pagina-gasto-contenedor .tabla-gasto thead th {
     position: sticky;

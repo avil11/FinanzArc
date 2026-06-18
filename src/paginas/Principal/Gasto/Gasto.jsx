@@ -127,7 +127,8 @@ function Gasto() {
     <div className="pagina-ingreso-contenedor">
       <div className="encabezado-simple">
         <h1 className="titulo-seccion">Control de Gastos</h1>
-        <p className="texto-gris">Administra todas tus gastos en este apartado. <br /> Cotizaciones: 1 USD = ${tasas?.USD || 0} | 1 EUR = ${tasas?.EUR || 0}</p>
+        <p className="texto-gris"> Administre todos sus gastos en este apartado. El mismo es de carácter histórico y acumulado; para más detalles de sus gastos, clickee en los íconos del apartado "ACCIONES".
+          <strong><br /> Cotizaciones: 1 USD = ${tasas?.USD || 0} | 1 EUR = ${tasas?.EUR || 0}</strong> </p>
       </div>
 
       <div className="pagina-ingreso-tarjeta">
@@ -197,14 +198,14 @@ function Gasto() {
           </div>
           <div className="tabla-responsive">
             <table className="tabla-ingresos">
-              <thead><tr><th>Descripción</th><th>Monto</th><th>Fecha</th><th>Acciones</th></tr></thead>
+              <thead><tr><th>Descripción</th><th>Monto</th><th className="td-fecha">Fecha</th><th>Acciones</th></tr></thead>
               <tbody>
                 {gastosFiltrados.length === 0 ? (
                   <tr>
                     <td colSpan="4" style={{ textAlign: "center", padding: "3rem 1rem", color: "#a0a0a0" }}>
                       {listaGastos.length === 0
-                        ? "No tenés registrado ningún gasto. ¡Ingresá tu primer gasto abajo!"
-                        : "No se encontraron gastos que coincidan con tu búsqueda."}
+                        ? "Usted no tiene registrado ningún gasto. ¡Ingrese su primer gasto abajo!"
+                        : "No se encontraron gastos que coincidan con su búsqueda."}
                     </td>
                   </tr>
                 ) : (
@@ -216,7 +217,7 @@ function Gasto() {
                         </div>
                       </td>
                       <td className="monto-destacado" style={{ color: '#FF4B4B' }}>{FormatearMoneda(Number(item.MontoGasto), item.IdDivisa)}</td>
-                      <td className="texto-gris">{new Date(item.FechaGasto).toLocaleDateString()}</td>
+                      <td className="texto-gris td-fecha">{new Date(item.FechaGasto).toLocaleDateString()}</td>
                       <td>
                         <button className="btn-icon" onClick={() => prepararEdicion(item)}>✏️</button>
                         <button className="btn-icon" onClick={() => eliminarGasto(item.IdGasto)}>🗑️</button>

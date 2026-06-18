@@ -12,7 +12,6 @@
     gap: 30px;
     width: 100%;
     max-width: 1100px;
-    margin: 40px auto;
     align-items: stretch;
     
 }
@@ -32,14 +31,17 @@
   
   /* Fondo tenue simulando papel de cuaderno y línea de margen izquierdo */
   
-  box-shadow: inset 3px 0 0 #c8b277; /* Línea de encuadernación / margen */
+  box-shadow: inset 0px 2px 0 #c8b277; /* Línea de encuadernación / margen */
 }
 
 
-.boton-secundario-plan { border: none; border-radius: 12px; padding: 14px 24px; cursor: pointer; font-weight: 600; font-size: .95rem; transition: all .3s ease; }
-
-.boton-secundario-plan { background: rgba(255, 255, 255, .05); color: #fff; border: 1px solid rgba(255, 255, 255, .1); box-shadow: 0 4px 15px #c8b277;}
-.boton-secundario-plan:hover { background: rgba(255, 255, 255, .1); }
+.boton-secundario-plan {
+      text-decoration: none; background: transparent; border: 1px solid #D4AF37; color: #D4AF37; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: .85rem; font-weight: 500; transition: all .3s ease; text-transform: uppercase; letter-spacing: .5px;
+    }
+.boton-secundario-plan:hover { background: #D4AF37;
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, .1);}
 
 .selector-suscripcion{
     display: flex;
@@ -54,13 +56,12 @@
 .lista-detalles li {
   display: flex;
   align-items: flex-start;
-  font-size: 14.5px;
+  font-size: 18px;
   line-height: 1.6;
   word-break: break-word;
   
   /* Separación y líneas simulando renglones */
   padding: 8px 0 8px 10px; 
-  border-bottom: 1px solid #c8b277; 
   font-family: inherit; 
 }
 
@@ -83,8 +84,10 @@
 }
 
 .detalle-normal {
-  color: #37474f; /* Gris azulado muy oscuro, similar a la tinta de lapicera */
+    font-size: 35px;
+  color: rgba(255, 255, 255, 0.555); /* Gris azulado muy oscuro, similar a la tinta de lapicera */
   font-weight: 500;
+    text-align: center;
 }
 
 .detalle-vacio {
@@ -214,6 +217,14 @@
 
 .planes-boton {
     width: 300px;
+}
+.detalle-destacado {
+  color: #c8b277; /* Tu color dorado */
+  font-size: 15px; /* Un poco más pequeño que el texto normal */
+  font-style: italic; /* Letra cursiva para dar efecto de nota */
+  font-weight: 500;
+  text-align: center;
+  margin-top: 15px; /* Lo separa un poco más del texto de arriba */
 }
 
 @media (max-width: 1024px) {
