@@ -521,7 +521,7 @@ const GastoIngreso = () => {
           <h2>
             {mostrarSaludo
               ? `¡Bienvenido, ${nombre} ${apellido}!`
-              : "El Control Total de tu Economía"}
+              : "oadnofkifbfoqwueibvrouvwqeufv"}
           </h2>
           <p>
             Todas las monedas son convertidas automáticamente a ARS.
