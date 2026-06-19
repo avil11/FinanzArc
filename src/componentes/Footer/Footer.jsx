@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./Footer.css";
 import { Link } from "react-router-dom";
 import emailjs from '@emailjs/browser';
+import { FaWhatsapp, FaEnvelope, FaFileDownload } from 'react-icons/fa';
 
 const Footer = () => {
   const [modalContactoAbierto, setModalContactoAbierto] = useState(false);
@@ -80,22 +81,41 @@ const Footer = () => {
 
           <div className="footer-col-links">
             <h4>Contáctanos</h4>
-            <nav style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              <a href="https://wa.me/543516184200?text=Hola,%20vengo%20de%20la%20web" target="_blank" rel="noopener noreferrer" className="footer-link-interactivo">
-                Teléfono: +54 3516 184 200
+            <nav style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+
+              {/* WhatsApp */}
+              <a
+                href="https://wa.me/543516184200?text=Hola,%20vengo%20de%20la%20web"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-link-interactivo"
+                style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
+              >
+                <FaWhatsapp size={18} /> +54 3516 184 200
               </a>
 
+              {/* Email (Botón) */}
               <button
                 className="footer-link-interactivo"
                 onClick={() => setModalContactoAbierto(true)}
-                
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  textAlign: 'left', padding: 0, display: 'flex', alignItems: 'center', gap: '10px'
+                }}
               >
-                Gmail: Contactar vía email
+                <FaEnvelope size={18} /> Contactar vía email
               </button>
 
-              <a href="/presentacion.pdf" download="Presentacion_FinanzARC.pdf" className="footer-link-interactivo">
-                Descargar presentación
+              {/* Descarga */}
+              <a
+                href="/presentacion.pdf"
+                download="Presentacion_FinanzARC.pdf"
+                className="footer-link-interactivo"
+                style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
+              >
+                <FaFileDownload size={18} /> Cómo funciona nuestro servicio
               </a>
+
             </nav>
           </div>
         </div>
