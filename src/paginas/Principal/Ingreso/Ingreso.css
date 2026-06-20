@@ -318,19 +318,27 @@ body {
 }
 
 .btn-link {
-   background: rgba(200, 178, 119, .1);
-   border: 1px solid #c8b277;
+   background: transparent;
+   border: 1.5px solid #c8b277;
    color: #c8b277;
-   padding: 5px 15px;
-   border-radius: 20px;
-   cursor: pointer;
-   font-size: .85rem;
-   transition: all .3s;
-}
+   border-radius: 50%; 
+   width: 32px;
+   height: 32px;
+   min-width: 32px;
+   min-height: 32px;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   padding: 0;   
+   font-size: 1.2rem;
+   cursor: pointer; 
 
+   transition: all 0.2s ease-in-out; 
+}
 .btn-link:hover {
    background: #c8b277;
-   color: #000;
+   color: #1a1a1a;
+   transform: scale(1.1); 
 }
 
 /* =========================================

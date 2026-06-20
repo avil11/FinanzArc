@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -375,18 +375,50 @@ const GastoIngreso = () => {
     </div>
   );
 
-  const BarraProgreso = ({ actual, objetivo, etiqueta }) => {
-    const porcentaje = objetivo > 0 ? Math.min(100, (actual / objetivo) * 100) : 0;
+  const BarraProgreso = ({ actual = 0, objetivo = 0, etiqueta = "Meta", idDivisa }) => {
+    // 1. Aseguramos que los valores sean números
+    const valorActual = Number(actual) || 0;
+    const valorObjetivo = Number(objetivo) || 0;
+
+    // 2. Calculamos el porcentaje
+    const porcentaje = valorObjetivo > 0 ? Math.min(100, (valorActual / valorObjetivo) * 100) : 0;
+
+    // 3. Obtenemos el nombre de la divisa
+    const obtenerNombreDivisa = (id) => {
+      switch (Number(id)) {
+        case 2: return "Creada en USD a ARS";
+        case 3: return "Creada en EUR a ARS";
+        default: return "ARS";
+      }
+    };
+    const nombreDivisa = obtenerNombreDivisa(idDivisa);
+
     return (
       <div className="item-progreso-general">
         <div className="info-progreso-general">
-          <span className="truncate-text-general-ahorro" style={{ fontWeight: "500", color: "#ffffff" }}>{etiqueta}</span>
-          <span className="truncate-text-general-ahorro-precio" style={{ color: "#c8b277", fontWeight: "bold" }}>{porcentaje.toFixed(0)}%</span>
+          <span className="truncate-text-general-ahorro" style={{ fontWeight: "500", color: "#ffffff" }}>
+            {etiqueta}
+          </span>
+          <span className="truncate-text-general-ahorro-precio" style={{ color: "#c8b277", fontWeight: "bold" }}>
+            {porcentaje.toFixed(0)}%
+          </span>
         </div>
         <div className="pista-barra-general">
           <div className="relleno-barra-general" style={{ width: `${porcentaje}%` }} />
         </div>
-        <div className="texto-monto-general">${actual.toLocaleString("es-AR")} / ${objetivo.toLocaleString("es-AR")}</div>
+        <div className="texto-monto-general" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "5px" }}>
+          <span className="spanValorMeta">${valorActual.toLocaleString("es-AR")} / ${valorObjetivo.toLocaleString("es-AR")}</span>
+          <span style={{
+            fontSize: "0.75em",
+            color: "#c8b277",
+            backgroundColor: "#2a2a2a",
+            padding: "2px 6px",
+            borderRadius: "4px",
+            whiteSpace: "nowrap"
+          }}>
+            {nombreDivisa}
+          </span>
+        </div>
       </div>
     );
   };
@@ -424,16 +456,12 @@ const GastoIngreso = () => {
       toast.warning("No se encontró un usuario válido para realizar la acción.");
       return;
     }
-
-    // CAPA 2 (Ciberseguridad): Si el usuario modificó el HTML o state local e intenta mandar el fetch
     if (!rolUsuario || rolUsuario < 2) {
       toast.error("Acceso denegado: Tu plan actual no te permite realizar esta acción.");
       return;
     }
-
     const confirmacion = window.confirm('¿Estás seguro de que quieres archivar el mes?');
-    if (!confirmacion) return;
-
+    if (!confirmacion) return; 
     try {
       setModalArchivarAbierto(false);
 
@@ -463,6 +491,9 @@ const GastoIngreso = () => {
 
   // Auxiliares para evaluar permisos en el renderizado
   const tienePermisoArchivar = rolUsuario !== null && rolUsuario >= 2;
+
+  const gastosOrdenados = useMemo(() => obtenerTopCinco(datosGastos), [datosGastos]);
+  const ingresosOrdenados = useMemo(() => obtenerTopCinco(datosIngresos), [datosIngresos]);
 
   return (
     <div className="contenedor-principal-general">
@@ -512,13 +543,13 @@ const GastoIngreso = () => {
       <div className="panel-graficos-general">
         {datosGastos.length > 0 ? (
           <div className="tarjeta-general">
-            <h3>Gastos por Categoría</h3>
+            <h3>Gastos</h3>
             <div className="grafico-con-leyenda">
               <div className="grafico-pie">
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Pie
-                      data={datosGastos}
+                      data={gastosOrdenados}
                       cx="50%" cy="50%"
                       innerRadius={100} outerRadius={115}
                       paddingAngle={5}
@@ -526,7 +557,7 @@ const GastoIngreso = () => {
                       label={(props) => renderCenterLabel(props, calcularTotal(datosGastos))}
                       labelLine={false}
                     >
-                      {datosGastos.map((_, i) => (
+                      {gastosOrdenados.map((_, i) => (
                         <Cell key={i} fill={COLORESgasto[i % COLORESgasto.length]} stroke="none" />
                       ))}
                     </Pie>
@@ -535,7 +566,7 @@ const GastoIngreso = () => {
                 </ResponsiveContainer>
               </div>
               <div className="leyenda-grafico">
-                {obtenerTopCinco(datosGastos).map((item, index) => (
+                {gastosOrdenados.map((item, index) => (
                   <div className="item-leyenda" key={index}>
                     <span className="item-color-circulo" style={{ backgroundColor: COLORESgasto[index % COLORESgasto.length] }} />
                     <div className="leyenda-texto">
@@ -553,13 +584,13 @@ const GastoIngreso = () => {
 
         {datosIngresos.length > 0 ? (
           <div className="tarjeta-general">
-            <h3>Fuentes de Ingreso</h3>
+            <h3>Ingresos</h3>
             <div className="grafico-con-leyenda">
               <div className="grafico-pie">
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Pie
-                      data={datosIngresos}
+                      data={ingresosOrdenados}
                       cx="50%" cy="50%"
                       innerRadius={100} outerRadius={115}
                       paddingAngle={5}
@@ -567,7 +598,7 @@ const GastoIngreso = () => {
                       label={(props) => renderCenterLabel(props, calcularTotal(datosIngresos))}
                       labelLine={false}
                     >
-                      {datosIngresos.map((_, i) => (
+                      {ingresosOrdenados.map((_, i) => (
                         <Cell key={i} fill={COLORES[i % COLORES.length]} stroke="none" />
                       ))}
                     </Pie>
@@ -576,7 +607,7 @@ const GastoIngreso = () => {
                 </ResponsiveContainer>
               </div>
               <div className="leyenda-grafico">
-                {obtenerTopCinco(datosIngresos).map((item, index) => (
+                {ingresosOrdenados.map((item, index) => (
                   <div className="item-leyenda" key={index}>
                     <span className="item-color-circulo" style={{ backgroundColor: COLORES[index % COLORES.length] }} />
                     <div className="leyenda-texto">
@@ -638,12 +669,19 @@ const GastoIngreso = () => {
           </div>
         </div>
 
-        {/* METAS ACTIVAS */}
         {metasActivas.length > 0 ? (
           <div className="grid-ahorros-general">
             {metasActivas.map((meta, indice) => (
               <div key={indice} className="tarjeta-ahorro-item">
-                <BarraProgreso actual={meta.actual} objetivo={meta.objetivo} etiqueta={meta.etiqueta} />
+
+                {/* Aquí pasamos el IdDivisa como prop nueva */}
+                <BarraProgreso
+                  actual={meta.actual}
+                  objetivo={meta.objetivo}
+                  etiqueta={meta.etiqueta}
+                  idDivisa={meta.IdDivisa}
+                />
+
                 <button className="boton-editar-ahorro" onClick={() => abrirModalEditar(meta)}>
                   Editar
                 </button>

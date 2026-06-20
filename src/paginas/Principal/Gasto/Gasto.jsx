@@ -184,18 +184,17 @@ function Gasto() {
 
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#1e1e1f',
-                    borderRadius: '10px',
-                    border: '1px solid rgba(200, 178, 119, 0.3)',
-                    color: '#fff'
+                    backgroundColor: "#1e1e1f",
+                    border: "1px solid rgba(200, 178, 119, 0.3)",
+                    borderRadius: "8px"
                   }}
-                  itemStyle={{ color: '#c8b277' }}
-                  formatter={(value, name) => [`$${value.toLocaleString()}`, name]}
+                  itemStyle={{ fontWeight: "500"}}
+                  formatter={(value, name) => [`$${formatMontoParaInput(value)}`, name]}
                 />
 
                 <text x="50%" y="50%" fill="#fff" textAnchor="middle" dominantBaseline="central">
-                  <tspan x="50%" dy="-0.5em" fontSize="14" fill="#a0a0a0">Total</tspan>
-                  <tspan x="50%" dy="1.5em" fontSize="20" fontWeight="bold">${totalMonto.toLocaleString()}</tspan>
+                  <tspan x="50%" dy="-0.5em" fontSize="14" fill="#c8b277" fontWeight="bold">Total (ARS)</tspan>
+                  <tspan x="50%" dy="1.5em" fontSize="20" fontWeight="bold" fill="#FF4B4B">${totalMonto.toLocaleString()}</tspan>
                 </text>
               </PieChart>
             </ResponsiveContainer>
@@ -248,7 +247,7 @@ function Gasto() {
         <div className="seccion-detalle-inferior" style={{ marginTop: "20px", padding: "20px", backgroundColor: "#1e1e1f", borderRadius: "12px", border: "1px solid #333", width: "80%" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
             <h2>Detalle: {itemSeleccionado.Descripcion}</h2>
-            <button onClick={() => setVerMas(false)} className="btn-link">Cerrar ✕</button>
+            <button onClick={() => setVerMas(false)} className="btn-link">✕</button>
           </div>
 
           <div className="formulario-grid">
@@ -291,11 +290,6 @@ function Gasto() {
               <p>{new Date(itemSeleccionado.FechaGasto).toLocaleDateString()}</p>
             </div>
 
-            {/* Fecha Creación */}
-            <div className="formulario-grupo">
-              <label>Fecha de Creación</label>
-              <p>{new Date(itemSeleccionado.FechaCreacion).toLocaleDateString()}</p>
-            </div>
           </div>
         </div>
       )}

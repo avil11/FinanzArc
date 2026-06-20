@@ -632,3 +632,10 @@
     text-overflow: ellipsis;
     display: block;
 }
+
+@media (max-width: 420px) {
+    .texto-monto-general .spanValorMeta{
+        text-align: left;
+    }
+
+}

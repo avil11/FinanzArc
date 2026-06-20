@@ -240,6 +240,7 @@ const Comparativa = () => {
         const diferencia = valorA - valorB;
         const porcentaje = valorB !== 0 ? ((diferencia / valorB) * 100).toFixed(1) : "100";
         const esPositivo = esGasto ? diferencia <= 0 : diferencia >= 0;
+
         const esIgual = diferencia === 0;
         if (esIgual) return { monto: 0, percentage: 0, clase: "tendencia-neutral", texto: "Lo mismo que en el periodo" };
         return { monto: Math.abs(diferencia), percentage: Math.abs(porcentaje), clase: esPositivo ? "tendencia-positiva" : "tendencia-negativa", texto: diferencia >= 0 ? "Más que en el periodo" : "Menos que en el periodo" };
@@ -291,7 +292,7 @@ const Comparativa = () => {
     };
 
     const renderContenido = () => {
-        // Seguridad: Si fuerzan la vista 3 sin ser premium, devolvemos al inicio
+
         if (tipoPresentacion === 3 && !esPremium) {
             setTipoPresentacion(1);
             return null;
@@ -338,6 +339,7 @@ const Comparativa = () => {
                 </div>
             );
         } else if (tipoPresentacion === 2) {
+            const resultadoBalance = calcularDiferencia(datos.ingresoATotal, datos.gastoATotal, false);
             return (
                 <div className="comparativa-grid-layout">
                     <div className="seccion-comparativa-fila">
@@ -345,9 +347,17 @@ const Comparativa = () => {
                             <h2 className="subtitulo-seccion">Balance Mensual Neto</h2>
                             <div className="tarjeta-balance-superior">
                                 <div className="icon-comparar">NETO</div>
-                                <div className={`info-balance ${(datos.ingresoATotal - datos.gastoATotal) >= 0 ? "tendencia-positiva" : "tendencia-negativa"}`}>
-                                    <p className="monto-balance truncate-text-comparativa">${Math.abs(datos.ingresoATotal - datos.gastoATotal).toLocaleString()}</p>
-                                    <span className="porcentaje-balance">Diferencia Ingresos - Gastos</span>
+                                <div className={`info-balance ${resultadoBalance.clase}`}>
+                                    <p className="monto-balance truncate-text-comparativa">
+                                        ${Math.abs(datos.ingresoATotal - datos.gastoATotal).toLocaleString()}
+                                    </p>
+
+                                    {/* 3. Mostramos el texto según el resultado */}
+                                    <span className="porcentaje-balance">
+                                        {resultadoBalance.clase === "tendencia-neutral"
+                                            ? resultadoBalance.texto 
+                                            : "Diferencia Ingresos - Gastos"}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -432,12 +442,6 @@ const Comparativa = () => {
                             {tipoPresentacion === 1 ? "Ver Balances Mensuales" : "Ver Comparativa Mensual"}
                         </button>
 
-                    </div>
-                    <div className='botonVolverPrincipal'>
-                        {/* Cambié las flechas múltiples por una sola más limpia */}
-                        <Link to="/Principal" className="botonesComparativa btn-volver">
-                            ← Volver al Inicio
-                        </Link>
                     </div>
                 </div>
             </div>

@@ -22,8 +22,8 @@ const formatMontoParaInput = (val) => {
   // Agregamos puntos para separar miles
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   // Retornamos con coma si hay decimales, o si el usuario acaba de tipear una coma
-  return parts.length > 1 
-    ? parts[0] + "," + parts[1] 
+  return parts.length > 1
+    ? parts[0] + "," + parts[1]
     : (stringVal.endsWith(".") ? parts[0] + "," : parts[0]);
 };
 
@@ -224,7 +224,7 @@ function Ingreso() {
         <p className="texto-gris">
           Administre todos sus ingresos en este apartado. El mismo es de carácter histórico y acumulado; para más detalles de sus ingresos, clickee en los íconos del apartado "ACCIONES".
           <br></br>
-         <strong>Cotizaciones: 1 USD = ${tasas?.USD || "..."} | 1 EUR = ${tasas?.EUR || "..."}</strong> 
+          <strong>Cotizaciones: 1 USD = ${tasas?.USD || "..."} | 1 EUR = ${tasas?.EUR || "..."}</strong>
         </p>
       </div>
 
@@ -259,15 +259,20 @@ function Ingreso() {
                 </Pie>
 
                 <text x="50%" y="50%" fill="#fff" textAnchor="middle" dominantBaseline="central">
-                  <tspan x="50%" dy="-0.5em" fontSize="14" fill="#a0a0a0">Total (ARS)</tspan>
-                  <tspan x="50%" dy="1.5em" fontSize="20" fontWeight="bold">
+                  <tspan x="50%" dy="-0.5em" fontSize="14" fill="#c8b277" fontWeight="bold"  >Total (ARS)</tspan>
+                  <tspan x="50%" dy="1.5em" fontSize="20" fontWeight="bold"  fill="#007AFF" >
                     ${totalMonto.toLocaleString('es-AR')}
                   </tspan>
                 </text>
 
                 <Tooltip
-                  contentStyle={{ backgroundColor: "#1e1e1f", border: "1px solid rgba(200, 178, 119, 0.3)", borderRadius: "8px" }}
-                  itemStyle={{ color: "#fff" }}
+                  contentStyle={{
+                    backgroundColor: "#1e1e1f",
+                    border: "1px solid rgba(200, 178, 119, 0.3)",
+                    borderRadius: "8px"
+                  }}
+                  itemStyle={{ fontWeight: "500" }}
+                  formatter={(value, name) => [`$${formatMontoParaInput(value)}`, name]}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -339,7 +344,7 @@ function Ingreso() {
         <div className="seccion-detalle-inferior" style={{ marginTop: "20px", padding: "20px", backgroundColor: "#1e1e1f", borderRadius: "12px", border: "1px solid #333", width: "80%" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
             <h2>Detalle: {itemSeleccionado.Descripcion}</h2>
-            <button onClick={() => setVerMas(false)} className="btn-link">Cerrar ✕</button>
+            <button onClick={() => setVerMas(false)} className="btn-link">✕</button>
           </div>
 
           <div className="formulario-grid">
@@ -397,7 +402,7 @@ function Ingreso() {
                   placeholder='"850.000..."'
                   onChange={(e) => {
                     const val = e.target.value;
-                    
+
                     // 5. VALIDACIÓN CORREGIDA: quitamos puntos (miles) y convertimos coma en punto para validar
                     const rawVal = val.replace(/\./g, "").replace(",", ".");
                     const numVal = parseFloat(rawVal);
