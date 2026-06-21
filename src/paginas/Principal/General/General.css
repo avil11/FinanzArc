@@ -1,7 +1,7 @@
-/* =========================================
-   ESTILOS PÁGINA GENERAL (DASHBOARD)
-   ========================================= */
-
+/* ESTILOS PÁGINA GENERAL (DASHBOARD) 
+ESTO ES LO MAS IMPORTANTE YA QUE MARCA HASTA DONDE TIENE EL ANCHO 
+TODO EL CUERPO DE LA PAGINA (1210px)
+*/
 .contenedor-principal-general {
     background: transparent;
     width: 100%;
@@ -24,7 +24,6 @@
     padding: 20px;
     align-items: flex-start;
 }
-
 .titulo-principal-general h2 {
     font-size: 2rem;
     color: #fff;
@@ -32,7 +31,6 @@
     font-weight: 300;
     letter-spacing: 1px;
 }
-
 .titulo-principal-general p {
     font-size: 1.2rem !important;
     color: #a0a0a0;
@@ -40,36 +38,6 @@
     font-weight: 400;
     letter-spacing: 1px;
 }
-
-.botones-funciones-comparativas {
-    display: flex;
-    flex-direction: row;
-    gap: 15px;
-    margin-top: 10px;
-}
-
-.botonesComparativa {
-    text-decoration: none;
-    background: transparent;
-    border: 1px solid #D4AF37;
-    color: #D4AF37;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: .85rem;
-    font-weight: 500;
-    transition: all .3s ease;
-    text-transform: uppercase;
-    letter-spacing: .5px;
-}
-
-.botonesComparativa:hover {
-    background: #D4AF37;
-    color: #000;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 255, 255, .1);
-}
-
 .seccion-encabezado-general h2 {
     font-size: 2.2rem;
     font-weight: 300;
@@ -77,14 +45,14 @@
     margin-bottom: 10px;
     letter-spacing: 1px;
 }
-.modal-body-general{
+.modal-body-general {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     padding: 35px 15px 35px 15px;
 
-    
+
 }
 
 /* --- PANELES Y TARJETAS --- */
@@ -95,7 +63,6 @@
     gap: 30px;
     margin-bottom: 40px;
 }
-
 .tarjeta-general,
 .contenedor-ahorros-general {
     background: #1e1e1f;
@@ -106,14 +73,12 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
     transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
 }
-
 .tarjeta-general:hover,
 .contenedor-ahorros-general:hover {
     transform: translateY(-5px);
     border-color: rgba(200, 178, 119, .3);
     box-shadow: 0 15px 40px rgba(0, 0, 0, .7);
 }
-
 .tarjeta-general h3,
 .titulo-ahorros-general {
     margin-top: 0;
@@ -126,7 +91,7 @@
     text-align: center;
 }
 
-/* --- GRÁFICOS --- */
+/* --- GRÁFICOS DE TORTA. --- */
 .grafico-con-leyenda {
     display: flex;
     align-items: center;
@@ -135,13 +100,11 @@
     flex-wrap: wrap;
     flex-direction: column;
 }
-
 .grafico-pie {
     width: 230px;
     min-width: 220px;
     height: 250px;
 }
-
 .leyenda-grafico {
     display: flex;
     flex-direction: column;
@@ -149,7 +112,6 @@
     flex: 1;
     min-width: 170px;
 }
-
 .item-leyenda {
     display: flex;
     align-items: center;
@@ -160,14 +122,12 @@
     background: rgba(255, 255, 255, .03);
     border: 1px solid rgba(255, 255, 255, .08);
 }
-
 .item-color-circulo {
     width: 12px;
     height: 12px;
     border-radius: 50%;
     flex-shrink: 0;
 }
-
 .leyenda-texto {
     display: flex;
     align-items: center;
@@ -176,7 +136,6 @@
     color: #d5d5d5;
     font-size: .95rem;
 }
-
 .leyenda-texto strong {
     color: #fff;
 }
@@ -185,20 +144,17 @@
 .contenedor-ahorros-general {
     width: 100%;
 }
-
 .encabezado-ahorros-flex {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
 }
-
 .grid-ahorros-general {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
 }
-
 .tarjeta-ahorro-item {
     background: rgba(255, 255, 255, .02);
     padding: 20px;
@@ -208,20 +164,17 @@
     flex-direction: column;
     gap: 15px;
 }
-
 .item-progreso-general {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
-
 .info-progreso-general {
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 1rem;
 }
-
 .pista-barra-general {
     width: 100%;
     background: #2a2a2b;
@@ -230,7 +183,6 @@
     border: 1px solid rgba(255, 255, 255, .05);
     overflow: hidden;
 }
-
 .relleno-barra-general {
     height: 100%;
     background: linear-gradient(90deg, #8a733f 0%, #c8b277 100%);
@@ -238,7 +190,6 @@
     box-shadow: 0 0 10px rgba(200, 178, 119, .4);
     transition: width 1.5s cubic-bezier(.4, 0, .2, 1);
 }
-
 .texto-monto-general {
     font-size: .85rem;
     color: #888;
@@ -246,24 +197,7 @@
     margin-top: 2px;
 }
 
-.boton-editar-ahorro {
-    background: transparent;
-    color: #c8b277;
-    border: 1px solid rgba(200, 178, 119, .5);
-    padding: 6px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: .85rem;
-    align-self: flex-end;
-    transition: all .3s ease;
-}
-
-.boton-editar-ahorro:hover {
-    background: #c8b277;
-    color: #111;
-}
-
-/* --- ESTADOS VACÍOS (EMPTY STATES) --- */
+/* --- ESTADOS VACÍOS --- */
 .aviso-vacio {
     display: flex;
     flex-direction: column;
@@ -276,24 +210,20 @@
     padding: 30px;
     width: 100%;
 }
-
 .contenido-aviso-vacio {
     max-width: 300px;
 }
-
 .icono-placeholder {
     font-size: 48px;
     margin-bottom: 15px;
     opacity: .4;
     filter: grayscale(1);
 }
-
 .aviso-vacio p {
     color: #d5d5d5;
     font-size: 1rem;
     margin-bottom: 8px;
 }
-
 .sugerencia {
     font-size: 13px;
     color: #c8b277;
@@ -313,7 +243,6 @@
     z-index: 1000;
     padding: 24px;
 }
-
 .contenido-modal {
     width: min(100%, 520px);
     background: #141414;
@@ -326,12 +255,10 @@
     display: flex;
     flex-direction: column;
 }
-
 .formulario-cuerpo {
     overflow-y: auto;
     padding-right: 5px;
 }
-
 .contenido-modal h3 {
     margin-top: 0;
     margin-bottom: 25px;
@@ -346,14 +273,12 @@
     gap: 8px;
     margin-bottom: 20px;
 }
-
 .formulario-grupo label {
     color: #c8b277;
     font-size: .9rem;
     text-transform: uppercase;
     letter-spacing: .5px;
 }
-
 .formulario-grupo input,
 .formulario-grupo select {
     width: 100%;
@@ -366,19 +291,16 @@
     font-size: 1rem;
     transition: border-color .3s;
 }
-
 .formulario-grupo input:focus,
 .formulario-grupo select:focus {
     border-color: #c8b277;
 }
-
 .formulario-acciones {
     display: flex;
     justify-content: center;
     gap: 15px;
     margin-top: 30px;
 }
-
 .modal-acciones {
     width: 100%;
     display: flex;
@@ -388,64 +310,6 @@
     margin-top: 20px;
 }
 
-.btn-Cancelar-General {
-  padding: 12px 28px;
-  background-color: #e50000; /* Rojo puro de advertencia */
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(229, 0, 0, 0.2);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.btn-Cancelar-General:hover {
-  background-color: #ff1a1a;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(229, 0, 0, 0.4);
-}
-.btn-Cancelar-General:active {
-  transform: translateY(0);
-}
-.btn-Confirmar-General {
-  padding: 12px 28px;
-  background-color: #ddb941; /* Dorado/Amarillo corporativo */
-  color: #121212; /* Texto oscuro para legibilidad impecable */
-  border: none;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(221, 185, 65, 0.2);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-Confirmar-General:hover {
-  background-color: #ebd167;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(221, 185, 65, 0.4);
-}
-
-.btn-Confirmar-General:active {
-  transform: translateY(0);
-}
-/* --- ANIMACIONES DE ENTRADA --- */
-@keyframes fadeInGeneral {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes scaleInGeneral {
-  from {
-    opacity: 0;
-    transform: scale(0.92);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
 /* --- BOTONES --- */
 .boton-primario,
 .boton-secundario {
@@ -457,71 +321,152 @@
     font-size: .95rem;
     transition: all .3s ease;
 }
-
 .boton-primario {
     background: linear-gradient(90deg, #8a733f 0%, #c8b277 100%);
     color: #111;
     box-shadow: 0 4px 15px rgba(200, 178, 119, .2);
 }
-
 .boton-primario:hover {
     transform: scale(1.02);
     box-shadow: 0 6px 20px rgba(200, 178, 119, .4);
 }
-
 .boton-secundario {
     background: rgba(255, 255, 255, .05);
     color: #fff;
     border: 1px solid rgba(255, 255, 255, .1);
 }
-
 .boton-secundario:hover {
     background: rgba(255, 255, 255, .1);
 }
-
 .botones-functions-comparativas {
     margin-top: 20px;
     display: flex;
     gap: 15px;
     justify-content: center;
 }
-
 .botones-functions-comparativas .botonesComparativa {
     width: 150px;
     padding: 5px
 }
-
-/* --- ANIMACIONES --- */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.btn-Cancelar-General {
+    padding: 12px 28px;
+    background-color: #e50000;
+    /* Rojo puro de advertencia */
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(229, 0, 0, 0.2);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-Cancelar-General:hover {
+    background-color: #ff1a1a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(229, 0, 0, 0.4);
+}
+.btn-Cancelar-General:active {
+    transform: translateY(0);
+}
+.btn-Confirmar-General {
+    padding: 12px 28px;
+    background-color: #ddb941;
+    /* Dorado/Amarillo corporativo */
+    color: #121212;
+    /* Texto oscuro para legibilidad impecable */
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(221, 185, 65, 0.2);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-Confirmar-General:hover {
+    background-color: #ebd167;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(221, 185, 65, 0.4);
+}
+.btn-Confirmar-General:active {
+    transform: translateY(0);
+}
+.boton-editar-ahorro {
+    background: transparent;
+    color: #c8b277;
+    border: 1px solid rgba(200, 178, 119, .5);
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: .85rem;
+    align-self: flex-end;
+    transition: all .3s ease;
+}
+.boton-editar-ahorro:hover {
+    background: #c8b277;
+    color: #111;
+}
+.botones-funciones-comparativas {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    margin-top: 10px;
+}
+.botonesComparativa {
+    text-decoration: none;
+    background: transparent;
+    border: 1px solid #D4AF37;
+    color: #D4AF37;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: .85rem;
+    font-weight: 500;
+    transition: all .3s ease;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+.botonesComparativa:hover {
+    background: #D4AF37;
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, .1);
 }
 
-/* 1. Primero creamos el "efectito" (la animación) fuera del media query */
-@keyframes aparecerSuave {
-    0% {
-        opacity: 0;
-        transform: translateY(-15px);
-        /* Empieza un poquito más arriba */
+/*
+    MEDIA QUERIES (RESPONSIVE) 
+    LO PONEMOS DE MAYOR A MENOR PARA QUE SE LOGRE SABER RAPIDO LOS CAMBIOS.
+*/
+@media (max-width:1100px) {
+    .grafico-con-leyenda {
+        display: flex;
+        align-items: center;
+        justify-content: center !important;
     }
 
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-        /* Vuelve a su posición original */
+    .seccion-encabezado-general {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+        animation: aparecerSuave 0.4s ease-out forwards;
+    }
+    .titulo-principal-general {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        animation: aparecerSuave 0.6s ease-out forwards;
+    }
+    .botones-functions-comparativas {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        animation: aparecerSuave 0.8s ease-out forwards;
     }
 }
-
-/* =========================================
-   MEDIA QUERIES (RESPONSIVE)
-   ========================================= */
 @media (max-width: 810px) {
     .contenedor-principal-general {
         padding: 100px 20px 40px;
@@ -546,7 +491,6 @@
         width: 100%;
     }
 }
-
 @media (max-width: 480px) {
     .seccion-encabezado-general h2 {
         font-size: 1.9rem;
@@ -567,52 +511,69 @@
         width: 100%;
     }
 }
-
 @media (max-width: 435px) {
     .botones-funciones-comparativas {
         flex-direction: column;
         width: 100%;
     }
 }
-
-/* 2. Aplicamos la animación dentro de tu Media Query */
-@media (max-width:1100px) {
-    .grafico-con-leyenda {
-        display: flex;
-        align-items: center;
-        justify-content: center !important;
+@media (max-width: 420px) {
+    .texto-monto-general .spanValorMeta {
+        text-align: left;
     }
 
-    .seccion-encabezado-general {
-        display: flex;
-        align-items: center;
-        text-align: center;
-        width: 100%;
-        /* Se ejecuta en 0.4s */
-        animation: aparecerSuave 0.4s ease-out forwards;        /* Se ejecuta después del título para crear un efecto en cascada */
+}
+
+/* --- 
+    ANIMACIONES 
+    PARA QUE EL CONTENEDOR DE ARRIBA APAREZCA SUAVE EN LA PAGINA PRINCIPAL CUANDO CAMBIEN LOS PIXELES
+--- */
+
+@keyframes fadeInGeneral {
+    from {
+        opacity: 0;
     }
 
-    .titulo-principal-general {
-        display: flex;
-        width: 100%;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        /* Se ejecuta en 0.6s para que aparezca justo después */
-        animation: aparecerSuave 0.6s ease-out forwards;
+    to {
+        opacity: 1;
+    }
+}
+@keyframes scaleInGeneral {
+    from {
+        opacity: 0;
+        transform: scale(0.92);
     }
 
-    .botones-functions-comparativas {
-        display: flex;
-        width: 100%;
-        justify-content: center;
-        align-items: center;
-        /* Se ejecuta en 0.8s para cerrar el efecto en cascada */
-        animation: aparecerSuave 0.8s ease-out forwards;
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
+@keyframes aparecerSuave {
+    0% {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
 
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/*CLASE PARA CUANDO LOS NUMEROS SEAN GRANDES -> NO SE ROMPA EL CONTENEDOR Y SE ESCONDA.*/
 .truncate-text-general {
 
     display: block;
@@ -624,18 +585,10 @@
     font-size: 1rem;
     font-weight: 500;
 }
-
 .truncate-text-general-ahorro {
     max-width: 200px !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     display: block;
-}
-
-@media (max-width: 420px) {
-    .texto-monto-general .spanValorMeta{
-        text-align: left;
-    }
-
 }
