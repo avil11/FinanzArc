@@ -4,7 +4,7 @@ import CarrouselPropuesta from "../../componentes/Carrousel/carrouselPropuesta-"
 
 const Inicio = () => {
   return (
-    <div className="inicio" style={{ backgroundColor: "#121212" }}>
+    <div className="inicio" >
 
       <div className="main-wrapper">
         {/* SECCIÓN HERO */}
@@ -25,83 +25,28 @@ const Inicio = () => {
           </div>
         </div>
 
-        <div className="containerServicio" id="servicio">
-          <div className="containerProyecto">
-            <h1>Sobre el Proyecto</h1>
-            <p>
-              En FinanzARC buscamos ofrecer soluciones para mejorar la gestión
-              financiera para las empresas y personas que estén buscando optimizar
-              su economía.
-            </p>
-            <img
-              src="/Imagenes/ImagenSobreProyecto.webp"
-              alt="Sobre el Proyecto"
-            />
-          </div>
-
-          <div className="containerTarjetas">
-            <div className="containerTarjetas1">
-              <div className="container1">
-                <img src="/Imagenes/Logo 1.webp" alt="Icono 1" />
-                <h4>Transforma datos en decisiones.</h4>
-                <p>
-                  Deja atrás el registro pasivo. Nuestra interfaz te permite
-                  visualizar flujos de dinero en tiempo real.
-                </p>
-              </div>
-              <div className="container2">
-                <img src="/Imagenes/Logo 2.webp" alt="Icono 2" />
-                <h4>Elimina la ceguera inflacionaria</h4>
-                <p>
-                  Recupera la noción real de tu poder adquisitivo. Convierte tus
-                  activos a divisas estables automáticamente.
-                </p>
-              </div>
-            </div>
-
-            <div className="containerTarjetas2">
-              <div className="container3">
-                <img src="/Imagenes/Logo 3.webp" alt="Icono 3" />
-                <h4>Respaldo digital inmediato.</h4>
-                <p>
-                  Vincula cada registro financiero con su comprobante digital.
-                  Centralizamos tu documentación.
-                </p>
-              </div>
-              <div className="container4">
-                <img src="/Imagenes/Logo 4.webp" alt="Icono 4" />
-                <h4>Frenando la inercia de gasto.</h4>
-                <p>
-                  No solo registras, ahorras. Kaptura te brinda las herramientas
-                  para fomentar un ahorro estratégico.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div className="containerPropuesta" id="propuesta">
           <div className="containerPropuestaIzquierda">
             <div className="introduccion">
-              <h1>Toma el control absoluto de tu patrimonio</h1>
-              <p>Nuestra plataforma te ofrece una vista panorámica inmediata y nítida de tu situación financiera, transformando datos complejos en perspectivas visuales inteligentes para una gestión patrimonial de precisión.</p>
+              <h1>Tome el control absoluto de su patrimonio con FinanzARC</h1>
+              <p>En FinanzARC impulsamos su economía con herramientas diseñadas para llevar sus finanzas personales o las de su empresa al siguiente nivel.</p>
             </div>
             <div className="items">
               <div className="item1">
-                <h2>01</h2>
-                <p>Di adiós al desorden administrativo. Vinculamos cada registro con su comprobante digital para una trazabilidad perfecta en gestiones legales e impositivas.</p>
+                <h2>BALANCE FINANCIERO</h2>
+                <p>Obtenga su balance financiero cruzando los ingresos y gastos de un mes específico, y mida su crecimiento analizando la comparativa histórica de sus ingresos y gastos mes a mes.</p>
               </div>
               <div className="item2">
-                <h2>02</h2>
-                <p>Recupera la noción real de tu poder adquisitivo. Nuestra conversión automática a divisas estables elimina la "ceguera inflacionaria".</p>
+                <h2>HISTORIAL DE MOVIMIENTOS</h2>
+                <p>El historial de movimientos se construye registrando sus ingresos y gastos mediante la carga manual en la plataforma y su posterior vinculación a su respectivo comprobante.</p>
               </div>
               <div className="item3">
-                <h2>03</h2>
-                <p>Detecta fugas de dinero mediante comparativas históricas. Pasamos del registro pasivo al análisis activo para optimizar tu economía.</p>
+                <h2>OBJETIVOS DE AHORRO</h2>
+                <p>Defina sus objetivos de ahorro fijando un monto objetivo y una fecha límite. Además, el sistema calcula automáticamente la conversión a Peso Argentino (ARS) en tiempo real si decide ahorrar en dólares o euros.</p>
               </div>
               <div className="item4">
-                <h2>04</h2>
-                <p>Obtén una visión rápida, clara y completa de tu situación y oportunidades financieras. Un control absoluto basado en evidencia.</p>
+                <h2>CONTROL DE DIVISAS</h2>
+                <p>Lleve el control exacto de sus divisas gracias a nuestro sistema de sincronización vía API, que actualiza las cotizaciones en tiempo real.</p>
               </div>
             </div>
           </div>

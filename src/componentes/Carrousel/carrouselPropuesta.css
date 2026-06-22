@@ -14,7 +14,7 @@
 .swiper-slide { height: auto !important; display: flex; justify-content: center; }
 
 /* --- TARJETA --- */
-.tarjeta-propuesta { margin-top: 30px; width: 100%; max-width: 280px; background: #1f2122; border-radius: 25px; padding: 30px 20px; display: flex; flex-direction: column; align-items: flex-start; height: 100%; /* Flexbox: ocupa 100% del alto */ position: relative; border: 1px solid rgba(197, 160, 95, .2); box-shadow: 0 0 15px rgba(197, 160, 95, .15), inset 0 0 20px rgba(197, 160, 95, .05); transition: all .3s ease; }
+.tarjeta-propuesta { margin-top: 30px; width: 100%; max-width: 280px; background: #111; border-radius: 25px; padding: 30px 20px; display: flex; flex-direction: column; align-items: flex-start; height: 100%; /* Flexbox: ocupa 100% del alto */ position: relative; border: 1px solid rgba(197, 160, 95, .2); box-shadow: 0 0 15px rgba(197, 160, 95, .15), inset 0 0 20px rgba(197, 160, 95, .05); transition: all .3s ease; }
 .tarjeta-propuesta:hover { transform: translateY(-6px); box-shadow: 0 0 25px rgba(197, 160, 95, .3), inset 0 0 30px rgba(197, 160, 95, .08); }
 .tarjeta-propuesta::before { content: ""; position: absolute; top: 10px; left: 20px; right: 20px; height: 2px; background: linear-gradient(to right, transparent, rgba(197, 160, 95, .6), transparent); }
 

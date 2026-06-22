@@ -5,7 +5,6 @@
     font-weight: 700;
     margin-bottom: 15px;
 }
-/* Contenedor Grid de las tarjetas */
 .contenedor-planes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -15,34 +14,33 @@
     align-items: stretch;
     
 }
+.planes-introduccion {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+}
+.planes-encabezado {
+    text-align: center !important;
+}
 
-/* =========================================
-   ESTILOS PARA LA LISTA DE DETALLES DE PLANES
-   Diseño: Cuaderno Tesis - Desarrollo Web
-   ========================================= */
-
+/* ESTILOS PARA LA LISTA DE DETALLES DE PLANES*/
 .lista-detalles {
   list-style-type: none;
-  padding: 10px 15px; /* Espaciado interno simulando los márgenes de una hoja */
+  padding: 10px 15px;
   margin: 15px 0 25px 0;
   display: flex;
   flex-direction: column;
   text-align: left;
-  
-  /* Fondo tenue simulando papel de cuaderno y línea de margen izquierdo */
-  
-  box-shadow: inset 0px 2px 0 #c8b277; /* Línea de encuadernación / margen */
+  box-shadow: inset 0px 2px 0 #c8b277; 
 }
-
-
 .boton-secundario-plan {
       text-decoration: none; background: transparent; border: 1px solid #D4AF37; color: #D4AF37; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: .85rem; font-weight: 500; transition: all .3s ease; text-transform: uppercase; letter-spacing: .5px;
-    }
+}
 .boton-secundario-plan:hover { background: #D4AF37;
     color: #000;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 255, 255, .1);}
-
 .selector-suscripcion{
     display: flex;
     align-items: center;
@@ -51,8 +49,6 @@
 
     
 }
-
-
 .lista-detalles li {
   display: flex;
   align-items: flex-start;
@@ -64,17 +60,13 @@
   padding: 8px 0 8px 10px; 
   font-family: inherit; 
 }
-
-/* Evita que el último elemento tenga una línea extra abajo */
 .lista-detalles li:last-child {
   border-bottom: none;
 }
-
 .detalle-incluido {
-  color: #27672a; /* Verde oscuro (simulando tinta de corrección aprobada) */
+  color: #27672a;
   font-weight: 600;
 }
-
 .detalle-excluido {
   color: #c62828; /* Rojo sobrio (simulando tinta roja) */
   opacity: 0.85;
@@ -82,14 +74,12 @@
   text-decoration: line-through; 
   text-decoration-color: rgba(198, 40, 40, 0.4);
 }
-
 .detalle-normal {
     font-size: 35px;
   color: rgba(255, 255, 255, 0.555); /* Gris azulado muy oscuro, similar a la tinta de lapicera */
   font-weight: 500;
     text-align: center;
 }
-
 .detalle-vacio {
   font-style: italic;
   color: #78909c;
@@ -102,8 +92,6 @@
   border-radius: 4px;
   background-color: #f5f7f8;
 }
-
-/* Tarjeta individual de Plan */
 .tarjeta-plan {
     display: flex;
     flex-direction: column;
@@ -121,7 +109,6 @@
     /* TRANSICIÓN: Clásica y lineal pero suave */
     transition: all 0.35s ease-in-out;
 }
-
 .tarjeta-plan:hover {
     /* Animación: Solo sube */
     transform: translateY(-12px);
@@ -135,13 +122,11 @@
     font-size: 1.6rem;
     font-weight: 600;
 }
-
 .tarjeta-plan h2 {
     color: #c8b277;
     font-size: 2.2rem;
     margin: 25px 0;
 }
-
 .tarjeta-plan p {
     color: #b0b0b1;
     line-height: 1.6;
@@ -149,7 +134,7 @@
     font-size: 1.05rem;
 }
 
-/* Botones de la Tarjeta */
+/* BOTONES */
 .btn-plan {
     width: 100%;
     padding: 15px;
@@ -159,32 +144,28 @@
     cursor: pointer;
     transition: all 0.3s ease;
 }
-
 .btn-plan:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
-
-/* Estilo para Usuarios (Suscribirse) */
 .btn-plan-suscribir {
     background: #c8b277;
     color: #1e1e1f;
     border: none;
 }
-
 .btn-plan-suscribir:hover:not(:disabled) {
     background: #d4c08b;
 }
-
-/* Estilo para Administrador (Editar Plan) */
 .btn-plan-editar {
     background: transparent;
     color: #c8b277;
     border: 1px solid #c8b277;
 }
-
 .btn-plan-editar:hover {
     background: rgba(200, 178, 119, 0.1);
+}
+.planes-boton {
+    width: 300px;
 }
 
 /* Textarea del Modal */
@@ -198,35 +179,20 @@
     min-height: 80px;
     resize: vertical;
 }
-
 .textarea-modal:focus {
     outline: none;
     border-color: #c8b277;
 }
-
-.planes-introduccion {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.planes-encabezado {
-    text-align: center !important;
-}
-
-.planes-boton {
-    width: 300px;
-}
 .detalle-destacado {
-  color: #c8b277; /* Tu color dorado */
-  font-size: 15px; /* Un poco más pequeño que el texto normal */
-  font-style: italic; /* Letra cursiva para dar efecto de nota */
+  color: #c8b277; 
+  font-size: 15px;
+  font-style: italic;
   font-weight: 500;
   text-align: center;
-  margin-top: 15px; /* Lo separa un poco más del texto de arriba */
+  margin-top: 15px; 
 }
 
+/* MEDIA QUERIES */
 @media (max-width: 1024px) {
     .contenedor-planes-grid{
         display: flex;
@@ -240,13 +206,11 @@
         /* max-width: 400px; */
     }
 }
-
 @media (max-width: 810px) {
     .planes-boton {
         width: 350px;
     }
 }
-
 @media (max-width: 585px) {
     .planes-boton {
         width: 250px;

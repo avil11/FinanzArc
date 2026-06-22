@@ -1,16 +1,14 @@
-/* --- Página de Perfil (Dashboard Style - Golden Sinergy) --- */
+/* --- Página de Perfil */
 .perfil-pagina-contenedor-general, .perfil-pagina-contenedor { 
     width: 100%; 
     display: flex; 
     justify-content: center; 
     align-items: center; 
 }
-
 .perfil-pagina-contenedor { 
     min-height: 80vh; 
     padding: 20px; 
 }
-
 .perfil-tarjeta-premium { 
     width: 100%; 
     max-width: 480px; 
@@ -26,7 +24,7 @@
     position: relative; 
 }
 
-/* --- Avatar Circular Editable --- */
+/* Avatar Circular Editable */
 .perfil-avatar { 
     width: 115px; 
     height: 115px; 
@@ -41,13 +39,11 @@
     position: relative;
     overflow: hidden; 
 }
-
 .avatar-inicial { 
     color: #c8b277; /* Color dorado para iniciales en lugar de negro */
     font-size: 2.2rem; 
     font-weight: 800; 
 }
-
 .avatar-imagen-cargada {
     width: 100%;
     height: 100%;
@@ -71,12 +67,10 @@
     transition: opacity 0.3s ease, transform 0.3s ease;
     transform: translateY(10px);
 }
-
 .perfil-avatar:hover .capa-subir-foto {
     opacity: 1;
     transform: translateY(0);
 }
-
 .capa-subir-foto span {
     font-size: 1.2rem;
     margin-bottom: 5px;
@@ -90,7 +84,6 @@
     font-weight: 700; 
     letter-spacing: -0.3px; 
 }
-
 .perfil-email-header {
     color: #888;
     font-size: 0.9rem;
@@ -106,7 +99,6 @@
     border-radius: 16px; 
     text-align: left; 
 }
-
 .info-item { 
     display: flex; 
     flex-direction: row; /* Elementos lado a lado */
@@ -115,11 +107,9 @@
     padding: 14px 0; 
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
-
 .info-item:last-child { 
     border-bottom: none;
 }
-
 .info-item label { 
     margin: 0; 
     color: #888; 
@@ -128,7 +118,6 @@
     text-transform: uppercase; 
     font-weight: 600; 
 }
-
 .info-item span { 
     color: #eee; 
     font-size: 0.95rem; 
@@ -145,21 +134,22 @@
     border-left: 3px solid #c8b277; /* Línea lateral en lugar de borde cortado */
     border-bottom: none;
 }
-
 .badge-dorado { 
     color: #c8b277 !important; /* Dorado de la paleta unificado */
     font-weight: 700; 
     font-size: 1.05rem !important;
     text-shadow: 0 0 15px rgba(200, 178, 119, 0.3); 
 }
-
-/* --- Botones --- */
 .perfil-acciones { 
     display: flex; 
     flex-direction: column; 
     gap: 12px; 
 }
 
+/*BOTONES*/
+.BotonLogout:active { 
+    transform: translateY(0) scale(.98); 
+}
 .boton-ver-planes { 
     width: 100%; 
     padding: 14px;
@@ -174,12 +164,10 @@
     text-transform: uppercase; 
     letter-spacing: 1px; 
 }
-
 .boton-ver-planes:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(200, 178, 119, 0.3);
 }
-
 .BotonLogout { 
     width: 100%; 
     padding: 14px; 
@@ -194,18 +182,13 @@
     text-transform: uppercase; 
     letter-spacing: 1px; 
 }
-
 .BotonLogout:hover { 
     background: rgba(255, 82, 82, 0.1); /* Efecto más sutil */
     border-color: #ff5252; 
     transform: translateY(-2px); 
 }
 
-.BotonLogout:active { 
-    transform: translateY(0) scale(.98); 
-}
-
-/* Animación de entrada */
+/* ANIMACIONES:*/
 @keyframes fadeInPerfil { 
     from { opacity: 0; transform: scale(.97) translateY(10px); } 
     to { opacity: 1; transform: scale(1) translateY(0); } 

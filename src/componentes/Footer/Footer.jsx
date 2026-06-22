@@ -61,7 +61,7 @@ const Footer = () => {
         <div className="footer-contenido">
           <div className="footer-col-marca">
             <div className="Titulo"><h4>FinanzARC</h4></div>
-            <p className="descripcion-footer">Gestión financiera de precisión para transformar tu futuro económico.</p>
+            <p className="descripcion-footer">"Gestión financiera para transformar tu futuro económico."</p>
           </div>
 
           <div className="footer-col-equipo">
